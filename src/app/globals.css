@@ -13,9 +13,9 @@
   --border: #e4e7eb;
   --shadow: 0 8px 24px rgba(15, 76, 92, 0.08);
   --shadow-strong: 0 16px 40px rgba(15, 76, 92, 0.12);
-  --font-body: "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
-  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-ui: "Bricolage Grotesque", "Inter", "Segoe UI", sans-serif;
+  --font-body: var(--font-inter), "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-heading: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-ui: var(--font-bricolage), "Inter", "Segoe UI", sans-serif;
 }
 
 * {

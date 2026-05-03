@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import { Bricolage_Grotesque, Fraunces, Inter } from "next/font/google";
 import Script from "next/script";
 
 import { Footer } from "@/components/layout/footer";
+
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 import { Navbar } from "@/components/layout/navbar";
 
 import "./globals.css";
@@ -12,7 +17,7 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "whenwihungr
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "When Wi Hungry | Jamaican Restaurant Reviews",
+    default: "When Wi Hungry | Honest Jamaican Restaurant & Food Reviews",
     template: "%s | When Wi Hungry"
   },
   description:
@@ -59,14 +64,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${bricolage.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,400..900&family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body>
         <Script

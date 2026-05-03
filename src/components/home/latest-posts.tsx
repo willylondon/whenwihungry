@@ -28,7 +28,7 @@ export function LatestPosts({ posts }: LatestPostsProps) {
           {posts.map((post) => (
             <Link className="card story-card" href={`/reviews/${post.slug}`} key={post.slug}>
               <div className="story-card-image">
-                <img alt="" loading="lazy" src={post.image} />
+                <img alt={post.title} loading="lazy" src={post.image} />
                 <span className="badge">{post.category}</span>
               </div>
               <h3>{post.title}</h3>

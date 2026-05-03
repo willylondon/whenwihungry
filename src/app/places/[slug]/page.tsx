@@ -36,8 +36,33 @@ export default async function PlacePage({ params }: PlacePageProps) {
     ? await getCommunityComments(community.id)
     : [];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    name: place.name,
+    image: place.image,
+    description: place.description,
+    servesCuisine: "Jamaican",
+    priceRange: place.priceRange || "$$",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: place.address,
+      addressLocality: place.parish,
+      addressRegion: "JM"
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: place.rating,
+      reviewCount: place.reviewCount || 1
+    }
+  };
+
   return (
     <section className="section">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container detail-stack">
         <PlaceHeader place={place} />
         <PlaceInfoCard place={place} />

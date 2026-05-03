@@ -1,3 +1,4 @@
+import { MapViewWrapper } from "@/components/browse/map-view-wrapper";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
 import { getApprovedCommunityPlaces } from "@/lib/community";
@@ -66,21 +67,24 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               results.map((place) => <PlaceListCard key={place.slug} place={place} />)
             )}
           </div>
-          <aside className="card map-placeholder">
-            <span className="eyebrow">Map view</span>
-            <h2>Nearby shortlist</h2>
-            <p>
-              Map markers can live here later. For now, use the shortlist to
-              compare areas quickly.
-            </p>
-            <ul className="hours-list">
-              {results.slice(0, 4).map((place) => (
-                <li key={place.slug}>
-                  {place.name} · {place.area}
-                </li>
-              ))}
-            </ul>
-          </aside>
+          {view === "map" ? (
+            <MapViewWrapper places={results} />
+          ) : (
+            <aside className="card map-placeholder">
+              <span className="eyebrow">Map view</span>
+              <h2>Nearby shortlist</h2>
+              <p>
+                Switch to the Map View to see interactive markers.
+              </p>
+              <ul className="hours-list">
+                {results.slice(0, 4).map((place) => (
+                  <li key={place.slug}>
+                    {place.name} · {place.area}
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
       </div>
     </section>
