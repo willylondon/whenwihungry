@@ -943,6 +943,25 @@ p {
   background: var(--cream);
 }
 
+.admin-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-listing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .directory-results {
   animation: fade-up 520ms ease both;
 }
@@ -1471,6 +1490,14 @@ p {
 
   .signin-nudge {
     display: grid;
+  }
+
+  .admin-listing {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-actions {
+    justify-content: stretch;
   }
 
   .btn,
