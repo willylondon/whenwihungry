@@ -1283,35 +1283,65 @@ p {
   }
 
   .site-header {
-    position: static;
+    position: sticky;
   }
 
   .nav-shell {
     min-height: auto;
-    padding: 18px 0;
+    padding: 12px 0 14px;
+    gap: 12px;
   }
 
   .brand {
     min-width: 0;
-    padding: 8px 0;
+    padding: 0;
   }
 
   .brand-logo {
-    width: 112px;
+    width: 86px;
     height: auto;
   }
 
   .nav-links {
+    order: 3;
     justify-content: flex-start;
     overflow-x: auto;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid rgba(15, 76, 92, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 250, 242, 0.9);
+    scrollbar-width: none;
   }
 
-  .nav-actions {
+  .nav-links::-webkit-scrollbar {
     display: none;
   }
 
-  .nav-links {
+  .nav-links a {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    font-size: 0.92rem;
+  }
+
+  .nav-actions {
+    display: flex;
+    width: auto;
     gap: 10px;
+    margin-left: auto;
+  }
+
+  .nav-search,
+  .nav-link-soft {
+    display: none;
+  }
+
+  .nav-actions .btn {
+    min-height: 42px;
+    width: auto;
+    padding: 10px 14px;
+    border-radius: 999px;
+    font-size: 0.92rem;
   }
 
   .search-bar,

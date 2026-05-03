@@ -6,9 +6,9 @@ type StatsBarProps = {
 
 export function StatsBar({ parishCount, placeCount, reviewCount }: StatsBarProps) {
   const items = [
-    { label: "Places Listed", value: placeCount },
-    { label: "Reviews Written", value: reviewCount },
-    { label: "Parishes Covered", value: parishCount }
+    { label: "Places Listed", suffix: "", value: placeCount },
+    { label: "Reviews Written", suffix: "+", value: reviewCount },
+    { label: "Parishes Covered", suffix: "+", value: parishCount }
   ];
 
   return (
@@ -17,7 +17,10 @@ export function StatsBar({ parishCount, placeCount, reviewCount }: StatsBarProps
         <div className="stats-grid card">
           {items.map((item) => (
             <div className="stat-item" key={item.label}>
-              <strong>{item.value}+</strong>
+              <strong>
+                {item.value}
+                {item.suffix}
+              </strong>
               <span>{item.label}</span>
             </div>
           ))}

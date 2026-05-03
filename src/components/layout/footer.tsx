@@ -17,7 +17,9 @@ export function Footer() {
         </div>
         <div>
           <h3>Contact</h3>
-          <p>hello@whenwihungry.com</p>
+          <p>
+            <a href="mailto:hello@whenwihungry.com">hello@whenwihungry.com</a>
+          </p>
           <p>@whenwihungry</p>
         </div>
       </div>
