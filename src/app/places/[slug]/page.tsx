@@ -1,10 +1,17 @@
 import { notFound } from "next/navigation";
 
 import { PlaceListCard } from "@/components/browse/place-list-card";
+import { CommunityFeedback } from "@/components/place/community-feedback";
 import { PlaceHeader } from "@/components/place/place-header";
 import { PlaceInfoCard } from "@/components/place/place-info-card";
 import { ReviewList } from "@/components/place/review-list";
 import { TiktokEmbed } from "@/components/place/tiktok-embed";
+import {
+  getApprovedCommunityPlaceBySlug,
+  getCommunityComments,
+  getCommunityRestaurant,
+  getCurrentUser
+} from "@/lib/community";
 import { getPlaceBySlug, getRelatedPlaces } from "@/lib/places";
 
 type PlacePageProps = {
@@ -15,11 +22,19 @@ type PlacePageProps = {
 
 export default async function PlacePage({ params }: PlacePageProps) {
   const { slug } = await params;
-  const place = getPlaceBySlug(slug);
+  const place = getPlaceBySlug(slug) ?? (await getApprovedCommunityPlaceBySlug(slug));
 
   if (!place) {
     notFound();
   }
+
+  const [community, user] = await Promise.all([
+    getCommunityRestaurant(place.slug),
+    getCurrentUser()
+  ]);
+  const communityComments = community
+    ? await getCommunityComments(community.id)
+    : [];
 
   return (
     <section className="section">
@@ -27,6 +42,12 @@ export default async function PlacePage({ params }: PlacePageProps) {
         <PlaceHeader place={place} />
         <PlaceInfoCard place={place} />
         <TiktokEmbed url={place.tiktokUrl} />
+        <CommunityFeedback
+          comments={communityComments}
+          community={community}
+          isSignedIn={Boolean(user)}
+          slug={place.slug}
+        />
         <ReviewList reviews={place.reviews} />
         <section>
           <div className="section-heading">

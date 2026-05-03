@@ -1,4 +1,4 @@
-import { categories, latestPosts, places, testimonials } from "@/data/places";
+import { categories, latestPosts, places, testimonials, type Place } from "@/data/places";
 import { reviewPosts } from "@/data/reviews";
 
 export function getFeaturedPlaces() {
@@ -43,12 +43,13 @@ export function getFilteredPlaces(filters: {
   price?: string;
   rating?: string;
   sort?: string;
-}) {
+}, extraPlaces: Place[] = []) {
   const query = filters.query?.trim().toLowerCase();
 
   const minimumRating = filters.rating ? Number(filters.rating) : 0;
+  const allPlaces = [...places, ...extraPlaces];
 
-  const filtered = places.filter((place) => {
+  const filtered = allPlaces.filter((place) => {
     const matchesQuery =
       !query ||
       place.name.toLowerCase().includes(query) ||
@@ -150,3 +151,4 @@ export function getRelatedReviewPosts(slug: string) {
 }
 
 export { categories, latestPosts, reviewPosts, testimonials };
+export { places };

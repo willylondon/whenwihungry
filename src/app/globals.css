@@ -756,6 +756,16 @@ p {
   gap: 10px;
 }
 
+.site-footer a {
+  color: var(--primary);
+  font-weight: 700;
+  transition: color 160ms ease;
+}
+
+.site-footer a:hover {
+  color: var(--hot);
+}
+
 .filters {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr)) auto;
@@ -830,6 +840,107 @@ p {
 .review-stack {
   display: grid;
   gap: 20px;
+}
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 0.7fr);
+  gap: 48px;
+  align-items: start;
+}
+
+.form-card,
+.feedback-form {
+  display: grid;
+  gap: 18px;
+}
+
+.form-card fieldset {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form-card label,
+.feedback-form label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 800;
+}
+
+.form-card input,
+.form-card select,
+.form-card textarea,
+.feedback-form select,
+.feedback-form textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font: 500 1rem/1.4 var(--font-body);
+}
+
+.form-card input,
+.form-card select,
+.feedback-form select {
+  min-height: 52px;
+  padding: 0 16px;
+}
+
+.form-card textarea,
+.feedback-form textarea {
+  min-height: 128px;
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.form-alert,
+.form-success {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 700;
+}
+
+.form-alert {
+  background: rgba(239, 71, 111, 0.12);
+  color: #9f1239;
+}
+
+.form-success {
+  background: rgba(46, 196, 182, 0.14);
+  color: var(--primary);
+}
+
+.community-card {
+  display: grid;
+  gap: 24px;
+}
+
+.section-heading.compact {
+  margin-bottom: 0;
+}
+
+.signin-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(15, 76, 92, 0.12);
+  border-radius: 16px;
+  background: var(--cream);
 }
 
 .directory-results {
@@ -1240,7 +1351,8 @@ p {
   .info-grid,
   .review-layout,
   .review-index-hero,
-  .related-review-grid {
+  .related-review-grid,
+  .auth-shell {
     grid-template-columns: 1fr;
     grid-column: 1 / -1;
   }
@@ -1346,9 +1458,19 @@ p {
 
   .search-bar,
   .hero-ctas,
-  .stats-grid {
+  .stats-grid,
+  .form-grid,
+  .signin-nudge {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .signin-nudge {
+    display: grid;
   }
 
   .btn,

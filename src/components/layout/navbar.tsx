@@ -17,16 +17,16 @@ export function Navbar() {
           <Link href="/">Home</Link>
           <Link href="/browse">Restaurants</Link>
           <Link href="/reviews">Reviews</Link>
-          <Link href="/browse">Add Listing</Link>
+          <Link href="/add-listing">Add Listing</Link>
         </nav>
         <div className="nav-actions">
           <div className="nav-search">
             <SearchBar action="/browse" />
           </div>
-          <Link className="nav-link-soft" href="/reviews">
+          <Link className="nav-link-soft" href="/sign-in">
             Sign In
           </Link>
-          <Link className="btn btn-primary" href="/browse">
+          <Link className="btn btn-primary" href="/sign-up">
             Sign Up
           </Link>
         </div>

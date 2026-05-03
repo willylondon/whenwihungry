@@ -1,6 +1,7 @@
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
-import { categories, getFilteredPlaces, getParishStats } from "@/lib/places";
+import { getApprovedCommunityPlaces } from "@/lib/community";
+import { categories, getFilteredPlaces, getParishStats, places } from "@/lib/places";
 
 type BrowsePageProps = {
   searchParams: Promise<{
@@ -16,6 +17,9 @@ type BrowsePageProps = {
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
+  const communityPlaces = await getApprovedCommunityPlaces(
+    places.map((place) => place.slug)
+  );
   const results = getFilteredPlaces({
     query: params.q,
     parish: params.parish,
@@ -23,7 +27,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     price: params.price,
     rating: params.rating,
     sort: params.sort
-  });
+  }, communityPlaces);
   const view = params.view ?? "grid";
 
   return (
