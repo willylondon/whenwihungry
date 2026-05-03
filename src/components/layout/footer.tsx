@@ -18,9 +18,14 @@ export function Footer() {
         <div>
           <h3>Contact</h3>
           <p>
-            <a href="mailto:hello@whenwihungry.com">hello@whenwihungry.com</a>
+            <a href="mailto:whenwihungry@gmail.com">whenwihungry@gmail.com</a>
           </p>
-          <p>@whenwihungry</p>
+          <p>
+            <a href="https://www.instagram.com/whenwihungry">Instagram: @whenwihungry</a>
+          </p>
+          <p>
+            <a href="https://www.tiktok.com/@whenwihungry">TikTok: @whenwihungry</a>
+          </p>
         </div>
       </div>
     </footer>
