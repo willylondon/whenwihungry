@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     siteName: "When Wi Hungry",
     images: [
       {
-        url: "/logos/when-wi-hungry-logo-cream-1024.webp",
+        url: "/logos/when-wi-hungry-logo-transparent.png",
         width: 1024,
         height: 1024,
         alt: "When Wi Hungry"
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: "When Wi Hungry | Jamaican Restaurant Reviews",
     description:
       "Honest Jamaican restaurant reviews from a food reviewer first.",
-    images: ["/logos/when-wi-hungry-logo-cream-1024.webp"]
+    images: ["/logos/when-wi-hungry-logo-transparent.png"]
   }
 };
 
