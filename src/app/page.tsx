@@ -5,16 +5,24 @@ import { HeroSection } from "@/components/home/hero-section";
 import { LatestPosts } from "@/components/home/latest-posts";
 import { StatsBar } from "@/components/home/stats-bar";
 import { Testimonials } from "@/components/home/testimonials";
+import { getAllApprovedPlaces } from "@/lib/community";
 import {
   categories,
-  getFeaturedPlaces,
   getLatestReviewPosts,
-  getSiteStats,
   testimonials
 } from "@/lib/places";
 
-export default function HomePage() {
-  const stats = getSiteStats();
+export default async function HomePage() {
+  const allPlaces = await getAllApprovedPlaces();
+  const featured = [...allPlaces]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 6);
+
+  const stats = {
+    placeCount: allPlaces.length,
+    reviewCount: allPlaces.reduce((t, p) => t + p.reviewCount, 0),
+    parishCount: new Set(allPlaces.map((p) => p.parish)).size
+  };
 
   return (
     <>
@@ -25,7 +33,7 @@ export default function HomePage() {
         reviewCount={stats.reviewCount}
       />
       <AboutSection />
-      <FeaturedPlaces places={getFeaturedPlaces()} />
+      <FeaturedPlaces places={featured} />
       <CategorySection categories={categories} />
       <LatestPosts posts={getLatestReviewPosts()} />
       <Testimonials testimonials={testimonials} />

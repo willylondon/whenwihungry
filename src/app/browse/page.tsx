@@ -1,8 +1,8 @@
 import { MapViewWrapper } from "@/components/browse/map-view-wrapper";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
-import { getApprovedCommunityPlaces } from "@/lib/community";
-import { categories, getFilteredPlaces, getParishStats, places } from "@/lib/places";
+import { getAllApprovedPlaces } from "@/lib/community";
+import { categories, getFilteredPlaces, getParishStats } from "@/lib/places";
 
 type BrowsePageProps = {
   searchParams: Promise<{
@@ -18,9 +18,7 @@ type BrowsePageProps = {
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
-  const communityPlaces = await getApprovedCommunityPlaces(
-    places.map((place) => place.slug)
-  );
+  const allPlaces = await getAllApprovedPlaces();
   const results = getFilteredPlaces({
     query: params.q,
     parish: params.parish,
@@ -28,8 +26,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     price: params.price,
     rating: params.rating,
     sort: params.sort
-  }, communityPlaces);
+  }, allPlaces);
   const view = params.view ?? "grid";
+
 
   return (
     <section className="section directory-page">
