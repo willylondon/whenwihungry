@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { signInAction } from "@/app/auth/actions";
+import { PasswordField } from "@/components/auth/password-field";
 
 type SignInPageProps = {
   searchParams: Promise<{
@@ -34,10 +35,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
             Email
             <input name="email" required type="email" />
           </label>
-          <label>
-            Password
-            <input name="password" required type="password" />
-          </label>
+          <PasswordField label="Password" name="password" />
           <button className="btn btn-primary" type="submit">
             Sign in
           </button>
