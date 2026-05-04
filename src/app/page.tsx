@@ -1,44 +1,34 @@
-import { AboutSection } from "@/components/home/about-section";
-import { CategorySection } from "@/components/home/category-section";
-import { FeaturedPlaces } from "@/components/home/featured-places";
 import { HeroSection } from "@/components/home/hero-section";
-import { LatestPosts } from "@/components/home/latest-posts";
-import { StatsBar } from "@/components/home/stats-bar";
-import { Testimonials } from "@/components/home/testimonials";
 import { FeaturedCritique } from "@/components/home/featured-critique";
-import { getAllApprovedPlaces } from "@/lib/community";
+import { VideoGrid } from "@/components/home/video-grid";
+import { LatestReviews } from "@/components/home/latest-reviews";
+import { HiddenGems } from "@/components/home/hidden-gems";
+import { AboutSection } from "@/components/home/about-section";
+import { RatingExplainer } from "@/components/home/rating-explainer";
+import { GetReviewedCta } from "@/components/home/get-reviewed-cta";
 import {
-  categories,
+  getFeaturedReview,
+  getHiddenGems,
   getLatestReviewPosts,
-  testimonials
+  getVideoReviews
 } from "@/lib/places";
 
-export default async function HomePage() {
-  const allPlaces = await getAllApprovedPlaces();
-  const featured = [...allPlaces]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 6);
-
-  const stats = {
-    placeCount: allPlaces.length,
-    reviewCount: allPlaces.reduce((t, p) => t + p.reviewCount, 0),
-    parishCount: new Set(allPlaces.map((p) => p.parish)).size
-  };
+export default function HomePage() {
+  const featuredReview = getFeaturedReview();
+  const videoReviews = getVideoReviews();
+  const latestReviews = getLatestReviewPosts();
+  const hiddenGems = getHiddenGems();
 
   return (
-    <>
+    <div style={{ background: "var(--wwh-bg)" }}>
       <HeroSection />
-      <StatsBar
-        parishCount={stats.parishCount}
-        placeCount={stats.placeCount}
-        reviewCount={stats.reviewCount}
-      />
+      <FeaturedCritique post={featuredReview} />
+      <VideoGrid posts={videoReviews} />
+      <LatestReviews posts={latestReviews} />
+      {hiddenGems.length > 0 && <HiddenGems posts={hiddenGems} />}
       <AboutSection />
-      <FeaturedCritique />
-      <FeaturedPlaces places={featured} />
-      <CategorySection categories={categories} />
-      <LatestPosts posts={getLatestReviewPosts()} />
-      <Testimonials testimonials={testimonials} />
-    </>
+      <RatingExplainer />
+      <GetReviewedCta />
+    </div>
   );
 }

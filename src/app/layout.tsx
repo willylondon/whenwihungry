@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Fraunces, Inter } from "next/font/google";
+import { Bebas_Neue, Inter, Bricolage_Grotesque, Fraunces } from "next/font/google";
 import Script from "next/script";
 
 import { Footer } from "@/components/layout/footer";
-
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 import { Navbar } from "@/components/layout/navbar";
 
 import "./globals.css";
+
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-bebas"
+});
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
+const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
 
 const siteUrl = "https://whenwihungry.vercel.app";
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "whenwihungry.com";
@@ -17,11 +22,11 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "whenwihungr
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "When Wi Hungry | Honest Jamaican Restaurant & Food Reviews",
-    template: "%s | When Wi Hungry"
+    default: "WhenWiHungry | Honest Jamaican Food Reviews",
+    template: "%s | WhenWiHungry"
   },
   description:
-    "Honest Jamaican food reviews for cook shops, jerk stops, seafood runs, patty counters, and date-night restaurants worth trying.",
+    "The boldest food critic in Jamaica. If the food bad, me a go tell you straight. Honest reviews, no fake ratings, no corporate sponsorship.",
   alternates: {
     canonical: "/"
   },
@@ -33,17 +38,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/favicon-180.png", sizes: "180x180", type: "image/png" }]
   },
   openGraph: {
-    title: "When Wi Hungry | Jamaican Restaurant Reviews",
+    title: "WhenWiHungry | Jamaican Food Critic",
     description:
-      "Food-reviewer-first picks for Jamaican restaurants, cook shops, jerk stops, seafood runs, patties, and plates worth your appetite.",
+      "Honest, bold, video-first food reviews for Jamaica. Run go get it or save your money — we tell you straight.",
     url: siteUrl,
-    siteName: "When Wi Hungry",
+    siteName: "WhenWiHungry",
     images: [
       {
         url: "/logos/when-wi-hungry-logo-transparent.png",
         width: 1024,
         height: 1024,
-        alt: "When Wi Hungry"
+        alt: "WhenWiHungry"
       }
     ],
     locale: "en_JM",
@@ -51,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "When Wi Hungry | Jamaican Restaurant Reviews",
+    title: "WhenWiHungry | Honest Jamaican Food Reviews",
     description:
-      "Honest Jamaican restaurant reviews from a food reviewer first.",
+      "If the food bad… me a go tell you straight. Bold food critic reviews from Jamaica.",
     images: ["/logos/when-wi-hungry-logo-transparent.png"]
   }
 };
@@ -64,9 +69,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${fraunces.variable} ${bricolage.variable}`}>
-      <head>
-      </head>
+    <html
+      lang="en"
+      className={`${bebasNeue.variable} ${inter.variable} ${bricolage.variable} ${fraunces.variable}`}
+    >
+      <head />
       <body>
         <Script
           defer

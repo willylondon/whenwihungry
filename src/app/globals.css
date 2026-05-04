@@ -1,5 +1,30 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────
+   DARK CRITIC THEME — WhenWiHungry v2
+   Used by all new pages/components
+──────────────────────────────────────────── */
+:root {
+  --wwh-bg: #0b0b0b;
+  --wwh-surface: #121212;
+  --wwh-card: #1a1a1a;
+  --wwh-accent: #ff4d2d;
+  --wwh-accent2: #ffc857;
+  --wwh-text: #ffffff;
+  --wwh-muted: #9ca3af;
+  --wwh-border: rgba(255, 255, 255, 0.08);
+  --wwh-font-heading: var(--font-bebas), "Impact", sans-serif;
+  --wwh-font-body: var(--font-inter), "Segoe UI", sans-serif;
+  --wwh-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --wwh-shadow-glow: 0 0 40px rgba(255, 77, 45, 0.15);
+}
+
+/* ─────────────────────────────────────────
+   LEGACY LIGHT THEME (browse / admin / auth)
+──────────────────────────────────────────── */
 :root {
   --bg: #ffffff;
+
   --bg-alt: #f5f7fa;
   --primary: #0f4c5c;
   --accent: #ff9f1c;
@@ -851,7 +876,7 @@ p {
   background: #f8f8f8;
   border-color: rgba(0, 0, 0, 0.2);
   color: #000000 !important;
-
+}
 .site-footer a:hover {
   color: var(--hot);
 }

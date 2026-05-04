@@ -150,5 +150,17 @@ export function getRelatedReviewPosts(slug: string) {
   return (related.length > 0 ? related : posts).slice(0, 2);
 }
 
+export function getFeaturedReview() {
+  return reviewPosts.find((post) => post.isFeatured) ?? reviewPosts[0];
+}
+
+export function getHiddenGems() {
+  return reviewPosts.filter((post) => post.isHiddenGem).slice(0, 3);
+}
+
+export function getVideoReviews() {
+  return [...reviewPosts].filter((post) => post.videoUrl).slice(0, 6);
+}
+
 export { categories, latestPosts, reviewPosts, testimonials };
 export { places };

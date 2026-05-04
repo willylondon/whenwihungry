@@ -1,53 +1,208 @@
+"use client";
+
 import Link from "next/link";
-import { SearchBar } from "@/components/layout/search-bar";
-import { getCurrentUser, getUserRole } from "@/lib/community";
+import { useState } from "react";
 
-export async function Navbar() {
-  const [user, role] = await Promise.all([
-    getCurrentUser(),
-    getUserRole()
-  ]);
+const NAV_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/watch", label: "Watch" },
+  { href: "/reviews", label: "Reviews" },
+  { href: "/about", label: "About" },
+  { href: "/get-reviewed", label: "Get Reviewed" }
+];
 
-  const isAdmin = role === "admin";
+export function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="site-header">
-      <div className="container nav-shell">
-        <Link className="brand" href="/">
-          <img
-            alt="When Wi Hungry"
-            className="brand-logo"
-            src="/logos/when-wi-hungry-logo-transparent.png"
-          />
-        </Link>
-        <nav className="nav-links" aria-label="Primary">
-          <Link href="/">Home</Link>
-          <Link href="/browse">Restaurants</Link>
-          <Link href="/reviews">Reviews</Link>
-          <Link href="/add-listing">Add Listing</Link>
-          {isAdmin && <Link href="/admin/listings" style={{ color: "var(--hot)" }}>Admin</Link>}
-        </nav>
-        <div className="nav-actions">
-          <div className="nav-search">
-            <SearchBar action="/browse" />
-          </div>
-          {user ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <span style={{ fontSize: "0.88rem", color: "var(--muted)" }}>{user.email}</span>
-              <a className="nav-link-soft" href="/sign-in" style={{ cursor: "pointer" }}>Sign Out</a>
-            </div>
-          ) : (
-            <>
-              <Link className="nav-link-soft" href="/sign-in">
-                Sign In
+    <>
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          background: "rgba(11,11,11,0.88)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)"
+        }}
+      >
+        <div
+          style={{
+            width: "min(1200px, calc(100% - 40px))",
+            margin: "0 auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            minHeight: "72px",
+            gap: "24px"
+          }}
+        >
+          {/* Logo */}
+          <Link
+            href="/"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              textDecoration: "none",
+              flexShrink: 0
+            }}
+            aria-label="WhenWiHungry Home"
+          >
+            <img
+              src="/logos/when-wi-hungry-logo-transparent.png"
+              alt="WhenWiHungry"
+              style={{ height: "40px", width: "auto", objectFit: "contain" }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--wwh-font-heading)",
+                fontSize: "1.6rem",
+                color: "#fff",
+                letterSpacing: "0.02em",
+                lineHeight: 1,
+                textTransform: "uppercase"
+              }}
+            >
+              <span style={{ color: "var(--wwh-accent)" }}>When</span>Wi
+              <span style={{ color: "var(--wwh-accent2)" }}>Hungry</span>
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav
+            aria-label="Primary"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              flex: 1,
+              justifyContent: "center"
+            }}
+            className="desktop-nav"
+          >
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                style={{
+                  padding: "8px 16px",
+                  color: "var(--wwh-muted)",
+                  fontFamily: "var(--wwh-font-body)",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  textDecoration: "none",
+                  borderRadius: "8px",
+                  transition: "color 160ms ease, background 160ms ease"
+                }}
+                className="nav-dark-link"
+              >
+                {link.label}
               </Link>
-              <Link className="btn btn-primary" href="/sign-up">
-                Sign Up
-              </Link>
-            </>
-          )}
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <Link
+            href="/get-reviewed"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              padding: "10px 20px",
+              background: "var(--wwh-accent)",
+              color: "#fff",
+              fontFamily: "var(--wwh-font-body)",
+              fontWeight: 700,
+              fontSize: "0.88rem",
+              borderRadius: "8px",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              transition: "transform 160ms ease, box-shadow 160ms ease",
+              flexShrink: 0
+            }}
+            className="nav-cta-btn"
+          >
+            Get Reviewed
+          </Link>
+
+          {/* Hamburger */}
+          <button
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              display: "none",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "8px",
+              color: "#fff"
+            }}
+            className="hamburger-btn"
+          >
+            {menuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            )}
+          </button>
         </div>
-      </div>
-    </header>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div
+            style={{
+              background: "var(--wwh-surface)",
+              borderTop: "1px solid var(--wwh-border)",
+              padding: "16px 20px 24px"
+            }}
+            className="mobile-menu"
+          >
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  display: "block",
+                  padding: "14px 0",
+                  color: "var(--wwh-text)",
+                  fontFamily: "var(--wwh-font-body)",
+                  fontWeight: 600,
+                  fontSize: "1.1rem",
+                  textDecoration: "none",
+                  borderBottom: "1px solid var(--wwh-border)"
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <style>{`
+        .nav-dark-link:hover {
+          color: #fff !important;
+          background: rgba(255,255,255,0.06) !important;
+        }
+        .nav-cta-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 8px 24px rgba(255,77,45,0.35);
+        }
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .nav-cta-btn { display: none !important; }
+          .hamburger-btn { display: block !important; }
+        }
+      `}</style>
+    </>
   );
 }
