@@ -56,7 +56,7 @@ export function getFilteredPlaces(filters: {
 
     const matchesQuery = true; // Query matching is now handled by the Supabase RPC
     const matchesParish = !filters.parish || place.parish === filters.parish;
-    const normalizedFilter = filterCategory.replace(/-/g, " ");
+    const normalizedFilter = (filterCategory || "").replace(/-/g, " ");
     const placeCategory = (place.category || "").toLowerCase();
     const placeType = (place.type || "").toLowerCase();
     const matchesCategory =

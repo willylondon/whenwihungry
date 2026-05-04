@@ -88,6 +88,7 @@ export type PlaceV2 = Place & {
   community_score?: number;
   match_reason?: string;
   is_verified?: boolean;
+  final_score?: number;
 };
 
 function normalizeQuery(q: string): string {
