@@ -70,17 +70,17 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
           {place.verdict ? (
             <VerdictBadge verdict={place.verdict} size="sm" />
           ) : (
-            <span style={{ 
-              padding: "4px 12px", 
-              background: "rgba(255,255,255,0.05)", 
-              border: "1px solid rgba(255,255,255,0.1)", 
+            <span style={{
+              padding: "4px 12px",
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.1)",
               borderRadius: "999px",
               color: "rgba(255,255,255,0.4)",
               fontSize: "0.7rem",
               fontWeight: 700,
               textTransform: "uppercase"
             }}>
-              Verdict Pending
+              Not Yet Reviewed
             </span>
           )}
           <span className="badge" style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>{place.type}</span>
@@ -97,15 +97,14 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
         </div>
         
         <div className="card-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-               <span style={{ color: "var(--wwh-accent2)", fontSize: "0.9rem" }}>★</span>
-               <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>
-                 {((place.community_score || (place.rating * 20) || 0) / 20).toFixed(1)}
-               </span>
-            </div>
-            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{place.reviewCount} reviews</span>
-          </div>
+          {(place.community_score || place.rating) ? (
+            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>
+              Public signal: {((place.community_score || (place.rating * 20) || 0) / 20).toFixed(1)}
+              {place.reviewCount > 0 && ` · ${place.reviewCount.toLocaleString()} reviews`}
+            </span>
+          ) : (
+            <span />
+          )}
           <strong className="read-more" style={{ color: "var(--wwh-accent)", fontSize: "0.85rem" }}>READ TRUTH &rarr;</strong>
         </div>
       </div>

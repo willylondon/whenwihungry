@@ -111,81 +111,91 @@ async function logSearch(query: string, normalized: string, count: number) {
   }
 }
 
+// Synonyms to try when primary search returns few results.
+// Values are additional terms to search, not replacements.
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  "curry":       ["curry goat", "curried goat", "curry chicken"],
+  "fry chicken": ["fried chicken", "chicken"],
+  "fried chicken": ["fry chicken", "chicken"],
+  "icecream":    ["ice cream", "dessert"],
+  "i scream":    ["ice cream", "dessert"],
+  "patty":       ["patties", "beef patty"],
+  "patties":     ["patty", "beef patty", "juici", "tastee"],
+  "oxtail":      ["ox tail", "stew", "local food"],
+  "ox tail":     ["oxtail", "stew"],
+  "jerk centre": ["jerk"],
+  "jerk center": ["jerk"],
+  "seafood":     ["fish", "lobster", "shrimp", "conch"],
+  "fish":        ["seafood", "steam fish", "fried fish"],
+  "steam fish":  ["steamed fish", "seafood"],
+  "burger":      ["burgers", "beef burger"],
+  "pizza":       ["italian"],
+  "date night":  ["fine dining", "romantic", "upscale"],
+  "cheap food":  ["budget", "cook shop"],
+  "cheap eats":  ["budget", "cook shop"],
+  "ital":        ["vegan", "vegetarian"],
+  "box food":    ["lunch", "cook shop"],
+};
+
+function rpcRowToPlaceV2(row: any): PlaceV2 {
+  return {
+    ...dbRowToPlace(row),
+    verdict: row.verdict,
+    admin_score: row.admin_score,
+    community_score: row.community_score,
+    reviewCount: Number(row.review_count || 0),
+    match_reason: row.match_reason,
+    is_verified: row.is_verified,
+    final_score: row.final_score
+  };
+}
+
 export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
   const normalized = normalizeQuery(query);
 
-  // 1. Alias Mapping (for language differences)
-  const aliasMap: Record<string, string> = {
-    "fry chicken": "fried chicken",
-    "icecream": "ice cream",
-    "curried goat": "curry goat",
-    "curry": "curry goat",
-    "patty": "patties",
-    "jerk centre": "jerk center",
-    "ital": "vegan",
-    "cook shop": "local food",
-    "box food": "lunch",
-    "jamaican": "local food",
-  };
-
-  const searchQuery = aliasMap[normalized] || normalized;
-
-  // 2. Initial RPC search
-  let { data, error } = await supabase.rpc("search_restaurants", {
-    search_query: searchQuery
+  // Layer 1: RPC search on the normalized query
+  const { data: primaryData, error } = await supabase.rpc("search_restaurants", {
+    search_query: normalized
   });
+  if (error) console.error("RPC Search Error:", error.message);
 
-  if (error) {
-    console.error("RPC Search Error:", error.message);
-  }
-
+  const seen = new Set<string>();
   let finalResults: PlaceV2[] = [];
 
-  if (data && data.length > 0) {
-    finalResults = data.map((row: any) => ({
-      ...dbRowToPlace(row),
-      verdict: row.verdict,
-      admin_score: row.admin_score,
-      community_score: row.community_score,
-      reviewCount: Number(row.review_count || 0),
-      match_reason: row.match_reason,
-      is_verified: row.is_verified,
-      final_score: row.final_score
-    }));
+  for (const row of primaryData || []) {
+    seen.add(row.slug || row.id);
+    finalResults.push(rpcRowToPlaceV2(row));
   }
 
-  // 3. Fallback: If 0 results, expand or broaden
-  if (finalResults.length === 0) {
-    const categoryMap: Record<string, string> = {
-      "jerk": "jerk",
-      "seafood": "seafood",
-      "curry": "local-food",
-      "oxtail": "local-food",
-      "jamaican": "local-food",
-      "dessert": "dessert",
-      "ice cream": "dessert",
-    };
-
-    const fallbackCategory = categoryMap[normalized] || categoryMap[searchQuery];
-    
-    if (fallbackCategory) {
-      console.log(`Broadening search for "${normalized}" to category "${fallbackCategory}"`);
-      const all = await getAllApprovedPlaces();
-      const { getFilteredPlaces } = await import("@/lib/places");
-      finalResults = getFilteredPlaces({ category: fallbackCategory }, all as any) as PlaceV2[];
-      
-      // Update match reason for fallback results
-      finalResults = finalResults.map(r => ({
-        ...r,
-        match_reason: r.match_reason || `Category fallback: ${fallbackCategory}`
-      }));
+  // Layer 2: Synonym expansion — run if primary returned fewer than 5 results
+  if (finalResults.length < 5 && SEARCH_SYNONYMS[normalized]) {
+    for (const synonym of SEARCH_SYNONYMS[normalized]) {
+      const { data: synData } = await supabase.rpc("search_restaurants", { search_query: synonym });
+      for (const row of synData || []) {
+        const key = row.slug || row.id;
+        if (!seen.has(key)) {
+          seen.add(key);
+          finalResults.push({ ...rpcRowToPlaceV2(row), match_reason: row.match_reason || `Related: ${synonym}` });
+        }
+      }
     }
   }
 
-  // 4. Log search attempt (async)
-  logSearch(query, normalized, finalResults.length);
+  // Layer 3: Client-side word fallback — only if still empty
+  if (finalResults.length === 0) {
+    const all = await getAllApprovedPlaces();
+    const words = normalized.split(/\s+/).filter(w => w.length > 2);
+    for (const place of all) {
+      const text = [place.name, place.description, place.category, place.type, place.parish, place.area]
+        .filter(Boolean).join(" ").toLowerCase();
+      if (words.some(w => text.includes(w))) {
+        finalResults.push({ ...place, match_reason: place.match_reason || "Closest match" });
+      }
+    }
+  }
 
+  logSearch(query, normalized, finalResults.length);
   return finalResults;
 }
 

@@ -56,11 +56,25 @@ export function getFilteredPlaces(filters: {
 
     const matchesQuery = true; // Query matching is now handled by the Supabase RPC
     const matchesParish = !filters.parish || place.parish === filters.parish;
+    const normalizedFilter = filterCategory.replace(/-/g, " ");
+    const placeCategory = (place.category || "").toLowerCase();
+    const placeType = (place.type || "").toLowerCase();
     const matchesCategory =
-      !filterCategory || 
-      place.category?.toLowerCase() === filterCategory ||
-      place.type?.toLowerCase() === filterCategory ||
-      (filterCategory === "local-food" && (place.category?.toLowerCase() === "jamaican" || place.type?.toLowerCase() === "jamaican"));
+      !filterCategory ||
+      placeCategory.includes(normalizedFilter) ||
+      placeType.includes(normalizedFilter) ||
+      (normalizedFilter === "local food" && (
+        placeCategory.includes("jamaican") ||
+        placeType.includes("jamaican") ||
+        placeCategory.includes("local") ||
+        placeCategory.includes("cook shop")
+      )) ||
+      (normalizedFilter === "cheap eats" && place.priceRange === "$") ||
+      (normalizedFilter === "date night" && (
+        placeCategory.includes("fine dining") ||
+        placeCategory.includes("upscale") ||
+        placeCategory.includes("romantic")
+      ));
     const matchesPrice = !filters.price || place.priceRange === filters.price;
     const matchesRating = !minimumRating || (place.rating || 0) >= minimumRating;
 

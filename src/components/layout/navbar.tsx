@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { href: "/browse?category=jerk", label: "Jerk" },
   { href: "/browse?category=seafood", label: "Seafood" },
   { href: "/about", label: "About" },
-  { href: "/get-reviewed", label: "Get Reviewed" }
 ];
 
 export function Navbar() {
@@ -172,6 +171,21 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/get-reviewed"
+              onClick={() => setMenuOpen(false)}
+              style={{
+                display: "block",
+                padding: "14px 0",
+                color: "var(--wwh-accent)",
+                fontFamily: "var(--wwh-font-body)",
+                fontWeight: 700,
+                fontSize: "1.1rem",
+                textDecoration: "none"
+              }}
+            >
+              Get Reviewed
+            </Link>
           </div>
         )}
       </header>
