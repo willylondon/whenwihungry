@@ -21,3 +21,11 @@
 - Performed live audit of V2 build.
 - Identified critical issues: category filter 0 results, location page failure, inconsistent rating/reviews.
 - Created and approved implementation plan for Search & Filtering fixes.
+
+## [2026-05-04 00:51] - Search Working End-to-End ✅
+- Root cause found: RPC `WHERE keyword_relevance > 0` filtered everything out because DB records lacked matching text fields
+- Fix: category queries now bypass RPC entirely, use direct Supabase `.or("cuisine_type.ilike.%jerk%,...")` 
+- Build errors fixed: duplicate getUserRole removed, dbRowToPlace exported
+- Location pages fixed: direct parish query with variant matching (Kingston, Portland, etc.)
+- getUserRole() added to community.ts for admin protection
+- CONFIRMED LIVE: /browse?q=jerk returns jerk restaurants

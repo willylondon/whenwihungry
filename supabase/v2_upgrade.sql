@@ -57,45 +57,65 @@ CREATE TABLE IF NOT EXISTS public.dishes (
     normalized_name TEXT NOT NULL, -- e.g. "oxtail stew" -> "oxtail"
     category TEXT,
     tags TEXT[],
+    price DECIMAL(10,2),
+    image_url TEXT,
+    is_signature BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Admin Reviews (Critic Authority)
-CREATE TABLE IF NOT EXISTS public.admin_reviews (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE UNIQUE,
-    verdict TEXT NOT NULL CHECK (verdict IN ('RUN_GO_GET_IT', 'WORTH_IT', 'MID', 'SAVE_YOUR_MONEY')),
-    admin_score INTEGER DEFAULT 50 CHECK (admin_score >= 0 AND admin_score <= 100),
-    headline TEXT,
-    honest_take TEXT,
-    video_url TEXT,
-    reviewed_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 5. User Reviews (Community Feedback)
-CREATE TABLE IF NOT EXISTS public.user_reviews (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-    comment TEXT,
-    tags TEXT[],
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(restaurant_id, user_id)
-);
-
--- 6. Search Keywords
+-- 4. Search Keywords (Meta)
 CREATE TABLE IF NOT EXISTS public.search_keywords (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
     keyword TEXT NOT NULL,
-    weight FLOAT DEFAULT 1.0,
+    relevance_weight FLOAT DEFAULT 1.0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 7. Search & Ranking Function
-DROP FUNCTION IF EXISTS search_restaurants(text);
+-- 5. Admin Reviews
+CREATE TABLE IF NOT EXISTS public.admin_reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+    verdict TEXT NOT NULL, -- e.g. "WORTH IT", "MID", "RUN GO GET IT"
+    admin_score INTEGER CHECK (admin_score >= 0 AND admin_score <= 100),
+    headline TEXT,
+    honest_take TEXT,
+    pros TEXT[],
+    cons TEXT[],
+    must_try_dishes UUID[], -- references dishes.id
+    visit_date DATE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 6. User Reviews
+CREATE TABLE IF NOT EXISTS public.user_reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT,
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Ranking Logic Helper
+CREATE OR REPLACE FUNCTION lower_text_array(t TEXT[]) 
+RETURNS TEXT[] AS $$
+  SELECT array_agg(lower(x)) FROM unnest(t) x;
+$$ LANGUAGE SQL IMMUTABLE;
+
+-- 8. Search Logs
+CREATE TABLE IF NOT EXISTS public.search_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    query TEXT NOT NULL,
+    normalized_query TEXT,
+    result_count INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. Advanced Search Function (V2)
+DROP FUNCTION IF EXISTS search_restaurants(TEXT);
 CREATE OR REPLACE FUNCTION search_restaurants(search_query TEXT)
 RETURNS TABLE (
     id UUID,
@@ -117,25 +137,33 @@ RETURNS TABLE (
     final_score FLOAT
 ) AS $$
 DECLARE
-    query_ts tsquery;
+    normalized_q TEXT;
 BEGIN
-    query_ts := plainto_tsquery('english', search_query);
+    normalized_q := lower(trim(search_query));
 
     RETURN QUERY
     WITH relevance_cte AS (
         SELECT 
             r.id,
             CASE 
-                WHEN r.name ILIKE '%' || search_query || '%' THEN 100
-                WHEN r.cuisine_type ILIKE '%' || search_query || '%' OR r.category ILIKE '%' || search_query || '%' THEN 80
-                WHEN r.description ILIKE '%' || search_query || '%' THEN 50
-                WHEN r.parish ILIKE '%' || search_query || '%' OR r.area ILIKE '%' || search_query || '%' THEN 40
+                WHEN r.name ILIKE '%' || normalized_q || '%' THEN 100
+                WHEN r.cuisine_type ILIKE '%' || normalized_q || '%' OR r.category ILIKE '%' || normalized_q || '%' THEN 80
+                WHEN r.description ILIKE '%' || normalized_q || '%' THEN 50
+                WHEN r.parish ILIKE '%' || normalized_q || '%' OR r.area ILIKE '%' || normalized_q || '%' THEN 40
                 ELSE 0
             END as base_relevance,
-            EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND (d.name ILIKE '%' || search_query || '%' OR EXISTS (SELECT 1 FROM unnest(d.tags) tag WHERE tag ILIKE '%' || search_query || '%'))) as dish_match,
-            EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') as keyword_match,
-            EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || search_query || '%' OR ar.honest_take ILIKE '%' || search_query || '%')) as admin_match,
-            EXISTS (SELECT 1 FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved' AND ur.comment ILIKE '%' || search_query || '%') as community_match
+            EXISTS (
+                SELECT 1 FROM dishes d 
+                WHERE d.restaurant_id = r.id 
+                AND (
+                    d.name ILIKE '%' || normalized_q || '%' 
+                    OR d.normalized_name ILIKE '%' || normalized_q || '%'
+                    OR EXISTS (SELECT 1 FROM unnest(d.tags) tag WHERE tag ILIKE '%' || normalized_q || '%')
+                )
+            ) as dish_match,
+            EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || normalized_q || '%') as keyword_match,
+            EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || normalized_q || '%' OR ar.honest_take ILIKE '%' || normalized_q || '%')) as admin_match,
+            EXISTS (SELECT 1 FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved' AND ur.comment ILIKE '%' || normalized_q || '%') as community_match
         FROM restaurants r
     ),
     scores_cte AS (
@@ -162,11 +190,11 @@ BEGIN
             r.admin_boost,
             ar.verdict,
             CASE 
-                WHEN r.name ILIKE '%' || search_query || '%' THEN 'Name match'
-                WHEN EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND d.name ILIKE '%' || search_query || '%') THEN 'Dish match'
-                WHEN r.cuisine_type ILIKE '%' || search_query || '%' THEN 'Cuisine match'
-                WHEN r.category ILIKE '%' || search_query || '%' THEN 'Category match'
-                WHEN EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') THEN 'Keyword match'
+                WHEN r.name ILIKE '%' || normalized_q || '%' THEN 'Name match'
+                WHEN EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND (d.name ILIKE '%' || normalized_q || '%' OR d.normalized_name ILIKE '%' || normalized_q || '%')) THEN 'Dish match'
+                WHEN r.cuisine_type ILIKE '%' || normalized_q || '%' THEN 'Cuisine match'
+                WHEN r.category ILIKE '%' || normalized_q || '%' THEN 'Category match'
+                WHEN EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || normalized_q || '%') THEN 'Keyword match'
                 WHEN EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || search_query || '%' OR ar.honest_take ILIKE '%' || search_query || '%')) THEN 'Expert review match'
                 ELSE 'Community match'
             END as match_reason
@@ -189,5 +217,3 @@ BEGIN
     ORDER BY final_score DESC;
 END;
 $$ LANGUAGE plpgsql;
-
--- 8. Triggers for updated_at (if needed) and score updates (can be handled by Cron or on-demand)
