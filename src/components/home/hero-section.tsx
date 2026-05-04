@@ -205,8 +205,8 @@ export function HeroSection() {
             }}
           >
             {[
-              { value: "3K+", label: "Followers" },
-              { value: "50+", label: "Places Reviewed" },
+              { value: "3K+", label: "TikTok Followers" },
+              { value: "58+", label: "Food Spots Listed" },
               { value: "100%", label: "Unfiltered" }
             ].map((stat) => (
               <div key={stat.label}>

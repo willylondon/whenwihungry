@@ -1,14 +1,13 @@
 import Link from "next/link";
-import type { Place } from "@/data/places";
-import { getVerdictFromRating } from "@/lib/verdict";
+import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 
 type FeaturedCritiqueProps = {
-  place: Place;
+  place: PlaceV2;
 };
 
 export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
-  const verdict = getVerdictFromRating(place.rating);
+  const verdict = place.verdict ?? null;
   const quote = place.description || "A solid spot to grab a bite.";
   return (
     <section
@@ -119,7 +118,22 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
             }}
             className="featured-content"
           >
-            <VerdictBadge verdict={verdict} size="md" />
+            {verdict ? (
+              <VerdictBadge verdict={verdict} size="md" />
+            ) : (
+              <span style={{
+                display: "inline-flex", alignItems: "center",
+                padding: "6px 14px",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "999px",
+                color: "rgba(255,255,255,0.35)",
+                fontSize: "0.75rem", fontWeight: 700,
+                letterSpacing: "0.05em", fontFamily: "var(--wwh-font-body)"
+              }}>
+                NOT YET REVIEWED
+              </span>
+            )}
 
             <div>
               <span
@@ -232,7 +246,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
                 }}
                 className="featured-read-btn"
               >
-                The Honest Take
+                {verdict ? "The Honest Take" : "View Listing"}
               </Link>
               <Link
                 href={`/places/${place.slug}#video`}
