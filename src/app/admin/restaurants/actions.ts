@@ -87,6 +87,22 @@ export async function addKeywordAction(formData: FormData) {
 }
 
 export async function createRestaurantAction(formData: FormData) {
-   // Implementation for new restaurant
-   // ... simplified for brevity, similar to saveRestaurantAction but insert
+  const supabase = await createSupabaseServerClient();
+  
+  const { data, error } = await supabase
+    .from("restaurants")
+    .insert({
+      name: formData.get("name") as string,
+      slug: formData.get("slug") as string,
+      parish: formData.get("parish") as string,
+      city: formData.get("city") as string,
+      description: formData.get("description") as string
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  revalidatePath("/admin/restaurants");
+  redirect(`/admin/restaurants/${data.id}`);
 }

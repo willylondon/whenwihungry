@@ -72,8 +72,12 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const supabase = await createSupabaseServerClient();
   const [user, { data: restaurant }] = await Promise.all([
     getCurrentUser(),
-    supabase.from("restaurants").select("id, slug").eq("slug", place.slug).single()
+    supabase.from("restaurants").select("*, admin_reviews(verdict, admin_score)").eq("slug", place.slug).single()
   ]);
+
+  if (!restaurant) {
+     notFound();
+  }
 
   const [{ data: reviews }, { data: existingReview }] = await Promise.all([
     supabase
@@ -91,11 +95,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
   ]);
 
   const related = getRelatedPlaces(place.slug);
-  const verdict = getVerdictFromRating(place.rating);
+  
+  // Normalize verdict for VerdictBadge
+  const rawVerdict = restaurant.admin_reviews?.[0]?.verdict || "MID";
+  const verdictKey = rawVerdict.toLowerCase().replace(/_/g, "-") as any;
 
   return (
     <article style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
-      {/* ── Hero ── */}
+      {/* ... previous content ... */}
       <section
         style={{
           position: "relative",
@@ -133,7 +140,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           }}
         >
           {/* Breadcrumb */}
-          <div style={{ marginBottom: "20px", display: "flex", gap: "8px", alignItems: "center" }}>
+          <div style={{ marginBottom: "20px", display: "flex", gap: "12px", alignItems: "center" }}>
             <Link
               href="/browse"
               style={{
@@ -149,10 +156,15 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <span style={{ color: "rgba(255,255,255,0.4)", fontFamily: "var(--wwh-font-body)", fontSize: "0.82rem" }}>
               {place.category}
             </span>
+            {restaurant.is_verified && (
+               <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px", background: "rgba(46,196,182,0.1)", padding: "4px 10px", borderRadius: "6px", border: "1px solid rgba(46,196,182,0.3)" }}>
+                  <span style={{ color: "#2EC4B6", fontSize: "0.65rem", fontWeight: 800 }}>WWH VERIFIED</span>
+               </div>
+            )}
           </div>
 
           <div style={{ marginBottom: "20px" }}>
-            <VerdictBadge verdict={verdict} size="lg" />
+            <VerdictBadge verdict={verdictKey} size="lg" />
           </div>
 
           <h1
@@ -192,7 +204,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
       </section>
 
-      {/* ── Main content ── */}
+      {/* ... main content ... */}
       <div
         style={{
           width: "min(900px, calc(100% - 40px))",
@@ -330,7 +342,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
             {/* Verdict large */}
             <div style={{ marginTop: "4px" }}>
-              <VerdictBadge verdict={verdict} size="md" />
+              <VerdictBadge verdict={verdictKey} size="md" />
             </div>
 
             {/* Highlights */}

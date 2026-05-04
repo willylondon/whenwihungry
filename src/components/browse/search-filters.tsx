@@ -43,7 +43,7 @@ export function SearchFilters({
         className="filter-input"
         defaultValue={activeQuery}
         name="q"
-        placeholder="Search by name, area, or category"
+        placeholder="What yuh hungry for?"
         type="search"
       />
       <select className="filter-input" defaultValue={activeParish} name="parish">
