@@ -71,7 +71,15 @@ export function PlaceListCard({ place }: PlaceListCardProps) {
               </span>
             )}
           </div>
-          <span className="rating">★ {place.rating.toFixed(1)}</span>
+          {place.rating >= 4.5 ? (
+            <span className="badge" style={{ background: "rgba(46, 196, 182, 0.12)", color: "var(--leaf)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem" }}>WWH Approved</span>
+          ) : place.rating >= 4.0 ? (
+            <span className="badge" style={{ background: "rgba(255, 159, 28, 0.12)", color: "var(--accent)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem" }}>Go Hungry</span>
+          ) : place.rating >= 3.0 ? (
+            <span className="badge" style={{ background: "rgba(154, 165, 177, 0.12)", color: "var(--muted)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem" }}>Lunch Safe</span>
+          ) : (
+            <span className="badge" style={{ background: "rgba(239, 71, 111, 0.12)", color: "var(--hot)", padding: "4px 8px", borderRadius: "6px", fontSize: "0.75rem" }}>Skip It</span>
+          )}
         </div>
         <p>{place.description}</p>
         <div className="listing-details">
