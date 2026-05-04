@@ -4,13 +4,13 @@ import { notFound } from "next/navigation";
 import {
   getRelatedPlaces,
   getPlaceBySlug,
-  VIDEO_MAP
 } from "@/lib/places";
 import {
   getApprovedCommunityPlaceBySlug,
   getCommunityComments,
   getCommunityRestaurant,
-  getCurrentUser
+  getCurrentUser,
+  VIDEO_MAP
 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { ReviewCard } from "@/components/ui/review-card";

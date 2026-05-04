@@ -85,6 +85,19 @@ export async function getAllApprovedPlaces(): Promise<Place[]> {
   return (data ?? []).map(dbRowToPlace);
 }
 
+export const VIDEO_MAP: Record<string, string> = {
+  "usain-bolt-s-tracks-records-kingston": "https://vt.tiktok.com/ZS9Q8mN8F/",
+  "devon-house-i-scream-kingston": "https://vt.tiktok.com/ZS9Q8qJs1/",
+  "miss-t-s-kitchen-st-ann": "https://vt.tiktok.com/ZS9Q8uQst/",
+  "scotchies-coral-gardens-st-james": "https://vt.tiktok.com/ZS9Q8gU2B/",
+  "scotchies-draxhall-st-ann": "https://vt.tiktok.com/ZS9Q8gU2B/"
+};
+
+export async function getPlacesWithVideos(): Promise<Place[]> {
+  const all = await getAllApprovedPlaces();
+  return all.filter(p => !!VIDEO_MAP[p.slug.trim().toLowerCase()]);
+}
+
 export async function getApprovedCommunityPlaces(existingSlugs: string[]) {
   const all = await getAllApprovedPlaces();
   const existing = new Set(existingSlugs);

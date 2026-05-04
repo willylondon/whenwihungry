@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { getVideoPlaces } from "@/lib/places";
+import { getPlacesWithVideos } from "@/lib/community";
 import { VideoCard } from "@/components/ui/video-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Watch | WhenWiHungry",
   description: "Unfiltered food reviews on video. The realest take on Jamaica's food scene."
 };
 
-export default function WatchPage() {
-  const videoPlaces = getVideoPlaces();
+export default async function WatchPage() {
+  const videoPlaces = await getPlacesWithVideos();
 
   return (
     <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "80px 0" }}>

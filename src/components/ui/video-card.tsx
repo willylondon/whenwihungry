@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Place } from "@/data/places";
 import { getVerdictFromRating } from "@/lib/verdict";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
+import { VIDEO_MAP } from "@/lib/community";
 
 type VideoCardProps = {
   place: Place;
@@ -9,9 +10,12 @@ type VideoCardProps = {
 
 export function VideoCard({ place }: VideoCardProps) {
   const verdict = getVerdictFromRating(place.rating);
+  const hasVideo = !!VIDEO_MAP[place.slug];
+  const href = `/places/${place.slug}${hasVideo ? "#video" : ""}`;
+
   return (
     <Link
-      href={`/places/${place.slug}`}
+      href={href}
       style={{
         display: "block",
         position: "relative",
