@@ -9,14 +9,12 @@ import {
   getApprovedCommunityPlaceBySlug,
   getCommunityComments,
   getCommunityRestaurant,
-  getCurrentUser,
-  VIDEO_MAP
+  getCurrentUser
 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { ReviewCard } from "@/components/ui/review-card";
 import { getVerdictFromRating } from "@/lib/verdict";
 import { CommunityFeedback } from "@/components/place/community-feedback";
-import { TiktokEmbed } from "@/components/place/tiktok-embed";
 import { SocialShare } from "@/components/place/social-share";
 
 type PlacePageProps = {
@@ -194,87 +192,6 @@ export default async function PlacePage({ params }: PlacePageProps) {
           </div>
         </div>
       </section>
-
-      {/* ── Video embed ── */}
-      {(() => {
-        const videoUrl = VIDEO_MAP[place.slug];
-        if (!videoUrl) return null;
-
-        return (
-          <section
-            id="video"
-            style={{
-              background: "#000",
-              padding: "48px 0",
-              display: "flex",
-              justifyContent: "center"
-            }}
-          >
-            <div style={{ width: "min(900px, calc(100% - 40px))" }}>
-              <p
-                style={{
-                  margin: "0 0 20px",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontWeight: 700,
-                  fontSize: "0.8rem",
-                  color: "var(--wwh-accent)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.12em"
-                }}
-              >
-                Watch the Review
-              </p>
-              <div
-                style={{
-                  position: "relative",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  background: "var(--wwh-card)",
-                  border: "1px solid var(--wwh-border)",
-                  display: "flex",
-                  justifyContent: "center",
-                  padding: "24px"
-                }}
-              >
-                <blockquote
-                  className="tiktok-embed"
-                  cite={videoUrl}
-                  data-video-id=""
-                  style={{
-                    maxWidth: "325px",
-                    width: "100%",
-                    minHeight: "575px",
-                    margin: 0
-                  }}
-                >
-                  <a
-                    href={videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      marginTop: "12px",
-                      padding: "12px 24px",
-                      background: "var(--wwh-accent)",
-                      color: "#fff",
-                      fontFamily: "var(--wwh-font-body)",
-                      fontWeight: 700,
-                      fontSize: "0.9rem",
-                      borderRadius: "8px",
-                      textDecoration: "none"
-                    }}
-                  >
-                    Watch on TikTok →
-                  </a>
-                </blockquote>
-                <script async src="https://www.tiktok.com/embed.js" />
-              </div>
-            </div>
-          </section>
-        );
-      })()}
 
       {/* ── Main content ── */}
       <div

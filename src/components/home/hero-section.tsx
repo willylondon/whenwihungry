@@ -110,55 +110,75 @@ export function HeroSection() {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. Just honest, video-first food reviews from someone who eats everywhere and tells you everything.
+            No fake five stars. No sponsored plates. Just honest reviews from someone who eats everywhere and tells you everything.
           </p>
 
-          {/* CTAs */}
-          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-            <Link
-              href="/watch"
+          {/* Search bar */}
+          <div style={{ maxWidth: "600px", position: "relative" }}>
+            <form
+              action="/browse"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "16px 32px",
-                background: "var(--wwh-accent)",
-                color: "#fff",
-                fontFamily: "var(--wwh-font-body)",
-                fontWeight: 700,
-                fontSize: "1rem",
-                borderRadius: "8px",
-                textDecoration: "none",
-                transition: "transform 160ms ease, box-shadow 160ms ease"
-              }}
-              className="hero-cta-primary"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-              See the Truth
-            </Link>
-            <Link
-              href="/reviews"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                padding: "16px 32px",
+                display: "flex",
+                gap: "12px",
+                padding: "8px",
                 background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "#fff",
-                fontFamily: "var(--wwh-font-body)",
-                fontWeight: 700,
-                fontSize: "1rem",
-                borderRadius: "8px",
-                textDecoration: "none",
-                backdropFilter: "blur(8px)",
-                transition: "background 160ms ease, border-color 160ms ease"
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "16px",
+                transition: "border-color 200ms ease, box-shadow 200ms ease"
               }}
-              className="hero-cta-secondary"
+              className="hero-search-form"
             >
-              See if it worth it
-            </Link>
+              <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.4)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ position: "absolute", left: "16px" }}
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Find the best oxtail..."
+                  style={{
+                    width: "100%",
+                    padding: "16px 16px 16px 52px",
+                    background: "none",
+                    border: "none",
+                    color: "#fff",
+                    fontFamily: "var(--wwh-font-body)",
+                    fontSize: "1.1rem",
+                    outline: "none"
+                  }}
+                />
+              </div>
+              <button
+                type="submit"
+                style={{
+                  padding: "0 28px",
+                  background: "var(--wwh-accent)",
+                  color: "#fff",
+                  fontFamily: "var(--wwh-font-body)",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  borderRadius: "10px",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "transform 160ms ease"
+                }}
+                className="hero-search-btn"
+              >
+                Search
+              </button>
+            </form>
           </div>
 
           {/* Quick stats */}
@@ -174,8 +194,8 @@ export function HeroSection() {
           >
             {[
               { value: "3K+", label: "Followers" },
-              { value: "100K+", label: "Video Views" },
-              { value: "50+", label: "Places Reviewed" }
+              { value: "50+", label: "Places Reviewed" },
+              { value: "100%", label: "Unfiltered" }
             ].map((stat) => (
               <div key={stat.label}>
                 <p
@@ -232,13 +252,13 @@ export function HeroSection() {
       </div>
 
       <style>{`
-        .hero-cta-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 36px rgba(255,90,31,0.4);
+        .hero-search-form:focus-within {
+          border-color: var(--wwh-accent) !important;
+          box-shadow: 0 0 0 4px rgba(255,90,31,0.15);
         }
-        .hero-cta-secondary:hover {
-          background: rgba(255,255,255,0.1) !important;
-          border-color: rgba(255,255,255,0.3) !important;
+        .hero-search-btn:hover {
+          transform: scale(1.04);
+          background: #ff6a35 !important;
         }
       `}</style>
     </section>
