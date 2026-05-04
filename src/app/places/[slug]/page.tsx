@@ -194,6 +194,94 @@ export default async function PlacePage({ params }: PlacePageProps) {
         </div>
       </section>
 
+      {/* ── Video embed ── */}
+      {(() => {
+        const videoMap: Record<string, string> = {
+          "usain-bolt-s-tracks-records-kingston": "https://vt.tiktok.com/ZS9Q8mN8F/",
+          "devon-house-i-scream-kingston": "https://vt.tiktok.com/ZS9Q8qJs1/",
+          "miss-t-s-kitchen-st-ann": "https://vt.tiktok.com/ZS9Q8uQst/",
+          "scotchies-coral-gardens-st-james": "https://vt.tiktok.com/ZS9Q8gU2B/",
+          "scotchies-draxhall-st-ann": "https://vt.tiktok.com/ZS9Q8gU2B/"
+        };
+        const videoUrl = videoMap[place.slug];
+        if (!videoUrl) return null;
+
+        return (
+          <section
+            id="video"
+            style={{
+              background: "#000",
+              padding: "48px 0",
+              display: "flex",
+              justifyContent: "center"
+            }}
+          >
+            <div style={{ width: "min(900px, calc(100% - 40px))" }}>
+              <p
+                style={{
+                  margin: "0 0 20px",
+                  fontFamily: "var(--wwh-font-body)",
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  color: "var(--wwh-accent)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em"
+                }}
+              >
+                Watch the Review
+              </p>
+              <div
+                style={{
+                  position: "relative",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  background: "var(--wwh-card)",
+                  border: "1px solid var(--wwh-border)",
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "24px"
+                }}
+              >
+                <blockquote
+                  className="tiktok-embed"
+                  cite={videoUrl}
+                  data-video-id=""
+                  style={{
+                    maxWidth: "325px",
+                    width: "100%",
+                    minHeight: "575px",
+                    margin: 0
+                  }}
+                >
+                  <a
+                    href={videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginTop: "12px",
+                      padding: "12px 24px",
+                      background: "var(--wwh-accent)",
+                      color: "#fff",
+                      fontFamily: "var(--wwh-font-body)",
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      borderRadius: "8px",
+                      textDecoration: "none"
+                    }}
+                  >
+                    Watch on TikTok →
+                  </a>
+                </blockquote>
+                <script async src="https://www.tiktok.com/embed.js" />
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* ── Main content ── */}
       <div
         style={{
