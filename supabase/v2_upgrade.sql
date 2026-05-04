@@ -35,6 +35,20 @@ CREATE TABLE IF NOT EXISTS public.restaurants (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Patch existing table: safely add any missing V2 columns
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS area TEXT;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS image_url TEXT;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS cuisine_type TEXT;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS category TEXT;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS avg_rating FLOAT DEFAULT 0;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS admin_boost FLOAT DEFAULT 0;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.restaurants ADD COLUMN IF NOT EXISTS price_level INTEGER DEFAULT 2;
+
 -- 3. Dishes
 CREATE TABLE IF NOT EXISTS public.dishes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

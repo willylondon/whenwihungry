@@ -142,7 +142,6 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
       admin_reviews(verdict, admin_score),
       user_reviews(rating)
     `)
-    .eq("is_active", true) // Ensure we only get active listings
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
