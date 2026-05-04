@@ -33,7 +33,7 @@ export function Navbar() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            minHeight: "72px",
+            minHeight: "88px",
             gap: "24px"
           }}
         >
@@ -52,7 +52,7 @@ export function Navbar() {
             <img
               src="/logo.png"
               alt="WhenWiHungry"
-              style={{ height: "40px", width: "auto", objectFit: "contain" }}
+              style={{ height: "64px", width: "auto", objectFit: "contain" }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
               }}

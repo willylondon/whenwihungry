@@ -51,10 +51,10 @@ export function Footer() {
               src="/logo.png"
               alt="WhenWiHungry"
               style={{
-                height: "60px",
+                height: "96px",
                 width: "auto",
                 objectFit: "contain",
-                marginBottom: "16px"
+                marginBottom: "20px"
               }}
             />
             <p
