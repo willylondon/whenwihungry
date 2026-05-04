@@ -21,18 +21,18 @@ import { FilterChips } from "@/components/browse/filter-chips";
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
-  const query = params.query || params.q;
+  const q = params.q || params.query || (params as any).search || "";
   
   let allPlaces: PlaceV2[] = [];
   
-  if (query) {
-    allPlaces = await searchRestaurants(query);
+  if (q) {
+    allPlaces = await searchRestaurants(q);
   } else {
     allPlaces = await getAllApprovedPlaces();
   }
 
   const results = getFilteredPlaces({
-    query: query,
+    query: q,
     parish: params.parish,
     category: params.category,
     price: params.price,
@@ -81,7 +81,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 <PlaceListCard 
                   key={place.slug} 
                   place={place} 
-                  showMatchReason={Boolean(query)} 
+                  showMatchReason={Boolean(q)} 
                 />
               ))
             )}

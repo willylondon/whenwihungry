@@ -54,12 +54,7 @@ export function getFilteredPlaces(filters: {
   const filtered = allPlaces.filter((place) => {
     if (!place) return false;
 
-    const matchesQuery =
-      !query ||
-      place.name?.toLowerCase().includes(query) ||
-      place.area?.toLowerCase().includes(query) ||
-      place.category?.toLowerCase().includes(query) ||
-      place.type?.toLowerCase().includes(query);
+    const matchesQuery = true; // Query matching is now handled by the Supabase RPC
     const matchesParish = !filters.parish || place.parish === filters.parish;
     const matchesCategory =
       !filterCategory || 

@@ -118,7 +118,7 @@ BEGIN
                 WHEN r.parish ILIKE '%' || search_query || '%' OR r.area ILIKE '%' || search_query || '%' THEN 40
                 ELSE 0
             END as base_relevance,
-            EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND (d.name ILIKE '%' || search_query || '%' OR search_query = ANY(d.tags))) as dish_match,
+            EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND (d.name ILIKE '%' || search_query || '%' OR EXISTS (SELECT 1 FROM unnest(d.tags) tag WHERE tag ILIKE '%' || search_query || '%'))) as dish_match,
             EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') as keyword_match,
             EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || search_query || '%' OR ar.honest_take ILIKE '%' || search_query || '%')) as admin_match,
             EXISTS (SELECT 1 FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved' AND ur.comment ILIKE '%' || search_query || '%') as community_match
@@ -171,6 +171,7 @@ BEGIN
         ) as final_score
     FROM restaurants r
     JOIN scores_cte s ON s.id = r.id
+    WHERE s.keyword_relevance > 0
     ORDER BY final_score DESC;
 END;
 $$ LANGUAGE plpgsql;

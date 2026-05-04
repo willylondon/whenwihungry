@@ -117,6 +117,7 @@ export function HeroSection() {
           <div style={{ maxWidth: "600px", position: "relative" }}>
             <form
               action="/browse"
+              method="GET"
               style={{
                 display: "flex",
                 gap: "12px",
@@ -145,7 +146,7 @@ export function HeroSection() {
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
                 <input
-                  type="text"
+                  type="search"
                   name="q"
                   placeholder="What yuh hungry for?"
                   style={{
