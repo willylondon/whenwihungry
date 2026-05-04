@@ -233,7 +233,7 @@ export default function AboutPage() {
           {[
             { value: "3K+", label: "TikTok Followers" },
             { value: "100K+", label: "Total Views" },
-            { value: "50+", label: "Places Reviewed" },
+            { value: "58+", label: "Food Spots Listed" },
             { value: "0", label: "Free Meals Accepted" }
           ].map((stat) => (
             <div key={stat.label}>

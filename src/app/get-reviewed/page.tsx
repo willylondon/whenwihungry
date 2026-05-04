@@ -6,7 +6,7 @@ import { useState } from "react";
 const STATS = [
   { value: "3K+", label: "TikTok Followers" },
   { value: "100K+", label: "Video Views" },
-  { value: "50+", label: "Places Reviewed" },
+  { value: "58+", label: "Food Spots Listed" },
   { value: "100%", label: "Honest Opinions" }
 ];
 

@@ -209,7 +209,7 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
     .from("restaurants")
     .select(`
       *,
-      admin_reviews(verdict, admin_score),
+      admin_reviews(verdict, admin_score, honest_take, headline),
       user_reviews(rating)
     `)
     .order("is_featured", { ascending: false })
@@ -234,7 +234,7 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
       community_score: (row.avg_rating || avgCommunity) * 20,
       reviewCount: row.rating_count || userReviews.length,
       is_verified: row.is_verified || row.verified,
-      has_critic_review: Boolean(adminRev?.verdict)
+      has_critic_review: Boolean(adminRev?.verdict && (adminRev?.honest_take?.trim() || adminRev?.headline?.trim()))
     };
   });
 }

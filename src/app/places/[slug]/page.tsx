@@ -71,7 +71,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const supabase = await createSupabaseServerClient();
   const [user, { data: restaurant }] = await Promise.all([
     getCurrentUser(),
-    supabase.from("restaurants").select("*, admin_reviews(verdict, admin_score)").eq("slug", place.slug).single()
+    supabase.from("restaurants").select("*, admin_reviews(verdict, admin_score, honest_take, headline)").eq("slug", place.slug).single()
   ]);
 
   if (!restaurant) {
@@ -95,9 +95,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   const related = getRelatedPlaces(place.slug);
   
-  const rawVerdict = restaurant.admin_reviews?.[0]?.verdict ?? null;
+  const adminRev = restaurant.admin_reviews?.[0] ?? null;
+  const rawVerdict = adminRev?.verdict ?? null;
   const verdictKey = rawVerdict ? (rawVerdict.toLowerCase().replace(/_/g, "-") as any) : null;
-  const hasCriticReview = Boolean(verdictKey);
+  const hasCriticReview = Boolean(verdictKey && (adminRev?.honest_take?.trim() || adminRev?.headline?.trim()));
 
   return (
     <article style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
