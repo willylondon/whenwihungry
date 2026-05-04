@@ -10,11 +10,11 @@ export default async function HomePage() {
   const allPlaces = await getAllApprovedPlaces();
   
   // Highest rated becomes the featured critique
-  const featured = [...allPlaces].sort((a, b) => b.rating - a.rating);
+  const featured = [...allPlaces].sort((a, b) => (b.admin_score || 0) - (a.admin_score || 0));
   const featuredReview = featured.length > 0 ? featured[0] : null;
   
   // Most recent or popular for Latest Reviews
-  const latestReviews = [...allPlaces].slice(0, 6);
+  const latestReviews = [...allPlaces].sort((a, b) => (b.admin_score || 0) - (a.admin_score || 0)).slice(0, 6);
 
   return (
     <div style={{ background: "var(--wwh-bg)" }}>

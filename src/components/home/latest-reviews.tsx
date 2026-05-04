@@ -39,7 +39,7 @@ export function LatestReviews({ places }: LatestReviewsProps) {
             subtext="The most recent reviews. Honest. Unfiltered."
           />
           <Link
-            href="/places"
+            href="/browse"
             style={{
               display: "inline-flex",
               alignItems: "center",

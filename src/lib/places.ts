@@ -70,20 +70,26 @@ export function getFilteredPlaces(filters: {
     );
   });
 
-  return filtered.sort((left, right) => {
+  return filtered.sort((left: any, right: any) => {
+    // Priority 1: Use final_score (Ranking Engine)
+    if (left.final_score !== undefined && right.final_score !== undefined) {
+      return right.final_score - left.final_score;
+    }
+
     switch (filters.sort) {
       case "rating":
-        return right.rating - left.rating;
+        return (right.admin_score || right.rating || 0) - (left.admin_score || left.rating || 0);
       case "popular":
-        return right.reviewCount - left.reviewCount;
+        return (right.reviewCount || 0) - (left.reviewCount || 0);
       case "price-low":
-        return left.priceRange.length - right.priceRange.length;
+        return (left.priceRange?.length || 0) - (right.priceRange?.length || 0);
       case "price-high":
-        return right.priceRange.length - left.priceRange.length;
+        return (right.priceRange?.length || 0) - (left.priceRange?.length || 0);
       case "az":
         return left.name.localeCompare(right.name);
       default:
-        return right.reviewCount - left.reviewCount;
+        // Default: Sort by admin_score then popularity
+        return (right.admin_score || 0) - (left.admin_score || 0) || (right.reviewCount || 0) - (left.reviewCount || 0);
     }
   });
 }

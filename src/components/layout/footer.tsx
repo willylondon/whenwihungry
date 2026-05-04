@@ -2,16 +2,17 @@ import Link from "next/link";
 
 const FOOTER_LINKS = {
   Reviews: [
-    { href: "/reviews", label: "All Reviews" },
-    { href: "/reviews/category/jerk", label: "Jerk" },
-    { href: "/reviews/category/seafood", label: "Seafood" },
-    { href: "/reviews/category/local-food", label: "Local Food" },
-    { href: "/reviews/category/dessert", label: "Dessert" }
+    { href: "/browse", label: "All Reviews" },
+    { href: "/browse?category=jerk", label: "Jerk" },
+    { href: "/browse?category=seafood", label: "Seafood" },
+    { href: "/browse?category=local-food", label: "Local Food" },
+    { href: "/browse?category=dessert", label: "Dessert" }
   ],
   Explore: [
-    { href: "/watch", label: "Watch" },
     { href: "/about", label: "About the Critic" },
     { href: "/get-reviewed", label: "Get Reviewed" },
+    { href: "/restaurants/kingston", label: "Best in Kingston" },
+    { href: "/restaurants/portland", label: "Best in Portland" },
     { href: "/browse", label: "Restaurant Directory" }
   ],
   Social: [
