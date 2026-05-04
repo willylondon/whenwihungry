@@ -14,7 +14,6 @@ import {
 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { ReviewCard } from "@/components/ui/review-card";
-import { getVerdictFromRating } from "@/lib/verdict";
 import { CommunityFeedback } from "@/components/place/community-feedback";
 import { SocialShare } from "@/components/place/social-share";
 
@@ -96,9 +95,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   const related = getRelatedPlaces(place.slug);
   
-  // Normalize verdict for VerdictBadge
-  const rawVerdict = restaurant.admin_reviews?.[0]?.verdict || "MID";
-  const verdictKey = rawVerdict.toLowerCase().replace(/_/g, "-") as any;
+  const rawVerdict = restaurant.admin_reviews?.[0]?.verdict ?? null;
+  const verdictKey = rawVerdict ? (rawVerdict.toLowerCase().replace(/_/g, "-") as any) : null;
+  const hasCriticReview = Boolean(verdictKey);
 
   return (
     <article style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
@@ -164,7 +163,25 @@ export default async function PlacePage({ params }: PlacePageProps) {
           </div>
 
           <div style={{ marginBottom: "20px" }}>
-            <VerdictBadge verdict={verdictKey} size="lg" />
+            {hasCriticReview ? (
+              <VerdictBadge verdict={verdictKey} size="lg" />
+            ) : (
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                padding: "8px 18px",
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "999px",
+                color: "rgba(255,255,255,0.4)",
+                fontSize: "0.82rem",
+                fontWeight: 700,
+                letterSpacing: "0.05em",
+                fontFamily: "var(--wwh-font-body)"
+              }}>
+                NOT YET REVIEWED
+              </span>
+            )}
           </div>
 
           <h1
@@ -237,12 +254,12 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   margin: "0 0 16px",
                   fontFamily: "var(--wwh-font-heading)",
                   fontSize: "1.8rem",
-                  color: "var(--wwh-accent)",
+                  color: hasCriticReview ? "var(--wwh-accent)" : "rgba(255,255,255,0.4)",
                   textTransform: "uppercase",
                   letterSpacing: "0.02em"
                 }}
               >
-                The Honest Take
+                {hasCriticReview ? "The Honest Take" : "About This Place"}
               </h2>
               <p
                 style={{
@@ -340,9 +357,26 @@ export default async function PlacePage({ params }: PlacePageProps) {
               ))}
             </div>
 
-            {/* Verdict large */}
+            {/* Verdict / status */}
             <div style={{ marginTop: "4px" }}>
-              <VerdictBadge verdict={verdictKey} size="md" />
+              {hasCriticReview ? (
+                <VerdictBadge verdict={verdictKey} size="md" />
+              ) : (
+                <span style={{
+                  display: "inline-block",
+                  padding: "5px 14px",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "999px",
+                  color: "rgba(255,255,255,0.35)",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  fontFamily: "var(--wwh-font-body)"
+                }}>
+                  NOT YET REVIEWED
+                </span>
+              )}
             </div>
 
             {/* Highlights */}

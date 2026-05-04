@@ -89,6 +89,7 @@ export type PlaceV2 = Place & {
   match_reason?: string;
   is_verified?: boolean;
   final_score?: number;
+  has_critic_review?: boolean;
 };
 
 function normalizeQuery(q: string): string {
@@ -141,13 +142,14 @@ const SEARCH_SYNONYMS: Record<string, string[]> = {
 function rpcRowToPlaceV2(row: any): PlaceV2 {
   return {
     ...dbRowToPlace(row),
-    verdict: row.verdict,
+    verdict: row.verdict ?? undefined,
     admin_score: row.admin_score,
     community_score: row.community_score,
     reviewCount: Number(row.review_count || 0),
     match_reason: row.match_reason,
     is_verified: row.is_verified,
-    final_score: row.final_score
+    final_score: row.final_score,
+    has_critic_review: Boolean(row.verdict)
   };
 }
 
@@ -227,11 +229,12 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
 
     return {
       ...dbRowToPlace(row),
-      verdict: adminRev?.verdict || row.verdict,
+      verdict: adminRev?.verdict ?? undefined,
       admin_score: adminRev?.admin_score || row.admin_score,
       community_score: (row.avg_rating || avgCommunity) * 20,
       reviewCount: row.rating_count || userReviews.length,
-      is_verified: row.is_verified || row.verified
+      is_verified: row.is_verified || row.verified,
+      has_critic_review: Boolean(adminRev?.verdict)
     };
   });
 }

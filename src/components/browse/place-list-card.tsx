@@ -47,20 +47,29 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
       </div>
       <div className="browse-body">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-          <div className="post-date" style={{ color: "var(--wwh-accent)", fontWeight: 700, fontSize: "0.75rem" }}>THE HONEST TAKE</div>
+          <div
+            className="post-date"
+            style={{
+              color: place.has_critic_review ? "var(--wwh-accent)" : "rgba(255,255,255,0.3)",
+              fontWeight: 700,
+              fontSize: "0.75rem"
+            }}
+          >
+            {place.has_critic_review ? "THE HONEST TAKE" : "LISTING INFO"}
+          </div>
           {showMatchReason && place.match_reason && (
-             <span style={{ 
-               fontSize: "0.65rem", 
-               color: "#fff", 
-               fontWeight: 900, 
-               letterSpacing: "0.05em",
-               background: "var(--wwh-accent)", 
-               padding: "3px 10px", 
-               borderRadius: "4px",
-               boxShadow: "0 2px 8px rgba(255,90,31,0.3)"
-             }}>
-               MATCH: {place.match_reason.toUpperCase()}
-             </span>
+            <span style={{
+              fontSize: "0.65rem",
+              color: "#fff",
+              fontWeight: 900,
+              letterSpacing: "0.05em",
+              background: "var(--wwh-accent)",
+              padding: "3px 10px",
+              borderRadius: "4px",
+              boxShadow: "0 2px 8px rgba(255,90,31,0.3)"
+            }}>
+              MATCH: {place.match_reason.toUpperCase()}
+            </span>
           )}
         </div>
         
@@ -105,7 +114,9 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
           ) : (
             <span />
           )}
-          <strong className="read-more" style={{ color: "var(--wwh-accent)", fontSize: "0.85rem" }}>READ TRUTH &rarr;</strong>
+          <strong className="read-more" style={{ color: "var(--wwh-accent)", fontSize: "0.85rem" }}>
+            {place.has_critic_review ? "READ TRUTH →" : "VIEW LISTING →"}
+          </strong>
         </div>
       </div>
     </Link>

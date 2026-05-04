@@ -105,8 +105,12 @@ export function getFilteredPlaces(filters: {
       case "az":
         return left.name.localeCompare(right.name);
       default:
-        // Default: Sort by admin_score then popularity
-        return (right.admin_score || 0) - (left.admin_score || 0) || (right.reviewCount || 0) - (left.reviewCount || 0);
+        // Critic-reviewed places first, then by score, then by popularity
+        const rReviewed = right.has_critic_review ? 1 : 0;
+        const lReviewed = left.has_critic_review ? 1 : 0;
+        if (rReviewed !== lReviewed) return rReviewed - lReviewed;
+        return (right.final_score || right.admin_score || 0) - (left.final_score || left.admin_score || 0) ||
+               (right.reviewCount || 0) - (left.reviewCount || 0);
     }
   });
 }
