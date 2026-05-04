@@ -42,11 +42,12 @@ export function getFilteredPlaces(filters: {
   price?: string;
   rating?: string;
   sort?: string;
-}, extraPlaces: Place[] = []) {
+  view?: string;
+}, allPlaces: Place[] = []) {
   const query = filters.query?.trim().toLowerCase();
+  const filterCategory = filters.category?.trim().toLowerCase();
 
   const minimumRating = filters.rating ? Number(filters.rating) : 0;
-  const allPlaces = [...places, ...extraPlaces];
 
   const filtered = allPlaces.filter((place) => {
     const matchesQuery =
@@ -57,7 +58,9 @@ export function getFilteredPlaces(filters: {
       place.type.toLowerCase().includes(query);
     const matchesParish = !filters.parish || place.parish === filters.parish;
     const matchesCategory =
-      !filters.category || place.category === filters.category;
+      !filterCategory || 
+      place.category.toLowerCase() === filterCategory ||
+      place.type.toLowerCase() === filterCategory;
     const matchesPrice = !filters.price || place.priceRange === filters.price;
     const matchesRating = !minimumRating || place.rating >= minimumRating;
 

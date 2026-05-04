@@ -23,7 +23,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LocationPage({ params }: Props) {
   const { location } = await params;
-  const formattedLocation = location.charAt(0).toUpperCase() + location.slice(1).replace("-", " ");
+  
+  // Robust normalization: kingston -> Kingston, st-andrew -> St. Andrew, st-catherine -> St. Catherine
+  const formattedLocation = location
+    .split("-")
+    .map(word => word === "st" ? "St." : word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
   const results = await searchRestaurants(formattedLocation);
 
   return (

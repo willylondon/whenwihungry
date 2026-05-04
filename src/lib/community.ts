@@ -42,10 +42,10 @@ export async function getCommunityComments(restaurantId: string) {
 }
 
 function dbRowToPlace(restaurant: Record<string, any>): Place {
-  const category = restaurant.cuisine || restaurant.category || "Community Pick";
+  const category = restaurant.category || restaurant.cuisine_type || restaurant.cuisine || "Community Pick";
   return {
     address: restaurant.address || "",
-    area: restaurant.city || restaurant.area || "",
+    area: restaurant.area || restaurant.city || "",
     category,
     description: restaurant.description || "The food speaks for itself.",
     features: [],
@@ -57,11 +57,11 @@ function dbRowToPlace(restaurant: Record<string, any>): Place {
     parish: restaurant.parish,
     phone: restaurant.phone || "",
     priceRange: "$".repeat(restaurant.price_level || 2),
-    rating: Number(restaurant.admin_score) / 20 || 0, // Mock rating from score
-    reviewCount: 0,
+    rating: restaurant.avg_rating || Number(restaurant.admin_score || restaurant.rating || 0) / 20 || 0,
+    reviewCount: restaurant.rating_count || restaurant.review_count || restaurant.reviewCount || 0,
     reviews: [],
     slug: restaurant.slug,
-    type: restaurant.cuisine || "Restaurant",
+    type: restaurant.cuisine_type || restaurant.cuisine || "Restaurant",
     website: ""
   };
 }
@@ -81,15 +81,18 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   });
 
   if (error) {
-    console.error("Search error:", error);
+    console.error("RPC Search Error:", error.message, error.details);
     return [];
   }
+
+  console.log(`Search for "${query}" returned ${data?.length || 0} results`);
 
   return (data ?? []).map((row: any) => ({
     ...dbRowToPlace(row),
     verdict: row.verdict,
     admin_score: row.admin_score,
     community_score: row.community_score,
+    reviewCount: row.review_count,
     match_reason: row.match_reason,
     is_verified: row.is_verified
   }));
@@ -117,11 +120,11 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
 
     return {
       ...dbRowToPlace(row),
-      verdict: adminRev?.verdict,
-      admin_score: adminRev?.admin_score,
-      community_score: avgCommunity * 20, // Normalize to 100
-      reviewCount: userReviews.length,
-      is_verified: row.is_verified
+      verdict: adminRev?.verdict || row.verdict,
+      admin_score: adminRev?.admin_score || row.admin_score,
+      community_score: (row.avg_rating || avgCommunity) * 20, // Normalize to 100
+      reviewCount: row.rating_count || userReviews.length,
+      is_verified: row.is_verified || row.verified
     };
   });
 }

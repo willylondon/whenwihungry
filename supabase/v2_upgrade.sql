@@ -17,17 +17,20 @@ CREATE TABLE IF NOT EXISTS public.restaurants (
     slug TEXT NOT NULL UNIQUE,
     description TEXT,
     parish TEXT NOT NULL,
-    city TEXT,
+    area TEXT,
     address TEXT,
     phone TEXT,
     price_level INTEGER DEFAULT 2 CHECK (price_level >= 1 AND price_level <= 4),
-    cuisine TEXT,
+    cuisine_type TEXT,
+    category TEXT,
     image_url TEXT,
     latitude DECIMAL(9,6),
     longitude DECIMAL(9,6),
     is_verified BOOLEAN DEFAULT FALSE,
     admin_boost FLOAT DEFAULT 0,
     is_featured BOOLEAN DEFAULT FALSE,
+    avg_rating FLOAT DEFAULT 0,
+    rating_count INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -77,6 +80,7 @@ CREATE TABLE IF NOT EXISTS public.search_keywords (
 );
 
 -- 7. Search & Ranking Function
+DROP FUNCTION IF EXISTS search_restaurants(text);
 CREATE OR REPLACE FUNCTION search_restaurants(search_query TEXT)
 RETURNS TABLE (
     id UUID,
@@ -84,14 +88,16 @@ RETURNS TABLE (
     slug TEXT,
     description TEXT,
     parish TEXT,
-    city TEXT,
-    cuisine TEXT,
+    area TEXT,
+    cuisine_type TEXT,
+    category TEXT,
     image_url TEXT,
     price_level INTEGER,
     is_verified BOOLEAN,
     verdict TEXT,
     admin_score INTEGER,
     community_score FLOAT,
+    review_count BIGINT,
     match_reason TEXT,
     final_score FLOAT
 ) AS $$
@@ -106,8 +112,8 @@ BEGIN
             r.id,
             CASE 
                 WHEN r.name ILIKE '%' || search_query || '%' THEN 100
-                WHEN r.cuisine ILIKE '%' || search_query || '%' THEN 80
-                WHEN r.parish ILIKE '%' || search_query || '%' OR r.city ILIKE '%' || search_query || '%' THEN 40
+                WHEN r.cuisine_type ILIKE '%' || search_query || '%' OR r.category ILIKE '%' || search_query || '%' THEN 80
+                WHEN r.parish ILIKE '%' || search_query || '%' OR r.area ILIKE '%' || search_query || '%' THEN 40
                 ELSE 0
             END as base_relevance,
             EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND d.name ILIKE '%' || search_query || '%') as dish_match,
@@ -119,6 +125,7 @@ BEGIN
             r.id,
             COALESCE(ar.admin_score, 40) as admin_score,
             COALESCE((SELECT AVG(rating) FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved'), 0) * 20 as community_score,
+            (SELECT COUNT(*) FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved') as review_count,
             (SELECT 
                 GREATEST(
                     rel.base_relevance,
@@ -137,18 +144,19 @@ BEGIN
             CASE 
                 WHEN r.name ILIKE '%' || search_query || '%' THEN 'Name match'
                 WHEN EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND d.name ILIKE '%' || search_query || '%') THEN 'Dish match'
-                WHEN r.cuisine ILIKE '%' || search_query || '%' THEN 'Cuisine match'
+                WHEN r.cuisine_type ILIKE '%' || search_query || '%' THEN 'Cuisine match'
+                WHEN r.category ILIKE '%' || search_query || '%' THEN 'Category match'
                 ELSE 'Keyword match'
             END as match_reason
         FROM restaurants r
         LEFT JOIN admin_reviews ar ON ar.restaurant_id = r.id
     )
     SELECT 
-        r.id, r.name, r.slug, r.description, r.parish, r.city, r.cuisine, r.image_url, r.price_level, r.is_verified,
-        s.verdict, s.admin_score, s.community_score, s.match_reason,
+        r.id, r.name, r.slug, r.description, r.parish, r.area, r.cuisine_type, r.category, r.image_url, r.price_level, r.is_verified,
+        s.verdict, s.admin_score, s.community_score, s.review_count, s.match_reason,
         (
-            (s.admin_score * 0.55) + 
-            (s.community_score * 0.25) + 
+            (s.admin_score * 0.60) + 
+            (s.community_score * 0.20) + 
             (s.keyword_relevance * 0.15) + 
             (s.freshness_score * 0.05) + 
             s.admin_boost

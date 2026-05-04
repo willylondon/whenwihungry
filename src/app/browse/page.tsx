@@ -77,7 +77,13 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 <p>Try another parish or a broader search term.</p>
               </div>
             ) : (
-              results.map((place) => <PlaceListCard key={place.slug} place={place} />)
+              results.map((place) => (
+                <PlaceListCard 
+                  key={place.slug} 
+                  place={place} 
+                  showMatchReason={Boolean(query)} 
+                />
+              ))
             )}
           </div>
           {view === "map" ? (
