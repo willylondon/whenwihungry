@@ -41,7 +41,7 @@ export async function getCommunityComments(restaurantId: string) {
   return (data ?? []) as CommunityComment[];
 }
 
-function dbRowToPlace(restaurant: Record<string, any>): Place {
+export function dbRowToPlace(restaurant: Record<string, any>): Place {
   if (!restaurant) return {} as Place;
   
   const category = restaurant.category || restaurant.cuisine_type || restaurant.cuisine || "Community Pick";
@@ -240,18 +240,4 @@ export async function getCurrentUser() {
   } = await supabase.auth.getUser();
 
   return user;
-}
-
-export async function getUserRole() {
-  const user = await getCurrentUser();
-  if (!user) return null;
-
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  return data?.role ?? null;
 }
