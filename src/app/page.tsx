@@ -2,30 +2,31 @@ import { HeroSection } from "@/components/home/hero-section";
 import { FeaturedCritique } from "@/components/home/featured-critique";
 import { VideoGrid } from "@/components/home/video-grid";
 import { LatestReviews } from "@/components/home/latest-reviews";
-import { HiddenGems } from "@/components/home/hidden-gems";
 import { AboutSection } from "@/components/home/about-section";
 import { RatingExplainer } from "@/components/home/rating-explainer";
 import { GetReviewedCta } from "@/components/home/get-reviewed-cta";
-import {
-  getFeaturedReview,
-  getHiddenGems,
-  getLatestReviewPosts,
-  getVideoReviews
-} from "@/lib/places";
+import { getAllApprovedPlaces } from "@/lib/community";
 
-export default function HomePage() {
-  const featuredReview = getFeaturedReview();
-  const videoReviews = getVideoReviews();
-  const latestReviews = getLatestReviewPosts();
-  const hiddenGems = getHiddenGems();
+export default async function HomePage() {
+  const allPlaces = await getAllApprovedPlaces();
+  
+  // Highest rated becomes the featured critique
+  const featured = [...allPlaces].sort((a, b) => b.rating - a.rating);
+  const featuredReview = featured.length > 0 ? featured[0] : null;
+  
+  // Since we don't have a direct videoUrl field in Supabase right now,
+  // we'll use top popular places for the Video Grid as a placeholder.
+  const videoReviews = [...allPlaces].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 6);
+  
+  // Most recent or popular for Latest Reviews
+  const latestReviews = [...allPlaces].slice(0, 6);
 
   return (
     <div style={{ background: "var(--wwh-bg)" }}>
       <HeroSection />
-      <FeaturedCritique post={featuredReview} />
-      <VideoGrid posts={videoReviews} />
-      <LatestReviews posts={latestReviews} />
-      {hiddenGems.length > 0 && <HiddenGems posts={hiddenGems} />}
+      {featuredReview && <FeaturedCritique place={featuredReview} />}
+      {videoReviews.length > 0 && <VideoGrid places={videoReviews} />}
+      {latestReviews.length > 0 && <LatestReviews places={latestReviews} />}
       <AboutSection />
       <RatingExplainer />
       <GetReviewedCta />

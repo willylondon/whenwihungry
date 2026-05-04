@@ -1,5 +1,4 @@
 import { categories, latestPosts, places, testimonials, type Place } from "@/data/places";
-import { reviewPosts } from "@/data/reviews";
 
 export function getFeaturedPlaces() {
   return [...places]
@@ -97,70 +96,5 @@ export function getSiteStats() {
   };
 }
 
-export function getLatestReviewPosts() {
-  return [...reviewPosts].sort(
-    (left, right) =>
-      new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime()
-  );
-}
-
-export function getReviewCategories() {
-  return [...new Set(reviewPosts.map((post) => post.category))].sort();
-}
-
-export function getReviewCategorySlug(category: string) {
-  return category.toLowerCase().replaceAll(" ", "-");
-}
-
-export function getReviewCategoryBySlug(slug: string) {
-  return getReviewCategories().find(
-    (category) => getReviewCategorySlug(category) === slug
-  );
-}
-
-export function getFilteredReviewPosts(category?: string) {
-  const posts = getLatestReviewPosts();
-
-  if (!category) {
-    return posts;
-  }
-
-  return posts.filter(
-    (post) => post.category.toLowerCase() === category.toLowerCase()
-  );
-}
-
-export function getReviewPostBySlug(slug: string) {
-  return reviewPosts.find((post) => post.slug === slug);
-}
-
-export function getRelatedReviewPosts(slug: string) {
-  const current = getReviewPostBySlug(slug);
-
-  if (!current) {
-    return [];
-  }
-
-  const posts = getLatestReviewPosts().filter((post) => post.slug !== slug);
-  const related = posts.filter(
-      (post) =>
-        (post.category === current.category || post.parish === current.parish)
-    );
-
-  return (related.length > 0 ? related : posts).slice(0, 2);
-}
-
-export function getFeaturedReview() {
-  return reviewPosts.find((post) => post.isFeatured) ?? reviewPosts[0];
-}
-
-export function getHiddenGems() {
-  return reviewPosts.filter((post) => post.isHiddenGem).slice(0, 3);
-}
-
-export function getVideoReviews() {
-  return [...reviewPosts].filter((post) => post.videoUrl).slice(0, 6);
-}
-
-export { categories, latestPosts, reviewPosts, testimonials };
+export { categories, latestPosts, testimonials };
 export { places };

@@ -1,15 +1,17 @@
 import Link from "next/link";
-import type { ReviewPost } from "@/data/reviews";
+import type { Place } from "@/data/places";
+import { getVerdictFromRating } from "@/lib/verdict";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 
 type VideoCardProps = {
-  post: ReviewPost;
+  place: Place;
 };
 
-export function VideoCard({ post }: VideoCardProps) {
+export function VideoCard({ place }: VideoCardProps) {
+  const verdict = getVerdictFromRating(place.rating);
   return (
     <Link
-      href={`/reviews/${post.slug}`}
+      href={`/places/${place.slug}`}
       style={{
         display: "block",
         position: "relative",
@@ -26,8 +28,8 @@ export function VideoCard({ post }: VideoCardProps) {
     >
       {/* Thumbnail */}
       <img
-        src={post.image}
-        alt={post.title}
+        src={place.image}
+        alt={place.name}
         loading="lazy"
         style={{
           position: "absolute",
@@ -86,7 +88,7 @@ export function VideoCard({ post }: VideoCardProps) {
         }}
       >
         <div style={{ marginBottom: "8px" }}>
-          <VerdictBadge verdict={post.verdict} size="sm" />
+          <VerdictBadge verdict={verdict} size="sm" />
         </div>
         <p
           style={{
@@ -98,7 +100,7 @@ export function VideoCard({ post }: VideoCardProps) {
             lineHeight: 1.3
           }}
         >
-          {post.restaurant}
+          {place.name}
         </p>
         <p
           style={{
@@ -108,7 +110,7 @@ export function VideoCard({ post }: VideoCardProps) {
             fontSize: "0.8rem"
           }}
         >
-          {post.area}, {post.parish}
+          {place.area}, {place.parish}
         </p>
       </div>
 

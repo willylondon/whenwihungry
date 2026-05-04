@@ -1,4 +1,4 @@
-import type { Verdict } from "@/data/reviews";
+import type { Verdict } from "@/lib/verdict";
 
 const VERDICT_CONFIG: Record<
   Verdict,

@@ -1,9 +1,8 @@
 import type { MetadataRoute } from "next";
 
 import {
-  getReviewCategories,
-  getReviewCategorySlug,
-  reviewPosts
+  categories,
+  places
 } from "@/lib/places";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -17,20 +16,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1
     },
     {
-      url: `${baseUrl}/reviews`,
+      url: `${baseUrl}/browse`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9
     },
-    ...getReviewCategories().map((category) => ({
-      url: `${baseUrl}/reviews/category/${getReviewCategorySlug(category)}`,
+    ...categories.map((category) => ({
+      url: `${baseUrl}/browse?category=${encodeURIComponent(category)}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.85
     })),
-    ...reviewPosts.map((post) => ({
-      url: `${baseUrl}/reviews/${post.slug}`,
-      lastModified: new Date(post.publishedAt),
+    ...places.map((place) => ({
+      url: `${baseUrl}/places/${place.slug}`,
+      lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8
     }))

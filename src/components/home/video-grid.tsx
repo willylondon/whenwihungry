@@ -1,13 +1,13 @@
 import Link from "next/link";
-import type { ReviewPost } from "@/data/reviews";
+import type { Place } from "@/data/places";
 import { SectionHeader } from "@/components/ui/section-header";
 import { VideoCard } from "@/components/ui/video-card";
 
 type VideoGridProps = {
-  posts: ReviewPost[];
+  places: Place[];
 };
 
-export function VideoGrid({ posts }: VideoGridProps) {
+export function VideoGrid({ places }: VideoGridProps) {
   return (
     <section
       style={{
@@ -64,8 +64,8 @@ export function VideoGrid({ posts }: VideoGridProps) {
           }}
           className="video-grid"
         >
-          {posts.slice(0, 6).map((post) => (
-            <VideoCard key={post.slug} post={post} />
+          {places.map((place) => (
+            <VideoCard key={place.slug} place={place} />
           ))}
         </div>
       </div>

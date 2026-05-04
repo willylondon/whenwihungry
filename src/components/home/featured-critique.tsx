@@ -1,12 +1,15 @@
 import Link from "next/link";
-import type { ReviewPost } from "@/data/reviews";
+import type { Place } from "@/data/places";
+import { getVerdictFromRating } from "@/lib/verdict";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 
 type FeaturedCritiqueProps = {
-  post: ReviewPost;
+  place: Place;
 };
 
-export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
+export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
+  const verdict = getVerdictFromRating(place.rating);
+  const quote = place.description || "A solid spot to grab a bite.";
   return (
     <section
       style={{
@@ -54,8 +57,8 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
           {/* Image */}
           <div style={{ position: "relative", overflow: "hidden" }}>
             <img
-              src={post.image}
-              alt={post.title}
+              src={place.image}
+              alt={place.name}
               style={{
                 width: "100%",
                 height: "100%",
@@ -116,7 +119,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
             }}
             className="featured-content"
           >
-            <VerdictBadge verdict={post.verdict} size="md" />
+            <VerdictBadge verdict={verdict} size="md" />
 
             <div>
               <span
@@ -131,7 +134,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
                   letterSpacing: "0.08em"
                 }}
               >
-                {post.restaurant} · {post.area}
+                {place.category} · {place.parish}
               </span>
               <h2
                 style={{
@@ -143,7 +146,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
                   textTransform: "uppercase"
                 }}
               >
-                {post.title}
+                {place.name}
               </h2>
             </div>
 
@@ -159,7 +162,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
                 fontStyle: "italic"
               }}
             >
-              &ldquo;{post.quote}&rdquo;
+              &ldquo;{quote}&rdquo;
             </blockquote>
 
             {/* Quick hits */}
@@ -171,8 +174,8 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
               }}
             >
               {[
-                { label: "Best Item", value: post.bestItem },
-                { label: "Wait Time", value: post.waitTime }
+                { label: "Cuisine", value: place.type },
+                { label: "Price", value: place.priceRange }
               ].map((item) => (
                 <div
                   key={item.label}
@@ -213,7 +216,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
 
             <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
               <Link
-                href={`/reviews/${post.slug}`}
+                href={`/places/${place.slug}`}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -232,7 +235,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
                 The Honest Take
               </Link>
               <Link
-                href={`/reviews/${post.slug}#video`}
+                href={`/places/${place.slug}#video`}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",

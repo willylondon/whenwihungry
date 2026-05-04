@@ -1,17 +1,19 @@
 import Link from "next/link";
-import type { ReviewPost } from "@/data/reviews";
+import type { Place } from "@/data/places";
+import { getVerdictFromRating } from "@/lib/verdict";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 
 type ReviewCardProps = {
-  post: ReviewPost;
+  place: Place;
   variant?: "horizontal" | "vertical";
 };
 
-export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
+export function ReviewCard({ place, variant = "vertical" }: ReviewCardProps) {
+  const verdict = getVerdictFromRating(place.rating);
   if (variant === "horizontal") {
     return (
       <Link
-        href={`/reviews/${post.slug}`}
+        href={`/places/${place.slug}`}
         style={{
           display: "grid",
           gridTemplateColumns: "180px 1fr",
@@ -27,8 +29,8 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
       >
         <div style={{ overflow: "hidden", position: "relative" }}>
           <img
-            src={post.image}
-            alt={post.title}
+            src={place.image}
+            alt={place.name}
             loading="lazy"
             style={{
               width: "100%",
@@ -41,7 +43,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
         </div>
         <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "10px" }}>
           <div>
-            <VerdictBadge verdict={post.verdict} size="sm" />
+            <VerdictBadge verdict={verdict} size="sm" />
           </div>
           <h3
             style={{
@@ -53,7 +55,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
               lineHeight: 1.4
             }}
           >
-            {post.title}
+            {place.name}
           </h3>
           <p
             style={{
@@ -67,7 +69,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
               overflow: "hidden"
             }}
           >
-            {post.dek}
+            {place.description}
           </p>
           <span
             style={{
@@ -76,7 +78,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
               fontFamily: "var(--wwh-font-body)"
             }}
           >
-            {post.area} · {post.category}
+            {place.parish} · {place.category}
           </span>
         </div>
         <style>{`
@@ -95,7 +97,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
 
   return (
     <Link
-      href={`/reviews/${post.slug}`}
+      href={`/places/${place.slug}`}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -110,8 +112,8 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
     >
       <div style={{ overflow: "hidden", height: "220px", position: "relative" }}>
         <img
-          src={post.image}
-          alt={post.title}
+          src={place.image}
+          alt={place.name}
           loading="lazy"
           style={{
             width: "100%",
@@ -128,7 +130,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
             left: "12px"
           }}
         >
-          <VerdictBadge verdict={post.verdict} size="sm" />
+          <VerdictBadge verdict={verdict} size="sm" />
         </div>
       </div>
       <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
@@ -142,7 +144,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
             fontFamily: "var(--wwh-font-body)"
           }}
         >
-          {post.category}
+          {place.category}
         </span>
         <h3
           style={{
@@ -154,7 +156,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
             lineHeight: 1.4
           }}
         >
-          {post.title}
+          {place.name}
         </h3>
         <p
           style={{
@@ -168,7 +170,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
             overflow: "hidden"
           }}
         >
-          {post.dek}
+          {place.description}
         </p>
         <div
           style={{
@@ -181,8 +183,8 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
             color: "var(--wwh-muted)"
           }}
         >
-          <span>{post.area}</span>
-          <span>{post.readTime}</span>
+          <span>{place.parish}</span>
+          <span>{place.priceRange}</span>
         </div>
       </div>
       <style>{`

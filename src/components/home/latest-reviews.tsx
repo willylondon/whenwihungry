@@ -1,14 +1,14 @@
 import Link from "next/link";
-import type { ReviewPost } from "@/data/reviews";
+import type { Place } from "@/data/places";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ReviewCard } from "@/components/ui/review-card";
 
 type LatestReviewsProps = {
-  posts: ReviewPost[];
+  places: Place[];
 };
 
-export function LatestReviews({ posts }: LatestReviewsProps) {
-  const limited = posts.slice(0, 6);
+export function LatestReviews({ places }: LatestReviewsProps) {
+  const limited = places.slice(0, 6);
 
   return (
     <section
@@ -39,7 +39,7 @@ export function LatestReviews({ posts }: LatestReviewsProps) {
             subtext="The most recent reviews. Honest. Unfiltered."
           />
           <Link
-            href="/reviews"
+            href="/places"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -66,8 +66,8 @@ export function LatestReviews({ posts }: LatestReviewsProps) {
           }}
           className="latest-grid"
         >
-          {limited.map((post) => (
-            <ReviewCard key={post.slug} post={post} variant="vertical" />
+          {limited.map((place) => (
+            <ReviewCard key={place.slug} place={place} variant="vertical" />
           ))}
         </div>
       </div>
