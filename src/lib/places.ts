@@ -50,19 +50,21 @@ export function getFilteredPlaces(filters: {
   const minimumRating = filters.rating ? Number(filters.rating) : 0;
 
   const filtered = allPlaces.filter((place) => {
+    if (!place) return false;
+
     const matchesQuery =
       !query ||
-      place.name.toLowerCase().includes(query) ||
-      place.area.toLowerCase().includes(query) ||
-      place.category.toLowerCase().includes(query) ||
-      place.type.toLowerCase().includes(query);
+      place.name?.toLowerCase().includes(query) ||
+      place.area?.toLowerCase().includes(query) ||
+      place.category?.toLowerCase().includes(query) ||
+      place.type?.toLowerCase().includes(query);
     const matchesParish = !filters.parish || place.parish === filters.parish;
     const matchesCategory =
       !filterCategory || 
-      place.category.toLowerCase() === filterCategory ||
-      place.type.toLowerCase() === filterCategory;
+      place.category?.toLowerCase() === filterCategory ||
+      place.type?.toLowerCase() === filterCategory;
     const matchesPrice = !filters.price || place.priceRange === filters.price;
-    const matchesRating = !minimumRating || place.rating >= minimumRating;
+    const matchesRating = !minimumRating || (place.rating || 0) >= minimumRating;
 
     return (
       matchesQuery &&

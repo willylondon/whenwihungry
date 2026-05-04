@@ -42,25 +42,27 @@ export async function getCommunityComments(restaurantId: string) {
 }
 
 function dbRowToPlace(restaurant: Record<string, any>): Place {
+  if (!restaurant) return {} as Place;
+  
   const category = restaurant.category || restaurant.cuisine_type || restaurant.cuisine || "Community Pick";
   return {
     address: restaurant.address || "",
     area: restaurant.area || restaurant.city || "",
-    category,
+    category: String(category),
     description: restaurant.description || "The food speaks for itself.",
     features: [],
     hours: [],
     image: restaurant.image_url || "https://whenwihungry.vercel.app/logo.png",
-    lat: restaurant.latitude || restaurant.lat,
-    lng: restaurant.longitude || restaurant.lng,
-    name: restaurant.name,
-    parish: restaurant.parish,
+    lat: restaurant.latitude || restaurant.lat || 0,
+    lng: restaurant.longitude || restaurant.lng || 0,
+    name: restaurant.name || "Unknown Spot",
+    parish: restaurant.parish || "Jamaica",
     phone: restaurant.phone || "",
-    priceRange: "$".repeat(restaurant.price_level || 2),
+    priceRange: "$".repeat(Math.max(1, Math.min(4, Number(restaurant.price_level || 2)))),
     rating: restaurant.avg_rating || Number(restaurant.admin_score || restaurant.rating || 0) / 20 || 0,
     reviewCount: restaurant.rating_count || restaurant.review_count || restaurant.reviewCount || 0,
     reviews: [],
-    slug: restaurant.slug,
+    slug: restaurant.slug || String(Math.random()),
     type: restaurant.cuisine_type || restaurant.cuisine || "Restaurant",
     website: ""
   };
