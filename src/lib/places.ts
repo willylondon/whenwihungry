@@ -7,11 +7,13 @@ export function getFeaturedPlaces() {
     .slice(0, 6);
 }
 
-export function getParishStats() {
+export function getParishStats(allPlaces: Place[] = places) {
   const counts = new Map<string, number>();
 
-  for (const place of places) {
-    counts.set(place.parish, (counts.get(place.parish) ?? 0) + 1);
+  for (const place of allPlaces) {
+    if (place.parish) {
+      counts.set(place.parish, (counts.get(place.parish) ?? 0) + 1);
+    }
   }
 
   return [...counts.entries()]
@@ -62,7 +64,8 @@ export function getFilteredPlaces(filters: {
     const matchesCategory =
       !filterCategory || 
       place.category?.toLowerCase() === filterCategory ||
-      place.type?.toLowerCase() === filterCategory;
+      place.type?.toLowerCase() === filterCategory ||
+      (filterCategory === "local-food" && (place.category?.toLowerCase() === "jamaican" || place.type?.toLowerCase() === "jamaican"));
     const matchesPrice = !filters.price || place.priceRange === filters.price;
     const matchesRating = !minimumRating || (place.rating || 0) >= minimumRating;
 

@@ -12,14 +12,19 @@ export async function saveRestaurantAction(formData: FormData) {
     name: formData.get("name") as string,
     slug: formData.get("slug") as string,
     parish: formData.get("parish") as string,
-    city: formData.get("city") as string,
+    area: formData.get("area") as string,
     description: formData.get("description") as string,
+    cuisine_type: formData.get("cuisine_type") as string,
+    category: formData.get("category") as string,
+    phone: formData.get("phone") as string,
+    image_url: formData.get("image_url") as string,
+    price_level: parseInt(formData.get("price_level") as string || "2"),
     is_verified: formData.get("is_verified") === "on",
     is_featured: formData.get("is_featured") === "on",
+    is_active: formData.get("is_active") === "on",
     admin_boost: parseFloat(formData.get("admin_boost") as string || "0")
   };
 
-  // 1. Update restaurant table
   const { error: rError } = await supabase
     .from("restaurants")
     .update(updates)
@@ -27,7 +32,6 @@ export async function saveRestaurantAction(formData: FormData) {
 
   if (rError) throw rError;
 
-  // 2. Upsert admin review
   const verdict = formData.get("verdict") as string;
   const admin_score = parseInt(formData.get("admin_score") as string || "50");
 
@@ -95,8 +99,13 @@ export async function createRestaurantAction(formData: FormData) {
       name: formData.get("name") as string,
       slug: formData.get("slug") as string,
       parish: formData.get("parish") as string,
-      city: formData.get("city") as string,
-      description: formData.get("description") as string
+      area: formData.get("area") as string,
+      description: formData.get("description") as string,
+      cuisine_type: formData.get("cuisine_type") as string,
+      category: formData.get("category") as string,
+      image_url: formData.get("image_url") as string,
+      price_level: parseInt(formData.get("price_level") as string || "2"),
+      is_verified: formData.get("is_verified") === "on"
     })
     .select()
     .single();

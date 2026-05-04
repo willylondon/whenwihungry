@@ -91,7 +91,9 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                <span style={{ color: "var(--wwh-accent2)", fontSize: "0.9rem" }}>★</span>
-               <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>{place.community_score ? (place.community_score / 20).toFixed(1) : "0.0"}</span>
+               <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>
+                 {((place.community_score || (place.rating * 20) || 0) / 20).toFixed(1)}
+               </span>
             </div>
             <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.8rem" }}>{place.reviewCount} reviews</span>
           </div>

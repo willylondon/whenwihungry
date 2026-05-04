@@ -23,14 +23,43 @@ export default function NewRestaurantPage() {
                <input name="parish" required style={inputStyle} placeholder="Kingston, St. Ann, etc." />
              </div>
              <div>
-               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CITY</label>
-               <input name="city" style={inputStyle} placeholder="Optional" />
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>AREA / CITY</label>
+               <input name="area" style={inputStyle} placeholder="Optional" />
+             </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CUISINE TYPE</label>
+               <input name="cuisine_type" style={inputStyle} placeholder="e.g. Seafood" />
+             </div>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CATEGORY</label>
+               <input name="category" style={inputStyle} placeholder="e.g. Fine Dining" />
+             </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>IMAGE URL</label>
+               <input name="image_url" style={inputStyle} placeholder="https://..." />
+             </div>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>PRICE LEVEL (1-4)</label>
+               <input type="number" name="price_level" defaultValue="2" min="1" max="4" style={inputStyle} />
              </div>
           </div>
 
           <div className="form-group">
             <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>DESCRIPTION</label>
             <textarea name="description" style={{ ...inputStyle, minHeight: "120px" }} placeholder="Initial honest take..." />
+          </div>
+
+          <div style={{ display: "flex", gap: "20px" }}>
+             <label style={{ color: "#fff", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input type="checkbox" name="is_verified" />
+                WWH Verified
+             </label>
           </div>
 
           <button type="submit" style={{ padding: "16px", background: "var(--wwh-accent)", color: "#fff", fontWeight: 700, borderRadius: "8px", border: "none", cursor: "pointer" }}>

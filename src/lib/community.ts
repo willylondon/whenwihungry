@@ -78,8 +78,13 @@ export type PlaceV2 = Place & {
 
 export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
+  const normalizedQuery = query.toLowerCase().trim();
+  
+  // Handle "local-food" alias
+  const searchQuery = normalizedQuery === "local-food" ? "Jamaican" : query;
+
   const { data, error } = await supabase.rpc("search_restaurants", {
-    search_query: query
+    search_query: searchQuery
   });
 
   if (error) {
@@ -87,44 +92,51 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
     return [];
   }
 
-  console.log(`Search for "${query}" returned ${data?.length || 0} results`);
+  console.log(`Search for "${searchQuery}" returned ${data?.length || 0} results`);
 
   return (data ?? []).map((row: any) => ({
     ...dbRowToPlace(row),
     verdict: row.verdict,
     admin_score: row.admin_score,
     community_score: row.community_score,
-    reviewCount: row.review_count,
+    reviewCount: Number(row.review_count || 0),
     match_reason: row.match_reason,
-    is_verified: row.is_verified
+    is_verified: row.is_verified,
+    final_score: row.final_score
   }));
 }
 
 export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
   
-  // Fetch everything needed for V2 display
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("restaurants")
     .select(`
       *,
       admin_reviews(verdict, admin_score),
       user_reviews(rating)
     `)
+    .eq("is_active", true) // Ensure we only get active listings
+    .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
+  if (error) {
+    console.error("Fetch Error:", error);
+    return [];
+  }
+
   return (data ?? []).map((row: any) => {
-    const adminRev = row.admin_reviews?.[0];
+    const adminRev = Array.isArray(row.admin_reviews) ? row.admin_reviews[0] : row.admin_reviews;
     const userReviews = row.user_reviews || [];
     const avgCommunity = userReviews.length > 0 
-      ? userReviews.reduce((acc: number, cur: any) => acc + cur.rating, 0) / userReviews.length 
+      ? userReviews.reduce((acc: number, cur: any) => acc + (cur.rating || 0), 0) / userReviews.length 
       : 0;
 
     return {
       ...dbRowToPlace(row),
       verdict: adminRev?.verdict || row.verdict,
       admin_score: adminRev?.admin_score || row.admin_score,
-      community_score: (row.avg_rating || avgCommunity) * 20, // Normalize to 100
+      community_score: (row.avg_rating || avgCommunity) * 20,
       reviewCount: row.rating_count || userReviews.length,
       is_verified: row.is_verified || row.verified
     };

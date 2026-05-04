@@ -44,9 +44,36 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
                <input name="parish" defaultValue={r.parish} required style={inputStyle} />
              </div>
              <div>
-               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CITY</label>
-               <input name="city" defaultValue={r.city || ""} style={inputStyle} />
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>AREA / CITY</label>
+               <input name="area" defaultValue={r.area || r.city || ""} style={inputStyle} />
              </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CUISINE TYPE</label>
+               <input name="cuisine_type" defaultValue={r.cuisine_type || r.cuisine || ""} style={inputStyle} placeholder="e.g. Seafood" />
+             </div>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>CATEGORY</label>
+               <input name="category" defaultValue={r.category || ""} style={inputStyle} placeholder="e.g. Fine Dining" />
+             </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>PHONE</label>
+               <input name="phone" defaultValue={r.phone || ""} style={inputStyle} />
+             </div>
+             <div>
+               <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>PRICE LEVEL (1-4)</label>
+               <input type="number" name="price_level" defaultValue={r.price_level || 2} min="1" max="4" style={inputStyle} />
+             </div>
+          </div>
+
+          <div className="form-group">
+            <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>IMAGE URL</label>
+            <input name="image_url" defaultValue={r.image_url || ""} style={inputStyle} />
           </div>
 
           <div className="form-group">
@@ -77,14 +104,18 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "20px" }}>
+          <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
              <label style={{ color: "#fff", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <input type="checkbox" name="is_verified" defaultChecked={r.is_verified} />
                 WWH Verified
              </label>
              <label style={{ color: "#fff", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <input type="checkbox" name="is_featured" defaultChecked={r.is_featured} />
-                Featured Listing
+                Featured
+             </label>
+             <label style={{ color: "#fff", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input type="checkbox" name="is_active" defaultChecked={r.is_active !== false} />
+                Active Listing
              </label>
           </div>
 

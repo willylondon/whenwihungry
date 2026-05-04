@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.restaurants (
     is_featured BOOLEAN DEFAULT FALSE,
     avg_rating FLOAT DEFAULT 0,
     rating_count INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

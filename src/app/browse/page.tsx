@@ -67,7 +67,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           activeSort={params.sort}
           activeView={view}
           categories={categories}
-          parishes={getParishStats().map((item) => item.name)}
+          parishes={getParishStats(allPlaces).map((item) => item.name)}
         />
         <div className={`results-shell view-${view}`}>
           <div className="results-column directory-results">
