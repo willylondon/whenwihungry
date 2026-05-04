@@ -195,7 +195,7 @@ export function Footer() {
 
       <style>{`
         .social-icon:hover {
-          background: rgba(255,77,45,0.2) !important;
+          background: rgba(255,90,31,0.2) !important;
         }
         .footer-nav-link:hover {
           color: #fff !important;

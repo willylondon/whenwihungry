@@ -83,7 +83,7 @@ export default function GetReviewedPage() {
             width: "500px",
             height: "500px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,77,45,0.07) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(255,90,31,0.07) 0%, transparent 70%)",
             pointerEvents: "none"
           }}
         />
@@ -100,8 +100,8 @@ export default function GetReviewedPage() {
               display: "inline-block",
               marginBottom: "20px",
               padding: "6px 14px",
-              background: "rgba(255,77,45,0.1)",
-              border: "1px solid rgba(255,77,45,0.25)",
+              background: "rgba(255,90,31,0.1)",
+              border: "1px solid rgba(255,90,31,0.25)",
               borderRadius: "999px",
               color: "var(--wwh-accent)",
               fontFamily: "var(--wwh-font-body)",
@@ -493,11 +493,11 @@ export default function GetReviewedPage() {
           color: rgba(255,255,255,0.25);
         }
         input:focus, textarea:focus {
-          border-color: rgba(255,77,45,0.5) !important;
+          border-color: rgba(255,90,31,0.5) !important;
         }
         .submit-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 32px rgba(255,77,45,0.4);
+          box-shadow: 0 12px 32px rgba(255,90,31,0.4);
         }
         @media (max-width: 768px) {
           .get-reviewed-grid { grid-template-columns: 1fr !important; }

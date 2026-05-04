@@ -20,7 +20,7 @@ export function GetReviewedCta() {
           width: "800px",
           height: "400px",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(255,77,45,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse, rgba(255,90,31,0.08) 0%, transparent 70%)",
           pointerEvents: "none"
         }}
       />
@@ -39,8 +39,8 @@ export function GetReviewedCta() {
             display: "inline-block",
             marginBottom: "20px",
             padding: "6px 14px",
-            background: "rgba(255,77,45,0.12)",
-            border: "1px solid rgba(255,77,45,0.3)",
+            background: "rgba(255,90,31,0.12)",
+            border: "1px solid rgba(255,90,31,0.3)",
             borderRadius: "999px",
             color: "var(--wwh-accent)",
             fontFamily: "var(--wwh-font-body)",
@@ -119,7 +119,7 @@ export function GetReviewedCta() {
             }}
             className="cta-secondary-btn"
           >
-            Learn More
+            The Critic
           </Link>
         </div>
       </div>
@@ -127,7 +127,7 @@ export function GetReviewedCta() {
       <style>{`
         .cta-main-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 14px 40px rgba(255,77,45,0.4);
+          box-shadow: 0 14px 40px rgba(255,90,31,0.4);
         }
         .cta-secondary-btn:hover {
           background: rgba(255,255,255,0.09) !important;

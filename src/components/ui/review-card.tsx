@@ -83,7 +83,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
           .review-card-link:hover {
             transform: translateY(-3px);
             box-shadow: 0 16px 40px rgba(0,0,0,0.3);
-            border-color: rgba(255,77,45,0.2);
+            border-color: rgba(255,90,31,0.2);
           }
           .review-card-link:hover .review-card-img {
             transform: scale(1.06);
@@ -189,7 +189,7 @@ export function ReviewCard({ post, variant = "vertical" }: ReviewCardProps) {
         .review-card-vert:hover {
           transform: translateY(-5px);
           box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-          border-color: rgba(255,77,45,0.25);
+          border-color: rgba(255,90,31,0.25);
         }
         .review-card-vert:hover .review-card-vert-img {
           transform: scale(1.06);

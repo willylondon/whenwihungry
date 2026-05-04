@@ -8,7 +8,7 @@
   --wwh-bg: #0b0b0b;
   --wwh-surface: #121212;
   --wwh-card: #1a1a1a;
-  --wwh-accent: #ff4d2d;
+  --wwh-accent: #ff5a1f;
   --wwh-accent2: #ffc857;
   --wwh-text: #ffffff;
   --wwh-muted: #9ca3af;
@@ -16,7 +16,7 @@
   --wwh-font-heading: var(--font-bebas), "Impact", sans-serif;
   --wwh-font-body: var(--font-inter), "Segoe UI", sans-serif;
   --wwh-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --wwh-shadow-glow: 0 0 40px rgba(255, 77, 45, 0.15);
+  --wwh-shadow-glow: 0 0 40px rgba(255, 90, 31, 0.15);
 }
 
 /* ─────────────────────────────────────────

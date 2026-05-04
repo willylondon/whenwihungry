@@ -114,8 +114,8 @@ export default async function ReviewCategoryPage({ params }: CategoryPageProps) 
             <div
               style={{
                 padding: "24px 28px",
-                background: "rgba(255,77,45,0.06)",
-                border: "1px solid rgba(255,77,45,0.2)",
+                background: "rgba(255,90,31,0.06)",
+                border: "1px solid rgba(255,90,31,0.2)",
                 borderRadius: "16px",
                 maxWidth: "280px"
               }}

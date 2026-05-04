@@ -229,7 +229,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
                 }}
                 className="featured-read-btn"
               >
-                Read Full Review
+                The Honest Take
               </Link>
               <Link
                 href={`/reviews/${post.slug}#video`}
@@ -266,7 +266,7 @@ export function FeaturedCritique({ post }: FeaturedCritiqueProps) {
         }
         .featured-read-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(255,77,45,0.35);
+          box-shadow: 0 10px 30px rgba(255,90,31,0.35);
         }
         .featured-watch-btn:hover {
           background: rgba(255,255,255,0.09) !important;

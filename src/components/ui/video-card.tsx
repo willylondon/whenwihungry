@@ -122,7 +122,7 @@ export function VideoCard({ post }: VideoCardProps) {
         }
         .video-card-link:hover .play-btn {
           transform: translate(-50%,-50%) scale(1.12);
-          background: rgba(255,77,45,0.4);
+          background: rgba(255,90,31,0.4);
         }
       `}</style>
     </Link>

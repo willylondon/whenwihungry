@@ -4,9 +4,9 @@ const VERDICTS = [
   {
     emoji: "🔥",
     label: "Run Go Get It",
-    color: "#ff4d2d",
-    bg: "rgba(255,77,45,0.1)",
-    border: "rgba(255,77,45,0.25)",
+    color: "#ff5a1f",
+    bg: "rgba(255,90,31,0.1)",
+    border: "rgba(255,90,31,0.25)",
     description:
       "This one hit different. The food was exceptional, the experience was right, and you need to move quickly. No second chances — this is the one."
   },

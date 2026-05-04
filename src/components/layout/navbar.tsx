@@ -195,7 +195,7 @@ export function Navbar() {
         }
         .nav-cta-btn:hover {
           transform: translateY(-1px);
-          box-shadow: 0 8px 24px rgba(255,77,45,0.35);
+          box-shadow: 0 8px 24px rgba(255,90,31,0.35);
         }
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }

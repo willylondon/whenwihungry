@@ -60,7 +60,7 @@ export function AboutSection() {
                   position: "absolute",
                   inset: 0,
                   background:
-                    "linear-gradient(to top, rgba(255,77,45,0.15) 0%, transparent 50%)",
+                    "linear-gradient(to top, rgba(255,90,31,0.15) 0%, transparent 50%)",
                   borderRadius: "20px"
                 }}
               />
@@ -69,7 +69,7 @@ export function AboutSection() {
                 style={{
                   position: "absolute",
                   inset: 0,
-                  border: "2px solid rgba(255,77,45,0.35)",
+                  border: "2px solid rgba(255,90,31,0.35)",
                   borderRadius: "20px",
                   pointerEvents: "none"
                 }}
@@ -85,7 +85,7 @@ export function AboutSection() {
                   padding: "8px 20px",
                   background: "rgba(0,0,0,0.7)",
                   backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,77,45,0.4)",
+                  border: "1px solid rgba(255,90,31,0.4)",
                   borderRadius: "999px",
                   whiteSpace: "nowrap"
                 }}
@@ -225,8 +225,8 @@ export function AboutSection() {
               style={{
                 marginTop: "28px",
                 padding: "16px 20px",
-                background: "rgba(255,77,45,0.06)",
-                border: "1px solid rgba(255,77,45,0.2)",
+                background: "rgba(255,90,31,0.06)",
+                border: "1px solid rgba(255,90,31,0.2)",
                 borderRadius: "12px",
                 display: "flex",
                 alignItems: "center",
@@ -289,7 +289,7 @@ export function AboutSection() {
                   textDecoration: "none"
                 }}
               >
-                The Full Story
+                The Critic
               </Link>
             </div>
           </div>

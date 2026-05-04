@@ -44,7 +44,7 @@ export function HeroSection() {
           width: "600px",
           height: "600px",
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,77,45,0.12) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(255,90,31,0.12) 0%, transparent 70%)",
           pointerEvents: "none"
         }}
       />
@@ -66,8 +66,8 @@ export function HeroSection() {
               display: "inline-block",
               marginBottom: "20px",
               padding: "6px 14px",
-              background: "rgba(255,77,45,0.12)",
-              border: "1px solid rgba(255,77,45,0.3)",
+              background: "rgba(255,90,31,0.12)",
+              border: "1px solid rgba(255,90,31,0.3)",
               borderRadius: "999px",
               color: "var(--wwh-accent)",
               fontFamily: "var(--wwh-font-body)",
@@ -136,7 +136,7 @@ export function HeroSection() {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
-              Watch Reviews
+              See the Truth
             </Link>
             <Link
               href="/reviews"
@@ -157,7 +157,7 @@ export function HeroSection() {
               }}
               className="hero-cta-secondary"
             >
-              Find Food
+              See if it worth it
             </Link>
           </div>
 
@@ -234,7 +234,7 @@ export function HeroSection() {
       <style>{`
         .hero-cta-primary:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 36px rgba(255,77,45,0.4);
+          box-shadow: 0 12px 36px rgba(255,90,31,0.4);
         }
         .hero-cta-secondary:hover {
           background: rgba(255,255,255,0.1) !important;

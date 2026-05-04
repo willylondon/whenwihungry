@@ -52,7 +52,7 @@ export default function AboutPage() {
             width: "600px",
             height: "600px",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,77,45,0.08) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(255,90,31,0.08) 0%, transparent 70%)",
             pointerEvents: "none"
           }}
         />
@@ -172,7 +172,7 @@ export default function AboutPage() {
               borderRadius: "20px",
               overflow: "hidden",
               aspectRatio: "1/1",
-              border: "1px solid rgba(255,77,45,0.3)"
+              border: "1px solid rgba(255,90,31,0.3)"
             }}
           >
             <img
@@ -189,7 +189,7 @@ export default function AboutPage() {
                 padding: "8px 20px",
                 background: "rgba(0,0,0,0.75)",
                 backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,77,45,0.4)",
+                border: "1px solid rgba(255,90,31,0.4)",
                 borderRadius: "999px",
                 whiteSpace: "nowrap"
               }}

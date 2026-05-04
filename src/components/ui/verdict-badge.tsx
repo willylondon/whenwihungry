@@ -7,9 +7,9 @@ const VERDICT_CONFIG: Record<
   "run-go-get-it": {
     emoji: "🔥",
     label: "Run Go Get It",
-    bg: "rgba(255, 77, 45, 0.15)",
-    text: "#ff4d2d",
-    border: "rgba(255, 77, 45, 0.4)"
+    bg: "rgba(255, 90, 31, 0.15)",
+    text: "#ff5a1f",
+    border: "rgba(255, 90, 31, 0.4)"
   },
   "worth-it": {
     emoji: "👍",
