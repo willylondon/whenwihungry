@@ -49,7 +49,16 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
           <div className="post-date" style={{ color: "var(--wwh-accent)", fontWeight: 700, fontSize: "0.75rem" }}>THE HONEST TAKE</div>
           {showMatchReason && place.match_reason && (
-             <span style={{ fontSize: "0.7rem", color: "var(--wwh-accent)", fontWeight: 700, fontFamily: "var(--wwh-font-body)", background: "rgba(255,90,31,0.1)", padding: "2px 8px", borderRadius: "4px" }}>
+             <span style={{ 
+               fontSize: "0.65rem", 
+               color: "#fff", 
+               fontWeight: 900, 
+               letterSpacing: "0.05em",
+               background: "var(--wwh-accent)", 
+               padding: "3px 10px", 
+               borderRadius: "4px",
+               boxShadow: "0 2px 8px rgba(255,90,31,0.3)"
+             }}>
                MATCH: {place.match_reason.toUpperCase()}
              </span>
           )}

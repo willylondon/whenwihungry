@@ -78,10 +78,30 @@ export type PlaceV2 = Place & {
 
 export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
-  const normalizedQuery = query.toLowerCase().trim();
+  const rawQuery = query.toLowerCase().trim().replace(/-/g, " ");
   
-  // Handle "local-food" alias
-  const searchQuery = normalizedQuery === "local-food" ? "Jamaican" : query;
+  // 1. Alias Mapping
+  const queryAliases: Record<string, string> = {
+    "jerk": "jerk",
+    "jerk chicken": "jerk",
+    "jerk pork": "jerk",
+    "jerk centre": "jerk",
+    "jerk center": "jerk",
+    "seafood": "seafood",
+    "dessert": "dessert",
+    "ice cream": "dessert",
+    "icecream": "dessert",
+    "curry": "local-food",
+    "curried": "local-food",
+    "oxtail": "local-food",
+    "ox tail": "local-food",
+    "local food": "local-food",
+    "jamaican": "local-food"
+  };
+
+  const searchQuery = queryAliases[rawQuery] || query;
+
+  console.log(`Searching for "${query}" (Normalized: "${rawQuery}", Alias: "${searchQuery}")`);
 
   const { data, error } = await supabase.rpc("search_restaurants", {
     search_query: searchQuery
@@ -92,7 +112,13 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
     return [];
   }
 
-  console.log(`Search for "${searchQuery}" returned ${data?.length || 0} results`);
+  // 2. Defensive Fallback
+  if ((!data || data.length === 0) && queryAliases[rawQuery]) {
+    console.log(`RPC returned 0 for "${searchQuery}". Falling back to category filtering.`);
+    const all = await getAllApprovedPlaces();
+    const { getFilteredPlaces } = await import("@/lib/places");
+    return getFilteredPlaces({ category: queryAliases[rawQuery] }, all as any) as PlaceV2[];
+  }
 
   return (data ?? []).map((row: any) => ({
     ...dbRowToPlace(row),

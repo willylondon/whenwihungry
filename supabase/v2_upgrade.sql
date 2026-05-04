@@ -114,11 +114,14 @@ BEGIN
             CASE 
                 WHEN r.name ILIKE '%' || search_query || '%' THEN 100
                 WHEN r.cuisine_type ILIKE '%' || search_query || '%' OR r.category ILIKE '%' || search_query || '%' THEN 80
+                WHEN r.description ILIKE '%' || search_query || '%' THEN 50
                 WHEN r.parish ILIKE '%' || search_query || '%' OR r.area ILIKE '%' || search_query || '%' THEN 40
                 ELSE 0
             END as base_relevance,
-            EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND d.name ILIKE '%' || search_query || '%') as dish_match,
-            EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') as keyword_match
+            EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND (d.name ILIKE '%' || search_query || '%' OR search_query = ANY(d.tags))) as dish_match,
+            EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') as keyword_match,
+            EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || search_query || '%' OR ar.honest_take ILIKE '%' || search_query || '%')) as admin_match,
+            EXISTS (SELECT 1 FROM user_reviews ur WHERE ur.restaurant_id = r.id AND ur.status = 'approved' AND ur.comment ILIKE '%' || search_query || '%') as community_match
         FROM restaurants r
     ),
     scores_cte AS (
@@ -131,7 +134,9 @@ BEGIN
                 GREATEST(
                     rel.base_relevance,
                     CASE WHEN rel.dish_match THEN 100 ELSE 0 END,
-                    CASE WHEN rel.keyword_match THEN 70 ELSE 0 END
+                    CASE WHEN rel.keyword_match THEN 80 ELSE 0 END,
+                    CASE WHEN rel.admin_match THEN 70 ELSE 0 END,
+                    CASE WHEN rel.community_match THEN 50 ELSE 0 END
                 )
              FROM relevance_cte rel WHERE rel.id = r.id
             ) as keyword_relevance,
@@ -147,7 +152,9 @@ BEGIN
                 WHEN EXISTS (SELECT 1 FROM dishes d WHERE d.restaurant_id = r.id AND d.name ILIKE '%' || search_query || '%') THEN 'Dish match'
                 WHEN r.cuisine_type ILIKE '%' || search_query || '%' THEN 'Cuisine match'
                 WHEN r.category ILIKE '%' || search_query || '%' THEN 'Category match'
-                ELSE 'Keyword match'
+                WHEN EXISTS (SELECT 1 FROM search_keywords sk WHERE sk.restaurant_id = r.id AND sk.keyword ILIKE '%' || search_query || '%') THEN 'Keyword match'
+                WHEN EXISTS (SELECT 1 FROM admin_reviews ar WHERE ar.restaurant_id = r.id AND (ar.headline ILIKE '%' || search_query || '%' OR ar.honest_take ILIKE '%' || search_query || '%')) THEN 'Expert review match'
+                ELSE 'Community match'
             END as match_reason
         FROM restaurants r
         LEFT JOIN admin_reviews ar ON ar.restaurant_id = r.id

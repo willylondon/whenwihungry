@@ -146,7 +146,7 @@ export function HeroSection() {
                 </svg>
                 <input
                   type="text"
-                  name="query"
+                  name="q"
                   placeholder="What yuh hungry for?"
                   style={{
                     width: "100%",
