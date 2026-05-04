@@ -90,6 +90,11 @@ export type PlaceV2 = Place & {
   is_verified?: boolean;
   final_score?: number;
   has_critic_review?: boolean;
+  public_listing_summary?: string | null;
+  public_rating?: number | null;
+  public_review_count?: number | null;
+  review_status?: string | null;
+  source_status?: string | null;
 };
 
 function normalizeQuery(q: string): string {

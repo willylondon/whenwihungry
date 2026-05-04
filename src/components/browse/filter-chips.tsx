@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const CHIPS = [
   { label: "All", value: "" },
-  { label: "Critic Approved", value: "critic", query: { sort: "rating", rating: "4.5" } },
   { label: "Cheap Eats", value: "cheap", query: { price: "$" } },
   { label: "Best Rated", value: "best", query: { sort: "rating" } },
   { label: "Most Reviewed", value: "popular", query: { sort: "popular" } },

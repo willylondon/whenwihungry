@@ -110,7 +110,7 @@ export function HeroSection() {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. Just honest reviews from someone who eats everywhere and tells you everything.
+            No fake five stars. No sponsored plates. 58+ Jamaican food spots mapped — and the honest critic reviews are coming.
           </p>
 
           {/* Search bar */}

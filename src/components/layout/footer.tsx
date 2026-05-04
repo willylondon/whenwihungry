@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const FOOTER_LINKS = {
-  Reviews: [
-    { href: "/browse", label: "All Reviews" },
+  Directory: [
+    { href: "/browse", label: "All Food Spots" },
     { href: "/browse?category=jerk", label: "Jerk" },
     { href: "/browse?category=seafood", label: "Seafood" },
     { href: "/browse?category=local-food", label: "Local Food" },
@@ -176,7 +176,7 @@ export function Footer() {
               fontSize: "0.82rem"
             }}
           >
-            © {new Date().getFullYear()} WhenWiHungry. All reviews reflect the critic's honest opinion.
+            © {new Date().getFullYear()} WhenWiHungry. All critic reviews reflect the critic's honest, independent opinion. Food spots without a verdict are listings only.
           </p>
           <p
             style={{
@@ -186,7 +186,7 @@ export function Footer() {
               fontSize: "0.82rem"
             }}
           >
-            No stars. No sponsored reviews. Just the truth.
+            No stars. No sponsored content. No free meals.
           </p>
         </div>
       </div>

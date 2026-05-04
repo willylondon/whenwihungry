@@ -262,6 +262,24 @@ export default async function PlacePage({ params }: PlacePageProps) {
               >
                 {hasCriticReview ? "The Honest Take" : "About This Place"}
               </h2>
+              {!hasCriticReview && (
+                <p
+                  style={{
+                    margin: "0 0 16px",
+                    padding: "10px 14px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "8px",
+                    color: "rgba(255,255,255,0.35)",
+                    fontFamily: "var(--wwh-font-body)",
+                    fontSize: "0.82rem",
+                    lineHeight: 1.6,
+                    fontStyle: "italic"
+                  }}
+                >
+                  This is a listing, not a critic review yet. Public rating signals are shown for discovery only.
+                </p>
+              )}
               <p
                 style={{
                   margin: 0,

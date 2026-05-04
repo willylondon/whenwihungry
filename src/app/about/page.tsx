@@ -121,7 +121,7 @@ export default function AboutPage() {
                 lineHeight: 1.75
               }}
             >
-              The identity stays hidden. The reviews stay honest. That's the trade.
+              The identity stays hidden. The opinions stay honest. That's the trade.
             </p>
             <div style={{ marginTop: "32px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
               <a
@@ -145,7 +145,7 @@ export default function AboutPage() {
                 Follow on TikTok
               </a>
               <Link
-                href="/reviews"
+                href="/browse"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -160,7 +160,7 @@ export default function AboutPage() {
                   textDecoration: "none"
                 }}
               >
-                Read Reviews
+                Browse Food Spots
               </Link>
             </div>
           </div>
