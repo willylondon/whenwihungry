@@ -750,25 +750,107 @@ p {
 }
 
 .site-footer {
-  padding: 48px 0 56px;
-  background: #fff;
-  border-top: 1px solid var(--border);
+  padding: 64px 0;
+  background: #ffffff;
+  border-top: 1px solid rgba(15, 76, 92, 0.08);
 }
 
 .footer-grid {
-  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1.2fr;
+  gap: 40px;
 }
 
-.footer-grid > div {
-  display: grid;
-  gap: 10px;
-}
-
-.site-footer a {
+.footer-title {
+  font-family: var(--font-heading), sans-serif;
   color: var(--primary);
+  font-size: 1.4rem;
   font-weight: 700;
-  transition: color 160ms ease;
+  margin-bottom: 12px;
 }
+
+.footer-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.footer-subtitle {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-links-list a {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 200ms ease, transform 200ms ease;
+  display: inline-block;
+}
+
+.footer-links-list a:hover {
+  color: var(--primary);
+  transform: translateX(4px);
+}
+
+.social-links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #f9fbfb;
+  border: 1px solid rgba(15, 76, 92, 0.06);
+  color: var(--text) !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-link svg {
+  transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-link:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(15, 76, 92, 0.06);
+}
+
+.social-link:hover svg {
+  transform: scale(1.1);
+}
+
+.social-link.email:hover {
+  background: #fff5f5;
+  border-color: rgba(234, 67, 53, 0.2);
+  color: #ea4335 !important;
+}
+
+.social-link.instagram:hover {
+  background: #fef2f6;
+  border-color: rgba(225, 48, 108, 0.2);
+  color: #e1306c !important;
+}
+
+.social-link.tiktok:hover {
+  background: #f8f8f8;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #000000 !important;
 
 .site-footer a:hover {
   color: var(--hot);
