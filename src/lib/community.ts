@@ -72,17 +72,51 @@ function dbRowToPlace(restaurant: Record<string, unknown>): Place {
   };
 }
 
-export async function getAllApprovedPlaces(): Promise<Place[]> {
+export type PlaceV2 = Place & {
+  verdict?: string;
+  admin_score?: number;
+  community_score?: number;
+  match_reason?: string;
+  is_verified?: boolean;
+};
+
+export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("search_restaurants", {
+    search_query: query
+  });
+
+  if (error) {
+    console.error("Search error:", error);
+    return [];
+  }
+
+  return (data ?? []).map((row: any) => ({
+    ...dbRowToPlace(row),
+    verdict: row.verdict,
+    admin_score: row.admin_score,
+    community_score: row.community_score,
+    match_reason: row.match_reason,
+    is_verified: row.is_verified
+  }));
+}
+
+export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from("restaurants")
     .select(
-      "slug, name, description, parish, area, address, phone, website, price_range, category, image_url, avg_rating, rating_count, positive_comment_count, cuisine_type, latitude, longitude"
+      "*, admin_reviews(verdict, admin_score)"
     )
     .eq("status", "approved")
-    .order("recommendation_score", { ascending: false, nullsFirst: false });
+    .order("id", { ascending: false });
 
-  return (data ?? []).map(dbRowToPlace);
+  return (data ?? []).map((row: any) => ({
+    ...dbRowToPlace(row),
+    verdict: row.admin_reviews?.[0]?.verdict,
+    admin_score: row.admin_reviews?.[0]?.admin_score,
+    is_verified: row.is_verified
+  }));
 }
 
 export async function getApprovedCommunityPlaces(existingSlugs: string[]) {

@@ -1,11 +1,12 @@
 import { MapViewWrapper } from "@/components/browse/map-view-wrapper";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
-import { getAllApprovedPlaces } from "@/lib/community";
+import { getAllApprovedPlaces, searchRestaurants, type PlaceV2 } from "@/lib/community";
 import { categories, getFilteredPlaces, getParishStats } from "@/lib/places";
 
 type BrowsePageProps = {
   searchParams: Promise<{
+    query?: string;
     q?: string;
     parish?: string;
     category?: string;
@@ -16,17 +17,28 @@ type BrowsePageProps = {
   }>;
 };
 
+import { FilterChips } from "@/components/browse/filter-chips";
+
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
-  const allPlaces = await getAllApprovedPlaces();
+  const query = params.query || params.q;
+  
+  let allPlaces: PlaceV2[] = [];
+  
+  if (query) {
+    allPlaces = await searchRestaurants(query);
+  } else {
+    allPlaces = await getAllApprovedPlaces();
+  }
+
   const results = getFilteredPlaces({
-    query: params.q,
+    query: query,
     parish: params.parish,
     category: params.category,
     price: params.price,
     rating: params.rating,
     sort: params.sort
-  }, allPlaces);
+  }, allPlaces as any) as PlaceV2[];
   const view = params.view ?? "grid";
 
 
@@ -35,15 +47,17 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       <div className="container">
         <div className="section-heading directory-heading">
           <div>
-            <span className="eyebrow">Restaurants</span>
-            <h1>Browse the places already worth a closer look.</h1>
+            <span className="eyebrow">Discovery</span>
+            <h1>The Honest Shortlist.</h1>
             <p>
-              A practical index for the reviews, cravings, and local food stops
-              that make the When Wi Hungry shortlist.
+              Search by cravings, dishes, or parishes. No hype, just the truth about where to eat.
             </p>
           </div>
           <strong>{results.length} items found</strong>
         </div>
+        
+        <FilterChips />
+        
         <SearchFilters
           activeCategory={params.category}
           activeParish={params.parish}

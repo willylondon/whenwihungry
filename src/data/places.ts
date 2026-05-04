@@ -27,6 +27,11 @@ export type Place = {
   reviews: Review[];
   lat?: number;
   lng?: number;
+  is_verified?: boolean;
+  admin_verdict?: string;
+  admin_score?: number;
+  community_score?: number;
+  match_reason?: string;
 };
 
 export const places: Place[] = [];

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   getRelatedPlaces,
   getPlaceBySlug,
@@ -58,6 +59,8 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   };
 }
 
+import { ReviewSection } from "@/components/place/review-section";
+
 export default async function PlacePage({ params }: PlacePageProps) {
   const { slug } = await params;
   const place = getPlaceBySlug(slug) ?? (await getApprovedCommunityPlaceBySlug(slug));
@@ -66,36 +69,32 @@ export default async function PlacePage({ params }: PlacePageProps) {
     notFound();
   }
 
-  const [community, user] = await Promise.all([
-    getCommunityRestaurant(place.slug),
-    getCurrentUser()
+  const supabase = await createSupabaseServerClient();
+  const [user, { data: restaurant }] = await Promise.all([
+    getCurrentUser(),
+    supabase.from("restaurants").select("id, slug").eq("slug", place.slug).single()
   ]);
-  const communityComments = community
-    ? await getCommunityComments(community.id)
-    : [];
+
+  const [{ data: reviews }, { data: existingReview }] = await Promise.all([
+    supabase
+      .from("user_reviews")
+      .select("id, rating, comment, created_at")
+      .eq("restaurant_id", restaurant?.id)
+      .eq("status", "approved")
+      .order("created_at", { ascending: false }),
+    user ? supabase
+      .from("user_reviews")
+      .select("id")
+      .eq("restaurant_id", restaurant?.id)
+      .eq("user_id", user.id)
+      .maybeSingle() : Promise.resolve({ data: null })
+  ]);
 
   const related = getRelatedPlaces(place.slug);
   const verdict = getVerdictFromRating(place.rating);
 
-  const jsonLd: Record<string, any> = {
-    "@context": "https://schema.org",
-    "@type": "Restaurant",
-    name: place.name
-  };
-
-  if (place.image) jsonLd.image = place.image;
-  if (place.description) jsonLd.description = place.description;
-  if (place.category) jsonLd.servesCuisine = place.category;
-  if (place.priceRange) jsonLd.priceRange = place.priceRange;
-  if (place.phone && !place.phone.includes("555")) jsonLd.telephone = place.phone;
-
   return (
     <article style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       {/* ── Hero ── */}
       <section
         style={{
@@ -246,15 +245,13 @@ export default async function PlacePage({ params }: PlacePageProps) {
               </p>
             </div>
             
-            {/* Supabase Community Comments */}
-            <div>
-              <CommunityFeedback
-                comments={communityComments}
-                community={community}
-                isSignedIn={Boolean(user)}
-                slug={place.slug}
-              />
-            </div>
+            {/* User Review Section */}
+            <ReviewSection 
+              restaurantId={restaurant?.id}
+              reviews={reviews ?? []}
+              isSignedIn={Boolean(user)}
+              userReview={existingReview}
+            />
           </div>
 
           {/* ── Right: Quick Hits sidebar ── */}

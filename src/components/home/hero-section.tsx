@@ -147,7 +147,7 @@ export function HeroSection() {
                 <input
                   type="text"
                   name="query"
-                  placeholder="Find the best oxtail..."
+                  placeholder="What yuh hungry for?"
                   style={{
                     width: "100%",
                     padding: "16px 16px 16px 52px",
@@ -179,6 +179,17 @@ export function HeroSection() {
                 Search
               </button>
             </form>
+            <p
+              style={{
+                marginTop: "16px",
+                color: "rgba(255,255,255,0.4)",
+                fontFamily: "var(--wwh-font-body)",
+                fontSize: "0.85rem",
+                letterSpacing: "0.02em"
+              }}
+            >
+              Try: <span style={{ color: "rgba(255,255,255,0.7)" }}>oxtail, curry goat, ice cream, jerk chicken, date night.</span>
+            </p>
           </div>
 
           {/* Quick stats */}
