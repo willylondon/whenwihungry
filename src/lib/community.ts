@@ -93,32 +93,69 @@ export type PlaceV2 = Place & {
 export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
   const rawQuery = query.toLowerCase().trim().replace(/-/g, " ");
-  
-  // 1. Alias Mapping
-  const queryAliases: Record<string, string> = {
+
+  // Category alias map: normalized query -> DB category/cuisine_type value to search
+  const categoryAliases: Record<string, string> = {
     "jerk": "jerk",
     "jerk chicken": "jerk",
     "jerk pork": "jerk",
     "jerk centre": "jerk",
     "jerk center": "jerk",
     "seafood": "seafood",
+    "fish": "seafood",
     "dessert": "dessert",
     "ice cream": "dessert",
     "icecream": "dessert",
-    "curry": "local-food",
-    "curried": "local-food",
-    "oxtail": "local-food",
-    "ox tail": "local-food",
-    "local food": "local-food",
-    "jamaican": "local-food"
+    "curry": "curry",
+    "curried": "curry",
+    "curry goat": "curry",
+    "oxtail": "oxtail",
+    "ox tail": "oxtail",
+    "local food": "jamaican",
+    "local": "jamaican",
+    "jamaican": "jamaican",
   };
 
-  const searchQuery = queryAliases[rawQuery] || query;
+  const categoryTerm = categoryAliases[rawQuery];
 
-  console.log(`Searching for "${query}" (Normalized: "${rawQuery}", Alias: "${searchQuery}")`);
+  // If the query maps to a known category, do a direct DB ILIKE search.
+  // This guarantees parity with /browse?category=jerk which is known to work.
+  if (categoryTerm) {
+    const { data, error } = await supabase
+      .from("restaurants")
+      .select(`*, admin_reviews(verdict, admin_score), user_reviews(rating)`)
+      .or(`cuisine_type.ilike.%${categoryTerm}%,category.ilike.%${categoryTerm}%,name.ilike.%${categoryTerm}%`)
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false });
 
+    if (error) {
+      console.error("Direct category search error:", error.message);
+      return [];
+    }
+
+    console.log(`Category search "${categoryTerm}" returned ${data?.length || 0} results`);
+
+    return (data ?? []).map((row: any) => {
+      const adminRev = Array.isArray(row.admin_reviews) ? row.admin_reviews[0] : row.admin_reviews;
+      const userReviews = row.user_reviews || [];
+      const avgCommunity = userReviews.length > 0
+        ? userReviews.reduce((acc: number, cur: any) => acc + (cur.rating || 0), 0) / userReviews.length
+        : 0;
+      return {
+        ...dbRowToPlace(row),
+        verdict: adminRev?.verdict || row.verdict,
+        admin_score: adminRev?.admin_score || row.admin_score,
+        community_score: (row.avg_rating || avgCommunity) * 20,
+        reviewCount: row.rating_count || userReviews.length,
+        is_verified: row.is_verified || row.verified,
+        match_reason: `Cuisine match`
+      };
+    });
+  }
+
+  // For free-text queries not in the alias map, use the RPC ranking engine
   const { data, error } = await supabase.rpc("search_restaurants", {
-    search_query: searchQuery
+    search_query: query
   });
 
   if (error) {
@@ -126,13 +163,7 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
     return [];
   }
 
-  // 2. Defensive Fallback
-  if ((!data || data.length === 0) && queryAliases[rawQuery]) {
-    console.log(`RPC returned 0 for "${searchQuery}". Falling back to category filtering.`);
-    const all = await getAllApprovedPlaces();
-    const { getFilteredPlaces } = await import("@/lib/places");
-    return getFilteredPlaces({ category: queryAliases[rawQuery] }, all as any) as PlaceV2[];
-  }
+  console.log(`RPC search "${query}" returned ${data?.length || 0} results`);
 
   return (data ?? []).map((row: any) => ({
     ...dbRowToPlace(row),
