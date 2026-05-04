@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/home/hero-section";
 import { LatestPosts } from "@/components/home/latest-posts";
 import { StatsBar } from "@/components/home/stats-bar";
 import { Testimonials } from "@/components/home/testimonials";
+import { FeaturedCritique } from "@/components/home/featured-critique";
 import { getAllApprovedPlaces } from "@/lib/community";
 import {
   categories,
@@ -33,6 +34,7 @@ export default async function HomePage() {
         reviewCount={stats.reviewCount}
       />
       <AboutSection />
+      <FeaturedCritique />
       <FeaturedPlaces places={featured} />
       <CategorySection categories={categories} />
       <LatestPosts posts={getLatestReviewPosts()} />
