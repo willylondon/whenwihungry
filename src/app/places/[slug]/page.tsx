@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
   const title = `${place.name} | WhenWiHungry`;
   const description = place.description || `${place.name} — ${place.category || "Jamaican pick"} in ${place.parish}.`;
-  const imageUrl = place.image || "https://whenwihungry.vercel.app/logos/when-wi-hungry-logo-transparent.png";
+  const imageUrl = place.image || "https://whenwihungry.vercel.app/logo.png";
   const canonicalUrl = `https://whenwihungry.vercel.app/places/${place.slug}`;
 
   return {

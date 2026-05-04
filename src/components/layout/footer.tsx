@@ -47,19 +47,16 @@ export function Footer() {
           className="footer-cols"
         >
           <div>
-            <p
+            <img
+              src="/logo.png"
+              alt="WhenWiHungry"
               style={{
-                fontFamily: "var(--wwh-font-heading)",
-                fontSize: "2.2rem",
-                color: "var(--wwh-text)",
-                lineHeight: 0.95,
-                textTransform: "uppercase",
-                margin: "0 0 16px"
+                height: "60px",
+                width: "auto",
+                objectFit: "contain",
+                marginBottom: "16px"
               }}
-            >
-              <span style={{ color: "var(--wwh-accent)" }}>When</span>Wi
-              <span style={{ color: "var(--wwh-accent2)" }}>Hungry</span>
-            </p>
+            />
             <p
               style={{
                 color: "var(--wwh-muted)",

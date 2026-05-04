@@ -50,26 +50,13 @@ export function Navbar() {
             aria-label="WhenWiHungry Home"
           >
             <img
-              src="/logos/when-wi-hungry-logo-transparent.png"
+              src="/logo.png"
               alt="WhenWiHungry"
               style={{ height: "40px", width: "auto", objectFit: "contain" }}
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
               }}
             />
-            <span
-              style={{
-                fontFamily: "var(--wwh-font-heading)",
-                fontSize: "1.6rem",
-                color: "#fff",
-                letterSpacing: "0.02em",
-                lineHeight: 1,
-                textTransform: "uppercase"
-              }}
-            >
-              <span style={{ color: "var(--wwh-accent)" }}>When</span>Wi
-              <span style={{ color: "var(--wwh-accent2)" }}>Hungry</span>
-            </span>
           </Link>
 
           {/* Desktop nav */}
