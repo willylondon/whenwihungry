@@ -113,3 +113,17 @@ export async function getCurrentUser() {
 
   return user;
 }
+
+export async function getUserRole() {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return data?.role ?? null;
+}
