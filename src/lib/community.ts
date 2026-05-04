@@ -68,6 +68,20 @@ function dbRowToPlace(restaurant: Record<string, any>): Place {
   };
 }
 
+export async function getUserRole(): Promise<string | null> {
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  return data?.role ?? null;
+}
+
 export type PlaceV2 = Place & {
   verdict?: string;
   admin_score?: number;
