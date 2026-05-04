@@ -22,7 +22,7 @@ ALTER TABLE public.restaurants
 UPDATE public.restaurants r
 SET review_status = 'reviewed',
     source_status = 'critic_reviewed',
-    critic_reviewed_at = ar.created_at
+    critic_reviewed_at = NOW()
 FROM public.admin_reviews ar
 WHERE ar.restaurant_id = r.id
   AND ar.verdict IS NOT NULL;
