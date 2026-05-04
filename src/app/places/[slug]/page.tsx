@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import {
   getRelatedPlaces,
   getPlaceBySlug,
+  VIDEO_MAP
 } from "@/lib/places";
 import {
   getApprovedCommunityPlaceBySlug,
@@ -196,14 +197,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
       {/* ── Video embed ── */}
       {(() => {
-        const videoMap: Record<string, string> = {
-          "usain-bolt-s-tracks-records-kingston": "https://vt.tiktok.com/ZS9Q8mN8F/",
-          "devon-house-i-scream-kingston": "https://vt.tiktok.com/ZS9Q8qJs1/",
-          "miss-t-s-kitchen-st-ann": "https://vt.tiktok.com/ZS9Q8uQst/",
-          "scotchies-coral-gardens-st-james": "https://vt.tiktok.com/ZS9Q8gU2B/",
-          "scotchies-draxhall-st-ann": "https://vt.tiktok.com/ZS9Q8gU2B/"
-        };
-        const videoUrl = videoMap[place.slug];
+        const videoUrl = VIDEO_MAP[place.slug];
         if (!videoUrl) return null;
 
         return (

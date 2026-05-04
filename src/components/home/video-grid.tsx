@@ -37,7 +37,7 @@ export function VideoGrid({ places }: VideoGridProps) {
             subtext="The full unfiltered take. Watch before you spend."
           />
           <Link
-            href="/browse"
+            href="/watch"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -52,7 +52,7 @@ export function VideoGrid({ places }: VideoGridProps) {
             }}
             className="see-all-link"
           >
-            Browse all reviews →
+            See all videos →
           </Link>
         </div>
 

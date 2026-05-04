@@ -96,5 +96,17 @@ export function getSiteStats() {
   };
 }
 
+export const VIDEO_MAP: Record<string, string> = {
+  "usain-bolt-s-tracks-records-kingston": "https://vt.tiktok.com/ZS9Q8mN8F/",
+  "devon-house-i-scream-kingston": "https://vt.tiktok.com/ZS9Q8qJs1/",
+  "miss-t-s-kitchen-st-ann": "https://vt.tiktok.com/ZS9Q8uQst/",
+  "scotchies-coral-gardens-st-james": "https://vt.tiktok.com/ZS9Q8gU2B/",
+  "scotchies-draxhall-st-ann": "https://vt.tiktok.com/ZS9Q8gU2B/"
+};
+
+export function getVideoPlaces() {
+  return places.filter(place => VIDEO_MAP[place.slug]);
+}
+
 export { categories, latestPosts, testimonials };
 export { places };
