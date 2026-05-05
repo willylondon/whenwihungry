@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   const place = getPlaceBySlug(slug) ?? (await getApprovedCommunityPlaceBySlug(slug));
   if (!place) return {};
 
-  const title = `${place.name} | WhenWiHungry`;
+  const title = place.name;
   const description = place.description || `${place.name} — ${place.category || "Jamaican pick"} in ${place.parish}.`;
   const imageUrl = place.image || "https://whenwihungry.vercel.app/og/whenwihungry-og.png";
   const canonicalUrl = `https://whenwihungry.vercel.app/places/${place.slug}`;
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
     title,
     description,
     openGraph: {
-      title,
+      title: `${title} | WhenWiHungry`,
       description,
       url: canonicalUrl,
       siteName: "WhenWiHungry",
