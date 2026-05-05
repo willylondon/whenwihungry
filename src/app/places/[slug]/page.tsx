@@ -100,8 +100,54 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const verdictKey = rawVerdict ? (rawVerdict.toLowerCase().replace(/_/g, "-") as any) : null;
   const hasCriticReview = Boolean(verdictKey && (adminRev?.honest_take?.trim() || adminRev?.headline?.trim()));
 
+  const restaurantSchema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Restaurant",
+    name: place.name,
+    description: place.description || undefined,
+    url: `https://whenwihungry.vercel.app/places/${place.slug}`,
+    image: place.image || undefined,
+    servesCuisine: place.category || undefined,
+    priceRange: place.priceRange || undefined,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: place.address || undefined,
+      addressRegion: place.parish || undefined,
+      addressCountry: "JM"
+    }
+  };
+
+  const reviewSchema: Record<string, unknown> | null =
+    hasCriticReview && adminRev
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Review",
+          name: adminRev.headline || place.name,
+          reviewBody: adminRev.honest_take || undefined,
+          author: { "@type": "Person", name: "WhenWiHungry" },
+          itemReviewed: { "@type": "Restaurant", name: place.name },
+          ...(adminRev.admin_score
+            ? {
+                reviewRating: {
+                  "@type": "Rating",
+                  ratingValue: (adminRev.admin_score / 20).toFixed(1),
+                  bestRating: "5"
+                }
+              }
+            : {})
+        }
+      : null;
+
   return (
     <article style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema
+          )
+        }}
+      />
       {/* ... previous content ... */}
       <section
         style={{
@@ -180,7 +226,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 letterSpacing: "0.05em",
                 fontFamily: "var(--wwh-font-body)"
               }}>
-                NOT YET REVIEWED
+                Listed — Review Pending
               </span>
             )}
           </div>
@@ -393,7 +439,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   letterSpacing: "0.06em",
                   fontFamily: "var(--wwh-font-body)"
                 }}>
-                  NOT YET REVIEWED
+                  Listed — Review Pending
                 </span>
               )}
             </div>

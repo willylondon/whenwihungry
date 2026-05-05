@@ -33,8 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const displayName = variants[0];
   
   return {
-    title: `Best Restaurants in ${displayName} | When Wi Hungry`,
-    description: `Discover the most honest food reviews for restaurants in ${displayName}, Jamaica. No hype, just the truth.`,
+    title: `Best Restaurants in ${displayName} | WhenWiHungry`,
+    description: `Explore top food spots in ${displayName}: local favourites, jerk, grill, seafood, and Jamaican restaurants — honest and unfiltered.`,
     openGraph: {
       title: `Best Restaurants in ${displayName}`,
       description: `Unfiltered reviews for the top food spots in ${displayName}.`,
@@ -72,8 +72,26 @@ export default async function LocationPage({ params }: Props) {
     };
   });
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `Best Restaurants in ${displayName}`,
+    url: `https://whenwihungry.vercel.app/restaurants/${location}`,
+    numberOfItems: results.length,
+    itemListElement: results.slice(0, 20).map((place, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://whenwihungry.vercel.app/places/${place.slug}`,
+      name: place.name
+    }))
+  };
+
   return (
     <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
       <div className="container">
         <SectionHeader 
           eyebrow="Local Discovery"

@@ -55,7 +55,7 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
               fontSize: "0.75rem"
             }}
           >
-            {place.has_critic_review ? "THE HONEST TAKE" : "LISTING INFO"}
+            {place.has_critic_review ? "Critic Reviewed" : "Listed — Review Pending"}
           </div>
           {showMatchReason && place.match_reason && (
             <span style={{
@@ -89,7 +89,7 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
               fontWeight: 700,
               textTransform: "uppercase"
             }}>
-              Not Yet Reviewed
+              Listed — Review Pending
             </span>
           )}
           <span className="badge" style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>{place.type}</span>
@@ -115,7 +115,7 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
             <span />
           )}
           <strong className="read-more" style={{ color: "var(--wwh-accent)", fontSize: "0.85rem" }}>
-            {place.has_critic_review ? "READ TRUTH →" : "VIEW LISTING →"}
+            {place.has_critic_review ? "Read Review →" : "View Listing →"}
           </strong>
         </div>
       </div>

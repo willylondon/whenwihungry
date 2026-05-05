@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | WhenWiHungry"
   },
   description:
-    "The boldest food critic in Jamaica. If the food bad, me a go tell you straight. Honest reviews, no fake ratings, no corporate sponsorship.",
+    "Jamaica's boldest food critic. No fake ratings, no sponsored plates, no corporate nonsense — just honest Jamaican food reviews.",
   alternates: {
     canonical: "/"
   },
@@ -38,17 +38,17 @@ export const metadata: Metadata = {
     apple: [{ url: "/favicon-180.png", sizes: "180x180", type: "image/png" }]
   },
   openGraph: {
-    title: "WhenWiHungry | Jamaican Food Critic",
+    title: "WhenWiHungry | Jamaica's Boldest Food Critic",
     description:
-      "Honest, bold, video-first food reviews for Jamaica. Run go get it or save your money — we tell you straight.",
+      "No fake ratings. No sponsored plates. Just honest Jamaican food reviews.",
     url: siteUrl,
     siteName: "WhenWiHungry",
     images: [
       {
-        url: "/logo.png",
-        width: 1024,
-        height: 1024,
-        alt: "WhenWiHungry"
+        url: "/og",
+        width: 1200,
+        height: 630,
+        alt: "WhenWiHungry — Jamaica's boldest food critic"
       }
     ],
     locale: "en_JM",
@@ -56,10 +56,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "WhenWiHungry | Honest Jamaican Food Reviews",
+    title: "WhenWiHungry | Jamaica's Boldest Food Critic",
     description:
-      "If the food bad… me a go tell you straight. Bold food critic reviews from Jamaica.",
-    images: ["/logo.png"]
+      "No fake ratings. No sponsored plates. Just honest Jamaican food reviews.",
+    images: ["/og"]
   }
 };
 
@@ -75,6 +75,39 @@ export default function RootLayout({
     >
       <head />
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "WhenWiHungry",
+                url: siteUrl,
+                description:
+                  "Jamaica's boldest food critic. No fake ratings, no sponsored plates — just honest Jamaican food reviews.",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: {
+                    "@type": "EntryPoint",
+                    urlTemplate: `${siteUrl}/browse?q={search_term_string}`
+                  },
+                  "query-input": "required name=search_term_string"
+                }
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "WhenWiHungry",
+                url: siteUrl,
+                logo: `${siteUrl}/logo.png`,
+                description:
+                  "Jamaica's boldest food critic. Honest, independent reviews of Jamaican food spots.",
+                sameAs: ["https://www.tiktok.com/@whenwihungry"]
+              }
+            ])
+          }}
+        />
         <Script
           defer
           data-domain={plausibleDomain}

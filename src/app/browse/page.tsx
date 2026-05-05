@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { MapViewWrapper } from "@/components/browse/map-view-wrapper";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
@@ -18,6 +19,32 @@ type BrowsePageProps = {
 };
 
 import { FilterChips } from "@/components/browse/filter-chips";
+
+const CATEGORY_META: Record<string, { title: string; description: string }> = {
+  jerk: {
+    title: "Best Jerk Spots in Jamaica",
+    description:
+      "Discover jerk chicken, jerk pork, and pimento-wood cooked food spots across Jamaica."
+  },
+  seafood: {
+    title: "Best Seafood Spots in Jamaica",
+    description:
+      "Discover seafood restaurants, beach fish spots, lobster, conch, and Jamaican seafood listings."
+  }
+};
+
+export async function generateMetadata({ searchParams }: BrowsePageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params.category?.toLowerCase();
+  const categoryMeta = category ? CATEGORY_META[category] : null;
+
+  return {
+    title: categoryMeta?.title ?? "Restaurant Directory Jamaica",
+    description:
+      categoryMeta?.description ??
+      "Browse Jamaican food spots by craving, parish, category, price, and public signal."
+  };
+}
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = await searchParams;
@@ -41,9 +68,30 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   }, allPlaces as any) as PlaceV2[];
   const view = params.view ?? "grid";
 
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: params.category
+      ? `Best ${params.category} spots in Jamaica`
+      : params.parish
+        ? `Best food spots in ${params.parish}`
+        : "Jamaican Food Directory",
+    url: "https://whenwihungry.vercel.app/browse",
+    numberOfItems: results.length,
+    itemListElement: results.slice(0, 20).map((place, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://whenwihungry.vercel.app/places/${place.slug}`,
+      name: place.name
+    }))
+  };
 
   return (
     <section className="section directory-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
       <div className="container">
         <div className="section-heading directory-heading">
           <div>
