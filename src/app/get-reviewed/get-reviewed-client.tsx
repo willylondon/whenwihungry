@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function GetReviewedClient({ foodSpotCountLabel = "58+" }: { foodSpotCountLabel?: string }) {
+export function GetReviewedClient({ foodSpotCountLabel = "400+" }: { foodSpotCountLabel?: string }) {
   const STATS = [
     { value: "3K+", label: "TikTok Followers" },
     { value: "100K+", label: "Video Views" },

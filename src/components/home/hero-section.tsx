@@ -2,7 +2,7 @@ import Link from "next/link";
 
 type Props = { foodSpotCountLabel?: string };
 
-export function HeroSection({ foodSpotCountLabel = "58+" }: Props) {
+export function HeroSection({ foodSpotCountLabel = "400+" }: Props) {
   return (
     <section
       style={{

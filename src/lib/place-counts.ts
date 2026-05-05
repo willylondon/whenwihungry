@@ -5,7 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * Uses the same source as /browse — all approved, active restaurants.
  */
 
-const FALLBACK_COUNT = 58;
+const FALLBACK_COUNT = 400;
 
 export async function getPublicFoodSpotCount(): Promise<number> {
   const supabase = await createSupabaseServerClient();
