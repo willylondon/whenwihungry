@@ -30,6 +30,32 @@ UPDATE restaurants SET
   location_notes      = 'Description previously mentioned St. Catherine but parish/address indicates Kingston. Corrected by data cleanup script.'
 WHERE slug = 'usain-bolts-tracks-and-records';
 
+-- ── 4. Fix Willy's Thatch Roof description ───────────────────────────
+-- parish = Kingston, description incorrectly says "St. Catherine"
+
+UPDATE restaurants SET
+  description         = 'Mapped food spot in Kingston. Public signals are shown where available, with critic verdicts added as they go live.',
+  data_quality_status = 'corrected',
+  description_status  = 'conflict_fixed',
+  location_notes      = 'Description previously mentioned St. Catherine but parish/address indicates Kingston. Corrected by data cleanup script.'
+WHERE slug = 'willys-thatch-roof-and-cool-out-spot-ltd';
+
+-- ── 5. Fix Kingston records with "St. Mary" in description ───────────
+-- These are Kingston food spots imported via a "St. Mary restaurants" query.
+
+UPDATE restaurants SET
+  description         = 'Mapped food spot in Kingston. Public signals are shown where available, with critic verdicts added as they go live.',
+  data_quality_status = 'corrected',
+  description_status  = 'conflict_fixed',
+  location_notes      = 'Description previously mentioned St. Mary but parish/address indicates Kingston. Corrected by data cleanup script.'
+WHERE slug IN (
+  'tummy-quest',
+  'whitneys-kitchen-limited',
+  'breadfruit-hut',
+  'chef-kiss-ja',
+  'clubhouse-brewery'
+);
+
 -- ── Verify ────────────────────────────────────────────────────────────
 -- All four queries below should return 0 rows after a successful run.
 
