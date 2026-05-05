@@ -110,7 +110,7 @@ export function HeroSection() {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. 58+ Jamaican food spots mapped — and the honest critic reviews are coming.
+            No fake five stars. No sponsored plates. 58+ Jamaican food spots mapped. 10+ viral TikTok reviews. More anonymous verdicts loading.
           </p>
 
           {/* Search bar */}

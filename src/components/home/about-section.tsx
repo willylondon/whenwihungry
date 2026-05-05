@@ -123,7 +123,7 @@ export function AboutSection() {
               {[
                 { value: "3K+", label: "Followers" },
                 { value: "100K+", label: "Views" },
-                { value: "50+", label: "Reviews" }
+                { value: "10+", label: "Viral Reviews" }
               ].map((stat) => (
                 <div key={stat.label} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <span

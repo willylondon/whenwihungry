@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
 
   const title = `${place.name} | WhenWiHungry`;
   const description = place.description || `${place.name} — ${place.category || "Jamaican pick"} in ${place.parish}.`;
-  const imageUrl = place.image || "https://whenwihungry.vercel.app/logo.png";
+  const imageUrl = place.image || "https://whenwihungry.vercel.app/og/whenwihungry-og.png";
   const canonicalUrl = `https://whenwihungry.vercel.app/places/${place.slug}`;
 
   return {
@@ -44,7 +44,8 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: place.name
+          alt: place.name,
+          type: "image/png"
         }
       ],
       type: "website"

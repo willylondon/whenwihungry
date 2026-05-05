@@ -38,6 +38,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `Best Restaurants in ${displayName}`,
       description: `Unfiltered reviews for the top food spots in ${displayName}.`,
+      images: [
+        {
+          url: "https://whenwihungry.vercel.app/og/whenwihungry-og.png",
+          width: 1200,
+          height: 630,
+          alt: `WhenWiHungry — Best restaurants in ${displayName}`,
+          type: "image/png"
+        }
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: ["https://whenwihungry.vercel.app/og/whenwihungry-og.png"]
     }
   };
 }
