@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
+import { getPlaceStatusLabel, getPlaceCta, getPlaceStatus } from "@/lib/place-status";
 
 type PlaceListCardProps = {
   place: PlaceV2;
@@ -9,17 +10,38 @@ type PlaceListCardProps = {
 };
 
 export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardProps) {
+  const status = getPlaceStatus(place);
+  const statusLabel = getPlaceStatusLabel(place);
+  const cta = getPlaceCta(place);
+  const displayName = place.name || "Unnamed Food Spot";
+  const hasPublicSignal = (place.public_rating ?? 0) > 0 || (place.public_review_count ?? 0) > 0;
+
   return (
-    <Link className="browse-card card" href={`/places/${place.slug}`} style={{ overflow: "hidden", display: "block" }}>
-      <div className="browse-image-wrap" style={{ position: "relative" }}>
+    <Link
+      href={`/places/${place.slug}`}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "280px minmax(0, 1fr)",
+        background: "var(--wwh-card)",
+        border: "1px solid var(--wwh-border)",
+        borderRadius: "16px",
+        overflow: "hidden",
+        textDecoration: "none",
+        transition: "transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease"
+      }}
+      className="browse-card-link"
+    >
+      {/* ── Image ── */}
+      <div style={{ position: "relative", overflow: "hidden", minHeight: "100%" }}>
         <Image
-          alt={place.name}
-          className="browse-image"
-          height={220}
-          loading="lazy"
+          alt={displayName}
           src={place.image}
           width={320}
+          height={260}
+          loading="lazy"
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
         />
+        {/* Verified badge */}
         {place.is_verified && (
           <div
             style={{
@@ -27,13 +49,11 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
               top: "12px",
               left: "12px",
               background: "rgba(46,196,182,0.95)",
-              backdropFilter: "blur(4px)",
               padding: "5px 12px",
               borderRadius: "4px",
               display: "flex",
               alignItems: "center",
               gap: "6px",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.4)",
               zIndex: 10,
               border: "1px solid rgba(255,255,255,0.2)"
             }}
@@ -45,79 +65,135 @@ export function PlaceListCard({ place, showMatchReason = false }: PlaceListCardP
           </div>
         )}
       </div>
-      <div className="browse-body">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-          <div
-            className="post-date"
+
+      {/* ── Body ── */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+          padding: "20px 24px"
+        }}
+      >
+        {/* Status row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <span
             style={{
-              color: place.has_critic_review ? "var(--wwh-accent)" : "rgba(255,255,255,0.3)",
+              color: status === "critic-reviewed" ? "var(--wwh-accent)" : "rgba(255,255,255,0.35)",
               fontWeight: 700,
-              fontSize: "0.75rem"
+              fontSize: "0.72rem",
+              fontFamily: "var(--wwh-font-body)",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em"
             }}
           >
-            {place.has_critic_review ? "Critic Reviewed" : "Listed — Review Pending"}
-          </div>
+            {statusLabel}
+          </span>
           {showMatchReason && place.match_reason && (
-            <span style={{
-              fontSize: "0.65rem",
-              color: "#fff",
-              fontWeight: 900,
-              letterSpacing: "0.05em",
-              background: "var(--wwh-accent)",
-              padding: "3px 10px",
-              borderRadius: "4px",
-              boxShadow: "0 2px 8px rgba(255,90,31,0.3)"
-            }}>
+            <span
+              style={{
+                fontSize: "0.65rem",
+                color: "#fff",
+                fontWeight: 900,
+                letterSpacing: "0.05em",
+                background: "var(--wwh-accent)",
+                padding: "3px 10px",
+                borderRadius: "4px"
+              }}
+            >
               MATCH: {place.match_reason.toUpperCase()}
             </span>
           )}
         </div>
-        
-        <h3 style={{ marginBottom: "12px", color: "#fff" }}>{place.name}</h3>
-        
-        <div className="card-topline" style={{ marginBottom: "16px", display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-          {place.verdict ? (
+
+        {/* Name */}
+        <h3
+          style={{
+            margin: 0,
+            fontFamily: "var(--wwh-font-heading)",
+            fontSize: "1.35rem",
+            color: "#fff",
+            textTransform: "uppercase",
+            letterSpacing: "0.02em",
+            lineHeight: 1.1
+          }}
+        >
+          {displayName}
+        </h3>
+
+        {/* Verdict badge if reviewed */}
+        {place.verdict && status === "critic-reviewed" && (
+          <div>
             <VerdictBadge verdict={place.verdict} size="sm" />
-          ) : (
-            <span style={{
-              padding: "4px 12px",
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "999px",
-              color: "rgba(255,255,255,0.4)",
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              textTransform: "uppercase"
-            }}>
-              Listed — Review Pending
-            </span>
-          )}
-          <span className="badge" style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>{place.type}</span>
+          </div>
+        )}
+
+        {/* Description */}
+        {place.description && (
+          <p
+            style={{
+              margin: 0,
+              color: "rgba(255,255,255,0.5)",
+              fontFamily: "var(--wwh-font-body)",
+              fontSize: "0.85rem",
+              lineHeight: 1.55,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden"
+            }}
+          >
+            {place.description}
+          </p>
+        )}
+
+        {/* Metadata row */}
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            color: "rgba(255,255,255,0.35)",
+            fontFamily: "var(--wwh-font-body)",
+            fontSize: "0.78rem",
+            flexWrap: "wrap"
+          }}
+        >
+          {place.category && <span>{place.category}</span>}
+          {place.category && place.priceRange && <span>·</span>}
+          {place.priceRange && <span>{place.priceRange}</span>}
+          {(place.category || place.priceRange) && place.parish && <span>·</span>}
+          {place.parish && <span>{place.parish}</span>}
         </div>
 
-        <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.6)", marginBottom: "20px", lineHeight: 1.6 }}>{place.description}</p>
-        
-        <div className="listing-details" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "12px", marginBottom: "12px", display: "flex", gap: "12px", color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>
-          <span>{place.category}</span>
-          <span>•</span>
-          <span>{place.priceRange}</span>
-          <span>•</span>
-          <span>{place.parish}</span>
-        </div>
-        
-        <div className="card-meta" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {(place.community_score || place.rating) ? (
-            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>
-              Public signal: {((place.community_score || (place.rating * 20) || 0) / 20).toFixed(1)}
-              {place.reviewCount > 0 && ` · ${place.reviewCount.toLocaleString()} reviews`}
-            </span>
-          ) : (
-            <span />
-          )}
-          <strong className="read-more" style={{ color: "var(--wwh-accent)", fontSize: "0.85rem" }}>
-            {place.has_critic_review ? "Read Review →" : "View Listing →"}
-          </strong>
-        </div>
+        {/* Public signal */}
+        {hasPublicSignal && (
+          <div
+            style={{
+              color: "rgba(255,255,255,0.3)",
+              fontFamily: "var(--wwh-font-body)",
+              fontSize: "0.72rem"
+            }}
+          >
+            <span style={{ color: "#FFD700" }}>★</span>{" "}
+            Public signal: {typeof place.public_rating === "number" ? place.public_rating.toFixed(1) : "—"}
+            {(place.public_review_count ?? 0) > 0 && (
+              <span> · {Number(place.public_review_count ?? 0).toLocaleString()} ratings</span>
+            )}
+          </div>
+        )}
+
+        {/* CTA */}
+        <span
+          style={{
+            marginTop: "auto",
+            color: "var(--wwh-accent)",
+            fontFamily: "var(--wwh-font-body)",
+            fontWeight: 700,
+            fontSize: "0.85rem"
+          }}
+        >
+          {cta}
+        </span>
       </div>
     </Link>
   );
