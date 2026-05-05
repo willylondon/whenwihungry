@@ -1,6 +1,6 @@
 # Place Location Audit Report
 
-**Generated**: 2026-05-05T21:55:03.624Z
+**Generated**: 2026-05-05T22:11:06.812Z
 
 ## Summary
 
@@ -49,4 +49,4 @@
 | 9 | Street Mixovibes | street-mixovibes | Kingston |  | 263 Spanish Town Rd, Kingston, Jamaica | Name/area/address contains "spanish town" which suggests st catherine, not kingston | Correct parish to st catherine |
 | 10 | Waves Beach | waves-beach | St. Thomas |  | 190 Sand Drive, Seafort Hellshire Portmore, Kingston, Jamaica | Name/area/address contains "kingston" which suggests kingston, not st thomas | Correct parish to kingston |
 | 11 | cru bar and kitchen | (multiple) | Kingston, St. Andrew |  |  | Duplicate name across 2 parishes: Kingston, St. Andrew | Verify which is correct; merge or differentiate |
-| 12 | south avenue grill | (multiple) | Kingston, St. Andrew |  |  | Duplicate name across 2 parishes: Kingston, St. Andrew | Verify which is correct; merge or differentiate |
+| 12 | south avenue grill | (multiple) | St. Andrew, Kingston |  |  | Duplicate name across 2 parishes: St. Andrew, Kingston | Verify which is correct; merge or differentiate |
