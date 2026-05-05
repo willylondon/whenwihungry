@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { GetReviewedClient } from "./get-reviewed-client";
+import { getPublicFoodSpotCountLabel } from "@/lib/place-counts";
+
+export const revalidate = 21600;
 
 export const metadata: Metadata = {
   title: "Get Your Restaurant Reviewed",
@@ -25,6 +28,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function GetReviewedPage() {
-  return <GetReviewedClient />;
+export default async function GetReviewedPage() {
+  const foodSpotCountLabel = await getPublicFoodSpotCountLabel();
+  return <GetReviewedClient foodSpotCountLabel={foodSpotCountLabel} />;
 }

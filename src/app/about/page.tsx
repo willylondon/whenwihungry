@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getPublicFoodSpotCountLabel } from "@/lib/place-counts";
+
+export const revalidate = 21600;
 
 export const metadata: Metadata = {
   title: "About the Anonymous Food Critic",
@@ -48,7 +51,8 @@ const PHILOSOPHY = [
   }
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const foodSpotCountLabel = await getPublicFoodSpotCountLabel();
   return (
     <div style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
       {/* Hero */}
@@ -251,7 +255,7 @@ export default function AboutPage() {
           {[
             { value: "3K+", label: "TikTok Followers" },
             { value: "100K+", label: "Total Views" },
-            { value: "58+", label: "Food Spots Listed" },
+            { value: foodSpotCountLabel, label: "Food Spots Listed" },
             { value: "0", label: "Free Meals Accepted" }
           ].map((stat) => (
             <div key={stat.label}>
@@ -293,7 +297,7 @@ export default function AboutPage() {
             {[
               { value: "10+", label: "Viral TikTok Reviews" },
               { value: "100K+", label: "Total Views" },
-              { value: "58+", label: "Food Spots Mapped" },
+              { value: foodSpotCountLabel, label: "Food Spots Mapped" },
               { value: "0", label: "Free Meals Accepted" }
             ].map((s) => (
               <div key={s.label} style={{ padding: "24px 16px" }}>

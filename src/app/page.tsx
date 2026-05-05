@@ -5,9 +5,13 @@ import { AboutSection } from "@/components/home/about-section";
 import { RatingExplainer } from "@/components/home/rating-explainer";
 import { GetReviewedCta } from "@/components/home/get-reviewed-cta";
 import { getAllApprovedPlaces } from "@/lib/community";
+import { getPublicFoodSpotCountLabel } from "@/lib/place-counts";
+
+export const revalidate = 21600;
 
 export default async function HomePage() {
   const allPlaces = await getAllApprovedPlaces();
+  const foodSpotCountLabel = await getPublicFoodSpotCountLabel();
 
   const reviewed = allPlaces
     .filter(p => p.has_critic_review)
@@ -23,7 +27,7 @@ export default async function HomePage() {
 
   return (
     <div style={{ background: "var(--wwh-bg)" }}>
-      <HeroSection />
+      <HeroSection foodSpotCountLabel={foodSpotCountLabel} />
       {featuredReview && <FeaturedCritique place={featuredReview} />}
       {latestReviews.length > 0 && <LatestReviews places={latestReviews} variant="reviews" />}
       {recentListings.length > 0 && <LatestReviews places={recentListings} variant="listings" />}

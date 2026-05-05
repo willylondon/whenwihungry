@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-export function HeroSection() {
+type Props = { foodSpotCountLabel?: string };
+
+export function HeroSection({ foodSpotCountLabel = "58+" }: Props) {
   return (
     <section
       style={{
@@ -110,7 +112,7 @@ export function HeroSection() {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. 58+ Jamaican food spots mapped. 10+ viral TikTok reviews. More anonymous verdicts loading.
+            No fake five stars. No sponsored plates. {foodSpotCountLabel} Jamaican food spots mapped. 10+ viral TikTok reviews. More anonymous verdicts loading.
           </p>
 
           {/* Search bar */}
@@ -206,7 +208,7 @@ export function HeroSection() {
           >
             {[
               { value: "3K+", label: "TikTok Followers" },
-              { value: "58+", label: "Food Spots Listed" },
+              { value: foodSpotCountLabel, label: "Food Spots Listed" },
               { value: "100%", label: "Unfiltered" }
             ].map((stat) => (
               <div key={stat.label}>

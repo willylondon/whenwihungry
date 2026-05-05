@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 
-const STATS = [
-  { value: "3K+", label: "TikTok Followers" },
-  { value: "100K+", label: "Video Views" },
-  { value: "58+", label: "Food Spots Listed" },
-  { value: "100%", label: "Honest Opinions" }
-];
+export function GetReviewedClient({ foodSpotCountLabel = "58+" }: { foodSpotCountLabel?: string }) {
+  const STATS = [
+    { value: "3K+", label: "TikTok Followers" },
+    { value: "100K+", label: "Video Views" },
+    { value: foodSpotCountLabel, label: "Food Spots Listed" },
+    { value: "100%", label: "Honest Opinions" }
+  ];
 
 const VALUE_PROPS = [
   {
@@ -32,7 +33,6 @@ const VALUE_PROPS = [
   }
 ];
 
-export function GetReviewedClient() {
   const [formState, setFormState] = useState({
     name: "",
     restaurant: "",
