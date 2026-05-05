@@ -1,5 +1,5 @@
 import type { PlaceV2 } from "@/lib/community";
-import { getResolvedReviewStatus, hasCriticReviewContent } from "@/lib/review-status";
+import { getPlaceStatus, getPlaceStatusLabel, getPlaceCta, getPlaceDetailHeading } from "@/lib/place-status";
 
 type PlaceCardLike = Partial<PlaceV2> & {
   place_name?: string | null;
@@ -25,29 +25,19 @@ export function getPlaceSummary(place: PlaceCardLike) {
   );
 }
 
-export function isCriticReviewed(place: PlaceCardLike) {
-  return getResolvedReviewStatus(place) === "reviewed" && hasCriticReviewContent(place);
-}
-
 export function getPlaceCardState(place: PlaceCardLike) {
-  if (isCriticReviewed(place)) {
-    return {
-      badgeText: null,
-      ctaText: "READ TRUTH →",
-      heading: "The Honest Take",
-      label: "THE HONEST TAKE",
-      mode: "reviewed" as const
-    };
-  }
+  const status = getPlaceStatus(place);
+  const badgeText = status === "listed" ? getPlaceStatusLabel(place) : null;
+  const ctaText = getPlaceCta(place);
+  const heading = getPlaceDetailHeading(place);
+  const label = heading.toUpperCase();
+  const mode = status === "critic-reviewed" ? ("reviewed" as const) : ("listing" as const);
 
-  return {
-    badgeText: "NOT YET REVIEWED",
-    ctaText: "VIEW LISTING →",
-    heading: "Listing Info",
-    label: "LISTING INFO",
-    mode: "listing" as const
-  };
+  return { badgeText, ctaText, heading, label, mode };
 }
+
+// Re-export for backward compatibility
+export { getPlaceStatus, getPlaceStatusLabel, getPlaceCta, isCriticReviewed, isTikTokReviewed, isListedOnly, isReviewed } from "@/lib/place-status";
 
 export function getPlaceMetaLine(place: PlaceCardLike) {
   const segments = [place.type || place.category, place.priceRange, place.parish || place.area].filter(Boolean);

@@ -44,7 +44,7 @@ export async function generateMetadata({ searchParams }: BrowsePageProps): Promi
       categoryMeta?.description ??
       "Browse Jamaican food spots by craving, parish, category, price, and public signal.",
     openGraph: {
-      title: categoryMeta?.title ?? "Restaurant Directory Jamaica | WhenWiHungry",
+      title: categoryMeta?.title ?? "Restaurant Directory Jamaica",
       description:
         categoryMeta?.description ??
         "Browse Jamaican food spots by craving, parish, category, price, and public signal.",

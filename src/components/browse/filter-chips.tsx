@@ -8,7 +8,9 @@ const CHIPS = [
   { label: "Seafood", value: "seafood", query: { q: "seafood" } },
   { label: "Kingston", value: "kingston", query: { parish: "Kingston" } },
   { label: "Cheap Eats", value: "cheap", query: { q: "cheap eats" } },
-  { label: "Date Night", value: "datenight", query: { q: "date night" } }
+  { label: "Date Night", value: "datenight", query: { q: "date night" } },
+  { label: "Curry Goat", value: "curry", query: { q: "curry goat" } },
+  { label: "Ice Cream", value: "icecream", query: { q: "ice cream" } }
 ];
 
 export function FilterChips() {

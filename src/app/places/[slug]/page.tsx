@@ -16,6 +16,7 @@ import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { ReviewCard } from "@/components/ui/review-card";
 import { CommunityFeedback } from "@/components/place/community-feedback";
 import { SocialShare } from "@/components/place/social-share";
+import { getPlaceStatus, getPlaceStatusLabel, getPlaceCta, getPlaceDetailHeading, isCriticReviewed } from "@/lib/place-status";
 
 type PlacePageProps = {
   params: Promise<{ slug: string }>;
@@ -227,7 +228,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                 letterSpacing: "0.05em",
                 fontFamily: "var(--wwh-font-body)"
               }}>
-                Listed — Review Pending
+                {getPlaceStatusLabel(restaurant)}
               </span>
             )}
           </div>
@@ -288,7 +289,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
         >
           {/* ── Left: Content ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
-            {/* The Honest Take */}
+            {/* Critic Verdict / Listing Info */}
             <div
               style={{
                 padding: "28px 32px",
@@ -307,7 +308,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
                   letterSpacing: "0.02em"
                 }}
               >
-                {hasCriticReview ? "The Honest Take" : "About This Place"}
+                {getPlaceDetailHeading(restaurant)}
               </h2>
               {!hasCriticReview && (
                 <p

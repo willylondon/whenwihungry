@@ -31,7 +31,7 @@ export function LatestReviews({ places, variant = "reviews" }: LatestReviewsProp
             subtext={
               isReviews
                 ? "The most recent critic reviews. Honest. Unfiltered."
-                : "Food spots in the directory. Not yet reviewed by the critic."
+                : "Directory listings awaiting critic verdicts."
             }
           />
           <Link

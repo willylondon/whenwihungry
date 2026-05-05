@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const displayName = variants[0];
   
   return {
-    title: `Best Restaurants in ${displayName} | WhenWiHungry`,
+    title: `Best Restaurants in ${displayName}`,
     description: `Explore top food spots in ${displayName}: local favourites, jerk, grill, seafood, and Jamaican restaurants — honest and unfiltered.`,
     openGraph: {
       title: `Best Restaurants in ${displayName}`,
@@ -109,7 +109,7 @@ export default async function LocationPage({ params }: Props) {
         <SectionHeader 
           eyebrow="Local Discovery"
           heading={`Best in ${displayName}`}
-          subtext={`Showing the highest ranked food spots in ${displayName} based on critic and community scores.`}
+          subtext={`Showing mapped food spots in ${displayName} ranked by public signals, community activity, and critic verdicts where available.`}
         />
         
         <div style={{ display: "grid", gap: "24px", marginTop: "48px" }}>

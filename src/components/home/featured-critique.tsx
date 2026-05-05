@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
+import { getPlaceStatus, getPlaceStatusLabel, getPlaceCta, isListedOnly } from "@/lib/place-status";
 
 type FeaturedCritiqueProps = {
   place: PlaceV2;
@@ -131,7 +132,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
                 fontSize: "0.75rem", fontWeight: 700,
                 letterSpacing: "0.05em", fontFamily: "var(--wwh-font-body)"
               }}>
-                NOT YET REVIEWED
+                {getPlaceStatusLabel(place)}
               </span>
             )}
 
@@ -246,7 +247,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
                 }}
                 className="featured-read-btn"
               >
-                {verdict ? "The Honest Take" : "View Listing"}
+                {verdict ? getPlaceCta(place) : getPlaceCta(place)}
               </Link>
               <Link
                 href={`/places/${place.slug}#video`}

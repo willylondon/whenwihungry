@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About the Critic | WhenWiHungry",
+  title: "About the Anonymous Food Critic",
   description:
     "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
   openGraph: {
-    title: "About the Critic | WhenWiHungry",
+    title: "About the Anonymous Food Critic | WhenWiHungry",
     description:
       "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
     images: [
@@ -280,6 +280,31 @@ export default function AboutPage() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Proof So Far */}
+      <section style={{ padding: "80px 0", background: "rgba(255,90,31,0.03)", borderTop: "1px solid rgba(255,90,31,0.08)", borderBottom: "1px solid rgba(255,90,31,0.08)" }}>
+        <div style={{ width: "min(800px, calc(100% - 40px))", margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ margin: "0 0 40px", fontFamily: "var(--wwh-font-heading)", fontSize: "clamp(2rem, 3.5vw, 2.8rem)", color: "#fff", textTransform: "uppercase", letterSpacing: "0.02em" }}>
+            The Proof So Far
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", maxWidth: "700px", margin: "0 auto" }} className="proof-grid">
+            {[
+              { value: "10+", label: "Viral TikTok Reviews" },
+              { value: "100K+", label: "Total Views" },
+              { value: "58+", label: "Food Spots Mapped" },
+              { value: "0", label: "Free Meals Accepted" }
+            ].map((s) => (
+              <div key={s.label} style={{ padding: "24px 16px" }}>
+                <p style={{ margin: "0 0 6px", fontFamily: "var(--wwh-font-heading)", fontSize: "2.5rem", color: "var(--wwh-accent)", lineHeight: 1 }}>{s.value}</p>
+                <p style={{ margin: 0, color: "var(--wwh-muted)", fontFamily: "var(--wwh-font-body)", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ margin: "36px auto 0", color: "rgba(255,255,255,0.55)", fontFamily: "var(--wwh-font-body)", fontSize: "1rem", lineHeight: 1.7, maxWidth: "560px" }}>
+            Still anonymous. Still paying. Still telling the truth. No face. No bias. No filter.
+          </p>
         </div>
       </section>
 

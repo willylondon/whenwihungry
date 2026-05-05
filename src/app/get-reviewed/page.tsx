@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "Submit your Jamaican restaurant for possible listing or anonymous review by WhenWiHungry.",
   openGraph: {
-    title: "Get Your Restaurant Reviewed | WhenWiHungry",
+    title: "Get Your Restaurant Reviewed",
     description:
       "Submit your Jamaican restaurant for possible listing or anonymous review by WhenWiHungry.",
     images: [

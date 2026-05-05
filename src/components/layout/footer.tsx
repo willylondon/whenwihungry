@@ -3,6 +3,7 @@ import Link from "next/link";
 const FOOTER_LINKS = {
   Directory: [
     { href: "/browse", label: "All Food Spots" },
+    { href: "/reviews", label: "Viral Reviews" },
     { href: "/browse?category=jerk", label: "Jerk" },
     { href: "/browse?category=seafood", label: "Seafood" },
     { href: "/browse?category=local-food", label: "Local Food" },

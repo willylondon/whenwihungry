@@ -52,7 +52,7 @@ export function ReviewSection({ restaurantId, reviews, isSignedIn, userReview }:
       {/* Review Feed */}
       <div>
         <h2 style={{ fontFamily: "var(--wwh-font-heading)", fontSize: "1.8rem", color: "#fff", marginBottom: "24px", textTransform: "uppercase" }}>
-          Community Verdicts
+          Community Notes
         </h2>
         
         <div style={{ display: "grid", gap: "20px" }}>

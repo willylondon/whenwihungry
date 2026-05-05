@@ -135,7 +135,7 @@ export function GetReviewedClient() {
               maxWidth: "600px"
             }}
           >
-            Request a review. I come unannounced. I pay my bill. I tell the truth. If the food is right, 3K+ followers will know about it.
+            Submit your spot. If it fits the audience, it may be added to the directory or selected for an anonymous visit.
           </p>
         </div>
       </section>
@@ -280,6 +280,28 @@ export function GetReviewedClient() {
                 ⚠️ <strong>Read this first:</strong> Submitting a request doesn&apos;t guarantee a review, doesn&apos;t guarantee a positive review, and doesn&apos;t mean I&apos;ll announce when I&apos;m coming. If the food is good, the review will reflect that. If it&apos;s not — it will reflect that too.
               </p>
             </div>
+
+            {/* What Happens After You Submit */}
+            <div style={{ marginTop: "48px" }}>
+              <h3 style={{ margin: "0 0 20px", fontFamily: "var(--wwh-font-heading)", fontSize: "1.4rem", color: "#fff", textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                What Happens After You Submit
+              </h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {[
+                  { step: "1", text: "Your spot is reviewed for fit." },
+                  { step: "2", text: "It may be added to the directory." },
+                  { step: "3", text: "If selected, the critic may visit anonymously." },
+                  { step: "4", text: "The verdict goes where the audience is: TikTok first." }
+                ].map((item) => (
+                  <div key={item.step} style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "28px", height: "28px", borderRadius: "50%", background: "rgba(255,90,31,0.15)", color: "var(--wwh-accent)", fontFamily: "var(--wwh-font-body)", fontWeight: 700, fontSize: "0.8rem", flexShrink: 0 }}>
+                      {item.step}
+                    </span>
+                    <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontFamily: "var(--wwh-font-body)", fontSize: "0.92rem", lineHeight: 1.6 }}>{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Contact Form */}
@@ -310,14 +332,24 @@ export function GetReviewedClient() {
                 </h3>
                 <p
                   style={{
-                    margin: 0,
+                    margin: "0 0 16px",
                     color: "var(--wwh-muted)",
                     fontFamily: "var(--wwh-font-body)",
                     fontSize: "0.95rem",
                     lineHeight: 1.65
                   }}
                 >
-                  Got it. I&apos;ll be in touch if your spot makes the list. Keep the food consistent — you won&apos;t know when I&apos;m coming.
+                  This does not guarantee a review or a positive verdict. If selected, the visit may happen without notice.
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    color: "rgba(255,255,255,0.35)",
+                    fontFamily: "var(--wwh-font-body)",
+                    fontSize: "0.82rem"
+                  }}
+                >
+                  For collabs, tips, or corrections, message WhenWiHungry on TikTok or Instagram.
                 </p>
               </div>
             ) : (
