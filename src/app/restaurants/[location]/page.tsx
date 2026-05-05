@@ -3,6 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { dbRowToPlace, type PlaceV2 } from "@/lib/community";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { normalizeParish, isPlaceSafeForParishPage } from "@/lib/location-validation";
 
 type Props = {
   params: Promise<{ location: string }>;
@@ -69,7 +70,16 @@ export default async function LocationPage({ params }: Props) {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
-  const results: PlaceV2[] = (error || !data) ? [] : data.map((row: any) => {
+  const results: PlaceV2[] = (error || !data) ? [] : data
+    .filter((row: any) => isPlaceSafeForParishPage({
+      parish: row.parish,
+      area: row.area || row.city,
+      address: row.address,
+      name: row.name,
+      dataQualityStatus: row.data_quality_status,
+      manuallyVerified: row.manually_verified
+    }, location))
+    .map((row: any) => {
     const adminRev = Array.isArray(row.admin_reviews) ? row.admin_reviews[0] : row.admin_reviews;
     const userReviews = row.user_reviews || [];
     const avgCommunity = userReviews.length > 0
