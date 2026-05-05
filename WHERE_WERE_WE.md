@@ -1,32 +1,132 @@
-# Where Were We: Project Snapshot & Backup
+# Where Were We: Project Snapshot
+
+**Last updated**: 2026-05-05  
+**Live site**: https://whenwihungry.vercel.app/  
+**Repo**: github.com/willylondon/whenwihungry  
+**Stack**: Next.js 16 (Turbopack) + Supabase + Vercel  
+**Data**: 463 approved restaurants across 13 parishes
+
+---
 
 ## Current Status
-The project is completely **in sync with the `main` GitHub branch** and is running cleanly on Vercel. 
-The core issues surrounding search robustness and false "Critic Reviews" have been completely resolved.
+✅ Build passes clean. Deployed to Vercel production. All work pushed to `main`.
 
-## What We Did (The Work Up To Now)
+## What We Did (2026-05-05 — Full-Day Overhaul)
 
-### 1. Robust Layered Search Implementation
-We built out the `whenwihungry` discovery engine so that it searches natively like a proper Jamaican food app. 
-- Implemented the `search_restaurants` Supabase RPC to handle broad text matching and ranking (evaluating base relevance, dishes, keywords, admin reviews, and community reviews).
-- Created synonym expansion fallbacks (e.g., matching "fry chicken" to "fried chicken") and client-side fallbacks to ensure users never get a blank screen for reasonable queries.
-- Added a `search_logs` table and logging mechanism to continuously track user queries and failed searches for future improvement.
+### 1. Social Preview / OG Image Fix
+- Removed `/src/app/og/route.tsx` (WhatsApp doesn't respect dynamic OG routes)
+- Created `/public/og/whenwihungry-og.png` — 1200×630 dark branded card
+- All `og:image` and `twitter:image` point to the static PNG
+- Logo.png is NOT used as social preview image anywhere
 
-### 2. Fixed the "Stub Review" / Fake Verdict Bug
-Previously, unreviewed listings were appearing as if the Critic had reviewed them because of stale or empty rows in the `admin_reviews` table.
-- **Data Layer:** We created `supabase/clear_stub_admin_reviews.sql` and `supabase/remove_fake_verdicts.sql` to gracefully clean the database, removing verdicts from any row that lacks an actual `honest_take` or `headline`.
-- **UI Layer:** We tightened the `has_critic_review` logic so that the UI correctly differentiates between fully reviewed spots and mere listings. Unreviewed listings now safely display **"NOT YET REVIEWED"** and "About This Place" instead of a fake rating. The homepage appropriately separates "Fresh Off the Plate" (reviewed) from "Recently Added" (unreviewed).
+### 2. Review Status System (3 Content Types)
+- Created `src/lib/place-status.ts` — centralized helper
+  - `getPlaceStatus()` → `"listed" | "tiktok-reviewed" | "critic-reviewed"`
+  - `getPlaceStatusLabel()` → `"Listed — Review Pending" | "TikTok Reviewed" | "Critic Reviewed"`
+  - `getPlaceCta()` → `"View Listing →" | "Watch Review →" | "Read Verdict →"`
+  - `getPlaceDetailHeading()` → `"Listing Info" | "TikTok Review" | "Critic Verdict"`
+- Purged all old labels: NOT YET REVIEWED, THE HONEST TAKE, READ TRUTH, Verdict Pending
+- Rewrote `src/lib/place-card.ts` to use new status system
 
-### 3. Database Migration Scripts
-A robust set of SQL scripts has been committed to the `supabase/` folder to transition the database architecture cleanly to V2:
-- `v2_upgrade.sql`
-- `data_fields_migration.sql` 
-- `clear_stub_admin_reviews.sql`
-- `remove_fake_verdicts.sql`
-- `search_text_migration.sql`
+### 3. Language / Label Cleanup (Global)
+- "Food Spots" replaces "Reviews" for directory content
+- "Listed — Review Pending" replaces "NOT YET REVIEWED"
+- "Critic Verdict" / "Listing Info" replaces "The Honest Take" / "About This Place"
+- "Community Notes" replaces "Community Verdicts"
+- "View Listing →" replaces "READ TRUTH →"
+- Footer: "Critic reviews reflect the critic's honest, independent opinion. Food spots without a verdict are listings only."
+- Homepage recently-added: "Directory listings awaiting critic verdicts."
+- Homepage hero: "400+ Jamaican food spots mapped. 10+ viral TikTok reviews. More anonymous verdicts loading."
+- Critic card stats: 3K+ Followers, 100K+ Views, 10+ Viral Reviews, 400+ Food Spots
+- No "50+ Reviews" anywhere
 
-## Next Actions Required By You
-The codebase is solid and deployed. To finalize these changes in production, you need to manually apply the following scripts in your Supabase SQL Editor:
-1. Run `v2_upgrade.sql` to activate the `search_restaurants` RPC and logging tables.
-2. Run `clear_stub_admin_reviews.sql` and `remove_fake_verdicts.sql` to clean out the fake review data.
-3. Test a few searches ("jerk", "Moby Dick") on the live site to confirm the ranking engine is actively pulling from the new SQL logic.
+### 4. /reviews Page
+- Created new route for TikTok-reviewed + critic-reviewed content only
+- Hero: "Real Food Reactions. Viral Jamaican Reviews. No Fake Ratings."
+- Empty state: "Connecting Reviewed Spots — follow TikTok for latest"
+- Added "Viral Reviews" to navbar and footer
+
+### 5. SEO Intro Copy
+- `/restaurants/kingston` — "Kingston Food Spots Worth Mapping" (3 paragraphs)
+- `/restaurants/portland` — "Portland Food Spots Worth Mapping" (3 paragraphs)
+- `/browse?category=jerk` — "Jerk Chicken, Jerk Pork, and Roadside Smoke Across Jamaica"
+- `/browse?category=seafood` — "Fish, Lobster, Conch, Shrimp, and Beachside Seafood Spots"
+- Safe language: "mapped food spots," "public signals," "critic verdicts where available"
+
+### 6. Browse Chips
+- All, Jerk, Seafood, Kingston, Cheap Eats, Date Night, Curry Goat, Ice Cream
+
+### 7. SEO Title Double-Branding Fix
+- Root layout template: `%s | WhenWiHungry`
+- All page titles cleaned — no `| WhenWiHungry | WhenWiHungry` duplicates
+
+### 8. About Page
+- Added "The Proof So Far" block with dynamic food spot count
+- Stats: 3K+ TikTok Followers, 100K+ Total Views, 400+ Food Spots, 0 Free Meals
+
+### 9. Get Reviewed Page
+- Updated hero copy: "Submit your spot. If it fits the audience..."
+- Added "What Happens After You Submit" section (4 steps)
+- Updated success message: "This does not guarantee a review..."
+- Contact fallback: "For collabs, tips, or corrections, message WhenWiHungry on TikTok or Instagram."
+
+### 10. Place Card Name Visibility Fix
+- **Root cause**: `.card` CSS had white background (`rgba(255,255,255,0.96)`) but text was white (#fff) — invisible names
+- Rewrote `PlaceListCard` with explicit dark theme (`var(--wwh-card)` background)
+- Added fallback "Unnamed Food Spot" for missing names
+- Uses centralized place-status helpers for labels and CTAs
+- Shows public signal with proper null safety
+
+### 11. Data Integrity — Location/Parish Validation
+- Created `src/lib/location-validation.ts` — 14-parish alias maps, cross-validation
+- Created `scripts/audit-place-locations.ts` — loads all 465 records, flags cross-parish issues
+- Created `supabase/fix_parish_errors.sql` — 44 parish corrections (Portland→Kingston, etc.)
+- Updated `/restaurants/[location]` to filter through `isPlaceSafeForParishPage()`
+- Removed both JoJo's Jerk Pit records (closed down)
+- Audit: 58 flagged → 13 flagged after corrections
+- 6 false positives identified (street names, not parish names)
+- 2 records marked for manual review (border areas)
+- Added `npm run data:audit` script
+- `npm run build` passes clean
+
+### 12. Dynamic Food Spot Count
+- Created `src/lib/place-counts.ts`
+  - `getPublicFoodSpotCount()` — counts approved restaurants from Supabase
+  - `formatFoodSpotCount()` — 400+ / 500+ / 1K+ / etc.
+  - `getPublicFoodSpotCountLabel()` — fetch + format in one call
+- Exact count: 463 → label: "400+"
+- Updated homepage, about page, get-reviewed page
+- ISR revalidation: 6 hours (`revalidate = 21600`)
+- Fallback: 400+ (updated from stale 58+)
+- No hardcoded "58+" anywhere in src
+
+## Key Files
+| File | Purpose |
+|------|---------|
+| `src/lib/place-status.ts` | Centralized 3-type review status system |
+| `src/lib/place-counts.ts` | Dynamic food spot count from Supabase |
+| `src/lib/location-validation.ts` | Parish validation with 14-parish alias maps |
+| `src/lib/place-card.ts` | Card state helper using new status system |
+| `src/components/browse/place-list-card.tsx` | Browse card with visible names + dark theme |
+| `src/components/home/hero-section.tsx` | Homepage hero with dynamic count |
+| `src/app/reviews/page.tsx` | Viral Reviews archive page |
+| `src/app/about/page.tsx` | About page with Proof So Far block |
+| `public/og/whenwihungry-og.png` | Social preview image (1200×630) |
+| `scripts/audit-place-locations.ts` | Data quality audit script |
+| `supabase/fix_parish_errors.sql` | SQL migration for 44 parish corrections |
+| `reports/place-location-audit.md` | Latest audit report |
+
+## npm Scripts
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run test` | Vitest tests |
+| `npm run data:audit` | Run location audit report |
+
+## Next Actions
+- Populate TikTok review URLs in Supabase for `/reviews` page content
+- Add SEO intro copy for more categories (curry-goat, ice-cream, etc.)
+- Mark 2 ambiguous records manually (border areas)
+- Run Facebook Sharing Debugger / Twitter Card Validator after each deploy
+

@@ -1,26 +1,26 @@
 # Place Location Audit Report
 
-**Generated**: 2026-05-05T20:55:41.267Z
+**Generated**: 2026-05-05T21:55:03.624Z
 
 ## Summary
 
 | Metric | Count |
 |--------|-------|
-| Total places | 465 |
-| Total flagged | 13 |
+| Total places | 463 |
+| Total flagged | 12 |
 | Missing name | 0 |
 | Missing parish | 0 |
 | Missing area | 366 |
 | Missing address | 0 |
 | Missing coordinates | 0 |
-| Duplicates by name | 3 |
+| Duplicates by name | 2 |
 | Suspicious cross-parish | 10 |
 
 ## By Parish
 
 | Parish | Count |
 |--------|-------|
-| kingston | 138 |
+| kingston | 137 |
 | st james | 42 |
 | st ann | 33 |
 | westmoreland | 32 |
@@ -29,7 +29,7 @@
 | manchester | 28 |
 | trelawny | 27 |
 | st thomas | 26 |
-| st catherine | 25 |
+| st catherine | 24 |
 | portland | 24 |
 | hanover | 17 |
 | st mary | 14 |
@@ -48,6 +48,5 @@
 | 8 | Star Grill | star-grill-clarendon | Clarendon | May Pen | Manchester Ave, May Pen | Name/area/address contains "manchester" which suggests manchester, not clarendon | Correct parish to manchester |
 | 9 | Street Mixovibes | street-mixovibes | Kingston |  | 263 Spanish Town Rd, Kingston, Jamaica | Name/area/address contains "spanish town" which suggests st catherine, not kingston | Correct parish to st catherine |
 | 10 | Waves Beach | waves-beach | St. Thomas |  | 190 Sand Drive, Seafort Hellshire Portmore, Kingston, Jamaica | Name/area/address contains "kingston" which suggests kingston, not st thomas | Correct parish to kingston |
-| 11 | cru bar and kitchen | (multiple) | St. Andrew, Kingston |  |  | Duplicate name across 2 parishes: St. Andrew, Kingston | Verify which is correct; merge or differentiate |
-| 12 | jojo's jerk pit | (multiple) | St. Catherine, Kingston |  |  | Duplicate name across 2 parishes: St. Catherine, Kingston | Verify which is correct; merge or differentiate |
-| 13 | south avenue grill | (multiple) | Kingston, St. Andrew |  |  | Duplicate name across 2 parishes: Kingston, St. Andrew | Verify which is correct; merge or differentiate |
+| 11 | cru bar and kitchen | (multiple) | Kingston, St. Andrew |  |  | Duplicate name across 2 parishes: Kingston, St. Andrew | Verify which is correct; merge or differentiate |
+| 12 | south avenue grill | (multiple) | Kingston, St. Andrew |  |  | Duplicate name across 2 parishes: Kingston, St. Andrew | Verify which is correct; merge or differentiate |
