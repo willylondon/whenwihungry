@@ -209,7 +209,7 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
 
 export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
   const supabase = await createSupabaseServerClient();
-  
+
   const { data, error } = await supabase
     .from("restaurants")
     .select(`
@@ -217,6 +217,7 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
       admin_reviews(verdict, admin_score, honest_take, headline),
       user_reviews(rating)
     `)
+    .eq("status", "approved")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
