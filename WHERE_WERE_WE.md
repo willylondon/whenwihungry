@@ -9,7 +9,11 @@
 ---
 
 ## Current Status
-✅ Build passes clean. Deployed to Vercel production. All work pushed to `main`.
+✅ Build passes clean. Deployed to Vercel production. All work pushed to `main`.  
+✅ Description contamination fully resolved — 0 conflicts.  
+✅ Non-food filtering live in browse, search, and count queries.
+
+---
 
 ## What We Did (2026-05-05 — Full-Day Overhaul)
 
@@ -79,15 +83,10 @@
 
 ### 11. Data Integrity — Location/Parish Validation
 - Created `src/lib/location-validation.ts` — 14-parish alias maps, cross-validation
-- Created `scripts/audit-place-locations.ts` — loads all 465 records, flags cross-parish issues
-- Created `supabase/fix_parish_errors.sql` — 44 parish corrections (Portland→Kingston, etc.)
+- Created `scripts/audit-place-locations.ts` — loads all 463 records, flags cross-parish issues
+- Created `supabase/fix_parish_errors.sql` — parish corrections (Portland→Kingston, etc.)
 - Updated `/restaurants/[location]` to filter through `isPlaceSafeForParishPage()`
-- Removed both JoJo's Jerk Pit records (closed down)
-- Audit: 58 flagged → 13 flagged after corrections
-- 6 false positives identified (street names, not parish names)
-- 2 records marked for manual review (border areas)
 - Added `npm run data:audit` script
-- `npm run build` passes clean
 
 ### 12. Dynamic Food Spot Count
 - Created `src/lib/place-counts.ts`
@@ -97,24 +96,102 @@
 - Exact count: 463 → label: "400+"
 - Updated homepage, about page, get-reviewed page
 - ISR revalidation: 6 hours (`revalidate = 21600`)
-- Fallback: 400+ (updated from stale 58+)
 - No hardcoded "58+" anywhere in src
+
+---
+
+## What We Did (2026-05-05 — 15-Phase Data Quality Audit)
+
+### Phase 1 — Schema Audit
+- Mapped full `restaurants` table schema: status, parish, area, address, description, category, cuisine_type, data_quality_status, business_type, manually_verified, tiktok_url, verdict, admin_score, is_featured, is_verified
+- Confirmed `getAllApprovedPlaces()` had no `status=approved` filter — fixed
+
+### Phase 2 — Description Audit Script
+- `scripts/audit-place-descriptions.ts` — detects description text containing location keywords from the wrong parish
+- Found **10 Kingston records** with "portland" in description (import contamination)
+
+### Phase 3 — Safe Description Helper
+- `src/lib/place-description.ts`
+  - `getSafePlaceDescription(place)` — returns neutral fallback if description has cross-parish keywords
+  - `descriptionHasConflict(place)` — boolean for audit/UI use
+
+### Phase 4 — Quality Audit Script
+- `scripts/audit-place-quality.ts` — flags non-food businesses by known slug list, name pattern, and category pattern
+- Found **2 confirmed non-food records**: `lennys-cooking-gas`, `coronation-market-jamaica`
+
+### Phase 5 — Schema Columns Added (via Supabase Studio)
+```sql
+ALTER TABLE restaurants
+  ADD COLUMN IF NOT EXISTS data_quality_status TEXT DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS business_type TEXT DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS manually_verified BOOLEAN DEFAULT FALSE;
+```
+- `description_status TEXT` and `location_notes TEXT` columns also exist (confirmed by fix script)
+
+### Phase 6 — Data Quality Fix Script
+- `scripts/fix-place-data-quality.ts` — dry-run default, `--apply` to write
+- Applied:
+  - `lennys-cooking-gas` → `business_type=not_food, data_quality_status=rejected`
+  - `coronation-market-jamaica` → `business_type=food_adjacent, data_quality_status=needs_review`
+  - `rainforest-seafoods` → `business_type=food_adjacent`
+  - `jamaica-liquor-warehouse` → `business_type=food_adjacent`
+
+### Phase 7 — Visibility Helpers
+- `src/lib/place-visibility.ts`
+  - `isPublicFoodSpot()` — status=approved + not rejected + not not_food
+  - `isSafeForBrowse()` — same as above
+  - `isSafeForParishPage()` — stricter: excludes needs_review unless manually_verified
+  - `isReviewedPlace()` — has tiktok_url or critic verdict
+
+### Phase 8–11 — Route Audits & Text Checks
+- Filters confirmed ANDed (text search does not override parish/category)
+- /reviews correctly gates on `isReviewed()` — no listed-only records shown
+- `getPublicFoodSpotCount()` now uses identical filters as `getAllApprovedPlaces()`
+- No stale strings ("NOT YET REVIEWED", "THE HONEST TAKE", "58+") anywhere in src
+
+### Phase 12 — All 4 Reports Generated
+- `reports/place-description-audit.md` — conflicts: **0** (was 10)
+- `reports/place-quality-audit.md` — 2 non-food flagged
+- `reports/place-location-audit.md` — 463 records, 10 cross-parish (name/area based), 2 duplicates
+- `reports/public-route-audit.md` — all routes pass; schema gap documented
+
+### Phase 13–15 — Build, Verify, Commit
+- `npm run build` clean — 18 routes, 0 TypeScript errors
+- 5 commits on `main` covering descriptions / quality / visibility / reports / schema activation
+
+### Description Contamination Fix
+- `scripts/fix-contaminated-descriptions.ts` — dry-run default, `--apply` to write neutral descriptions
+- **RLS blocks UPDATE via anon key** — script silently hits 0 rows
+- `scripts/fix-contaminated-descriptions.sql` — SQL equivalent, run directly in Supabase Studio
+- Ran SQL in Studio → verification SELECT returned **0 rows** ✅
+- Re-ran `audit-place-descriptions.ts` → **With conflicts: 0** ✅
+
+---
 
 ## Key Files
 | File | Purpose |
 |------|---------|
 | `src/lib/place-status.ts` | Centralized 3-type review status system |
-| `src/lib/place-counts.ts` | Dynamic food spot count from Supabase |
-| `src/lib/location-validation.ts` | Parish validation with 14-parish alias maps |
+| `src/lib/place-counts.ts` | Dynamic food spot count (filters: approved + not rejected + not not_food) |
+| `src/lib/location-validation.ts` | Parish validation, 14-parish alias maps, isPlaceSafeForParishPage() |
+| `src/lib/place-description.ts` | getSafePlaceDescription() — neutral fallback for contaminated descriptions |
+| `src/lib/place-visibility.ts` | isPublicFoodSpot(), isSafeForBrowse(), isSafeForParishPage(), isReviewedPlace() |
 | `src/lib/place-card.ts` | Card state helper using new status system |
-| `src/components/browse/place-list-card.tsx` | Browse card with visible names + dark theme |
-| `src/components/home/hero-section.tsx` | Homepage hero with dynamic count |
+| `src/lib/community.ts` | getAllApprovedPlaces() — now filters status=approved + not rejected + not not_food |
+| `src/components/browse/place-list-card.tsx` | Browse card with dark theme and status helpers |
 | `src/app/reviews/page.tsx` | Viral Reviews archive page |
-| `src/app/about/page.tsx` | About page with Proof So Far block |
 | `public/og/whenwihungry-og.png` | Social preview image (1200×630) |
-| `scripts/audit-place-locations.ts` | Data quality audit script |
-| `supabase/fix_parish_errors.sql` | SQL migration for 44 parish corrections |
-| `reports/place-location-audit.md` | Latest audit report |
+| `scripts/audit-place-locations.ts` | Location data quality audit |
+| `scripts/audit-place-descriptions.ts` | Description cross-parish contamination audit |
+| `scripts/audit-place-quality.ts` | Non-food business detection |
+| `scripts/fix-place-data-quality.ts` | Tag business_type / data_quality_status (dry-run default) |
+| `scripts/fix-contaminated-descriptions.ts` | Replace contaminated descriptions (dry-run default; use .sql for actual writes) |
+| `scripts/fix-contaminated-descriptions.sql` | SQL to run in Supabase Studio — bypasses RLS |
+| `reports/place-description-audit.md` | Description audit — 0 conflicts |
+| `reports/place-location-audit.md` | Location audit — 10 cross-parish flags (manual review needed) |
+| `reports/place-quality-audit.md` | Quality audit — 2 non-food records |
+| `reports/public-route-audit.md` | Route audit — all routes pass |
+| `reports/live-verification.md` | Cache-busted URLs for post-deploy checks |
 
 ## npm Scripts
 | Script | Purpose |
@@ -122,11 +199,15 @@
 | `npm run dev` | Start dev server |
 | `npm run build` | Production build |
 | `npm run test` | Vitest tests |
-| `npm run data:audit` | Run location audit report |
+| `npm run data:audit` | Run location audit (`scripts/audit-place-locations.ts`) |
+| `npm run data:audit:descriptions` | Run description contamination audit |
+
+## Important: RLS Behaviour
+The `restaurants` table has Row Level Security enabled. The anon key (used in all scripts) can **SELECT** freely but **UPDATE** is blocked — the SDK returns no error but affects 0 rows. Always run data correction SQL directly in Supabase Studio for writes that need to bypass RLS.
 
 ## Next Actions
+- 10 suspicious cross-parish records in location audit — name/area-based flags, need manual one-by-one review in Supabase Studio
+- 2 duplicate restaurant names across parishes — manual verification
 - Populate TikTok review URLs in Supabase for `/reviews` page content
-- Add SEO intro copy for more categories (curry-goat, ice-cream, etc.)
-- Mark 2 ambiguous records manually (border areas)
+- Add SEO intro copy for more categories (curry-goat, ice-cream)
 - Run Facebook Sharing Debugger / Twitter Card Validator after each deploy
-
