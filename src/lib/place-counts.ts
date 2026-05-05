@@ -12,7 +12,9 @@ export async function getPublicFoodSpotCount(): Promise<number> {
   const { count, error } = await supabase
     .from("restaurants")
     .select("*", { count: "exact", head: true })
-    .eq("status", "approved");
+    .eq("status", "approved")
+    .neq("data_quality_status", "rejected")
+    .neq("business_type", "not_food");
 
   if (error || count == null) {
     console.warn("Failed to fetch food spot count:", error?.message);

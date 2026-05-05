@@ -4,10 +4,8 @@
  * Single source of truth for whether a record should appear on public routes.
  * These are client-side predicates applied to data already fetched from Supabase.
  *
- * NOTE: The data_quality_status and business_type fields are referenced here
- * but do not yet exist in the Supabase schema. Until those columns are added,
- * the relevant predicates will pass all records (undefined !== "rejected").
- * Run scripts/fix-place-data-quality.ts --apply after adding the columns.
+ * NOTE: data_quality_status and business_type columns were added to the
+ * restaurants table and seeded via scripts/fix-place-data-quality.ts --apply.
  */
 
 type VisibilityPlace = {

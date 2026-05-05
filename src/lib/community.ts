@@ -218,6 +218,8 @@ export async function getAllApprovedPlaces(): Promise<PlaceV2[]> {
       user_reviews(rating)
     `)
     .eq("status", "approved")
+    .neq("data_quality_status", "rejected")
+    .neq("business_type", "not_food")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
