@@ -42,7 +42,26 @@ export async function generateMetadata({ searchParams }: BrowsePageProps): Promi
     title: categoryMeta?.title ?? "Restaurant Directory Jamaica",
     description:
       categoryMeta?.description ??
-      "Browse Jamaican food spots by craving, parish, category, price, and public signal."
+      "Browse Jamaican food spots by craving, parish, category, price, and public signal.",
+    openGraph: {
+      title: categoryMeta?.title ?? "Restaurant Directory Jamaica | WhenWiHungry",
+      description:
+        categoryMeta?.description ??
+        "Browse Jamaican food spots by craving, parish, category, price, and public signal.",
+      images: [
+        {
+          url: "https://whenwihungry.vercel.app/og/whenwihungry-og.png",
+          width: 1200,
+          height: 630,
+          alt: "WhenWiHungry — Jamaica's boldest food critic",
+          type: "image/png"
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: ["https://whenwihungry.vercel.app/og/whenwihungry-og.png"]
+    }
   };
 }
 

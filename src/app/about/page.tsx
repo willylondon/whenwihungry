@@ -4,7 +4,25 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About the Critic | WhenWiHungry",
   description:
-    "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food."
+    "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
+  openGraph: {
+    title: "About the Critic | WhenWiHungry",
+    description:
+      "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
+    images: [
+      {
+        url: "https://whenwihungry.vercel.app/og/whenwihungry-og.png",
+        width: 1200,
+        height: 630,
+        alt: "WhenWiHungry — Jamaica's boldest food critic",
+        type: "image/png"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["https://whenwihungry.vercel.app/og/whenwihungry-og.png"]
+  }
 };
 
 const PHILOSOPHY = [
