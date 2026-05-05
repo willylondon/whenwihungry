@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "data:audit": "tsx scripts/audit-place-locations.ts"
+    "data:audit": "npx tsx scripts/audit-place-locations.ts",
+    "data:audit:descriptions": "npx tsx scripts/audit-place-descriptions.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
