@@ -77,7 +77,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
   ]);
 
   if (!restaurant) {
-     notFound();
+    notFound();
+  }
+
+  if (
+    restaurant.data_quality_status === "rejected" ||
+    restaurant.business_type === "not_food"
+  ) {
+    notFound();
   }
 
   const [{ data: reviews }, { data: existingReview }] = await Promise.all([

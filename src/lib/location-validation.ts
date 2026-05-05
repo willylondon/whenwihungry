@@ -167,14 +167,16 @@ export function isPlaceSafeForParishPage(
     name?: string | null;
     manuallyVerified?: boolean | null;
     dataQualityStatus?: string | null;
+    businessType?: string | null;
   },
   requestedParish: string
 ): boolean {
   const normalized = normalizeParish(requestedParish);
   if (!normalized) return false;
 
-  // Never show rejected records
+  // Never show rejected records or confirmed non-food businesses
   if (place.dataQualityStatus === "rejected") return false;
+  if (place.businessType === "not_food") return false;
 
   // Never show needs_review on parish pages unless manually verified
   if (place.dataQualityStatus === "needs_review" && !place.manuallyVerified) return false;

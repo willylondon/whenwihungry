@@ -24,37 +24,48 @@ const PARISH_KEYWORDS: Record<string, string[]> = {
     "red hills", "manor park", "papine", "mona"
   ],
   "st james": [
+    "st. james", "st james", "saint james",
     "montego bay", "mobay", "ironshore", "freeport", "hip strip",
     "gloucester avenue", "rose hall"
   ],
   "st ann": [
+    "st. ann", "st ann", "saint ann",
     "ocho rios", "runaway bay", "discovery bay", "priory", "mammee bay"
   ],
   westmoreland: [
+    "westmoreland",
     "negril", "savanna-la-mar", "sav-la-mar", "whitehouse"
   ],
   "st elizabeth": [
+    "st. elizabeth", "st elizabeth", "saint elizabeth",
     "black river", "treasure beach", "santa cruz", "junction", "malvern"
   ],
   manchester: [
+    "manchester",
     "mandeville", "christiana", "spur tree"
   ],
   "st catherine": [
+    "st. catherine", "st catherine", "saint catherine",
     "spanish town", "portmore", "old harbour", "linstead", "bog walk"
   ],
   clarendon: [
+    "clarendon",
     "may pen", "lionel town", "chapelton"
   ],
   "st mary": [
+    "st. mary", "st mary", "saint mary",
     "port maria", "oracabessa", "annotto bay", "highgate"
   ],
   hanover: [
+    "hanover",
     "lucea", "green island", "sandy bay"
   ],
   trelawny: [
+    "trelawny",
     "falmouth", "duncans", "rio bueno"
   ],
   "st thomas": [
+    "st. thomas", "st thomas", "saint thomas",
     "morant bay", "yallahs", "lyssons", "seaforth"
   ]
 };

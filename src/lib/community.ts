@@ -258,10 +258,12 @@ export async function getApprovedCommunityPlaceBySlug(slug: string) {
   const { data } = await supabase
     .from("restaurants")
     .select(
-      "slug, name, description, parish, area, address, phone, website, price_range, category, image_url, avg_rating, rating_count, positive_comment_count, cuisine_type, latitude, longitude"
+      "slug, name, description, parish, area, address, phone, website, price_range, category, image_url, avg_rating, rating_count, positive_comment_count, cuisine_type, latitude, longitude, data_quality_status, business_type"
     )
     .eq("slug", slug)
     .eq("status", "approved")
+    .neq("data_quality_status", "rejected")
+    .neq("business_type", "not_food")
     .maybeSingle();
 
   return data ? dbRowToPlace(data as Record<string, unknown>) : null;

@@ -67,6 +67,9 @@ export default async function LocationPage({ params }: Props) {
     .from("restaurants")
     .select(`*, admin_reviews(verdict, admin_score), user_reviews(rating)`)
     .in("parish", variants)
+    .eq("status", "approved")
+    .neq("data_quality_status", "rejected")
+    .neq("business_type", "not_food")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -77,7 +80,8 @@ export default async function LocationPage({ params }: Props) {
       address: row.address,
       name: row.name,
       dataQualityStatus: row.data_quality_status,
-      manuallyVerified: row.manually_verified
+      manuallyVerified: row.manually_verified,
+      businessType: row.business_type
     }, location))
     .map((row: any) => {
     const adminRev = Array.isArray(row.admin_reviews) ? row.admin_reviews[0] : row.admin_reviews;
