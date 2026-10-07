@@ -17,12 +17,12 @@ import { FilterChips } from "@/components/browse/filter-chips";
 
 const CATEGORY_META: Record<string, { title: string; description: string }> = {
   jerk: {
-    title: "Best Jerk Spots in Jamaica",
+    title: "Jerk Restaurants & Food Spots in Jamaica",
     description:
       "Discover jerk chicken, jerk pork, and pimento-wood cooked food spots across Jamaica."
   },
   seafood: {
-    title: "Best Seafood Spots in Jamaica",
+    title: "Seafood Restaurants in Jamaica",
     description:
       "Discover seafood restaurants, beach fish spots, lobster, conch, and Jamaican seafood listings."
   }
@@ -50,14 +50,22 @@ const CATEGORY_INTRO: Record<string, { heading: string; paragraphs: string[] }> 
 export async function generateMetadata({ searchParams }: BrowsePageProps): Promise<Metadata> {
   const params = normalizeBrowseParams(await searchParams);
   const category = params.category?.trim().toLowerCase().replace(/-/g, " ");
-  const categoryMeta = category && Object.hasOwn(CATEGORY_META, category) ? CATEGORY_META[category] : null;
+  const categoryName = categories.find(item => item.toLowerCase() === category);
+  const categoryMeta = category && Object.hasOwn(CATEGORY_META, category) ? CATEGORY_META[category] : categoryName ? {
+    title: `${categoryName} Food Spots in Jamaica`,
+    description: `Find ${categoryName.toLowerCase()} food spots across Jamaica. Compare parish, location and available listing details, with critic verdicts where published.`
+  } : null;
 
   const knownCategory = category && categories.some(item => item.toLowerCase() === category);
-  const isFiltered = Boolean(category && !knownCategory) || Object.entries(params).some(([key, value]) => Boolean(value) && key !== "category");
-  const canonical = knownCategory ? `/browse?category=${encodeURIComponent(category)}` : "/browse";
+  const isFiltered = Boolean(category && !knownCategory) || Object.entries(params).some(([key, value]) => Boolean(value) && key !== "category" && key !== "page");
+  const collection = knownCategory ? `/browse?category=${encodeURIComponent(category)}` : "/browse";
+  const results = isFiltered ? [] : getFilteredPlaces({ category }, await getAllApprovedPlaces());
+  const pagination = paginate(results, params.page);
+  const invalidPage = Boolean(params.page && Number(params.page) !== pagination.page);
+  const canonical = !isFiltered && pagination.page > 1 ? `${collection}${knownCategory ? "&" : "?"}page=${pagination.page}` : collection;
   return {
     alternates: { canonical },
-    ...(isFiltered ? { robots: { index: false, follow: true } } : {}),
+    ...(isFiltered || invalidPage || results.length === 0 ? { robots: { index: false, follow: true } } : {}),
     title: categoryMeta?.title ?? "Restaurant Directory Jamaica",
     description:
       categoryMeta?.description ??

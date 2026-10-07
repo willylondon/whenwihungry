@@ -19,14 +19,19 @@ function parishForSlug(location: string) {
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { location } = await params;
-  const displayName = getParishDisplayName(parishForSlug(location));
-  const canonical = `/restaurants/${location.toLowerCase()}`;
+  const parish = parishForSlug(location);
+  const displayName = parish === "kingston" ? "Kingston & St. Andrew" : getParishDisplayName(parish);
+  const collection = `/restaurants/${parish.replace(/ /g, "-")}`;
   const query = normalizeBrowseParams(await searchParams);
+  const results = (await getAllApprovedPlaces()).filter(place => isPlaceSafeForParishPage(place, parish));
+  const pagination = paginate(results, query.page);
+  const canonical = `${collection}${pagination.page > 1 ? `?page=${pagination.page}` : ""}`;
+  const invalidPage = Boolean(query.page && Number(query.page) !== pagination.page);
   return {
     title: `Restaurants in ${displayName}`,
     description: `Explore food spots in ${displayName}, with listing information and critic verdicts where available.`,
     alternates: { canonical },
-    ...(query.page ? { robots: { index: false, follow: true } } : {}),
+    ...(invalidPage || results.length === 0 ? { robots: { index: false, follow: true } } : {}),
     openGraph: { title: `Restaurants in ${displayName}`, url: siteUrl(canonical), images: [siteUrl("/og/whenwihungry-og.png")] }
   };
 }

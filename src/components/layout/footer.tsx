@@ -12,8 +12,8 @@ const FOOTER_LINKS = {
   Explore: [
     { href: "/about", label: "About the Critic" },
     { href: "/get-reviewed", label: "Get Reviewed" },
-    { href: "/restaurants/kingston", label: "Best in Kingston" },
-    { href: "/restaurants/portland", label: "Best in Portland" },
+    { href: "/restaurants/kingston", label: "Restaurants in Kingston" },
+    { href: "/restaurants/portland", label: "Restaurants in Portland" },
     { href: "/browse", label: "Restaurant Directory" },
     { href: "/privacy", label: "Privacy & Contact" }
   ],
