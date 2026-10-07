@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
@@ -56,18 +57,13 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
           className="featured-card"
         >
           {/* Image */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
-            <img
-              loading="lazy"
+          <div style={{ position: "relative", overflow: "hidden", minHeight: "400px" }}>
+            <Image
               src={place.image}
               alt={place.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                minHeight: "400px",
-                transition: "transform 600ms ease"
-              }}
+              fill
+              sizes="(max-width: 900px) 100vw, 600px"
+              style={{ objectFit: "cover", transition: "transform 600ms ease" }}
               className="featured-img"
             />
             {/* Overlay */}

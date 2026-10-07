@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export function AboutSection() {
@@ -49,11 +50,7 @@ export function AboutSection() {
                 maxWidth: "460px"
               }}
             >
-              <img
-                src="/critic-avatar.png"
-                alt="The Anonymous Critic"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              />
+              <Image src="/critic-avatar.png" alt="The Anonymous Critic" fill sizes="(max-width: 900px) 90vw, 460px" style={{ objectFit: "cover" }} />
               {/* Red rim overlay */}
               <div
                 style={{

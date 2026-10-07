@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+
 type SearchFiltersProps = {
   parishes: string[];
   categories: string[];
@@ -12,8 +16,15 @@ type SearchFiltersProps = {
 
 export function SearchFilters({ activeCategory, activeParish, activePrice, activeQuery,
   activeRating, activeSort, activeView = "grid", categories, parishes }: SearchFiltersProps) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const activeCount = [activeParish, activeCategory, activePrice, activeRating, activeSort].filter(Boolean).length;
+  // Choices apply immediately; typing a search still waits for the Search button.
+  const applyOnChange = (event: FormEvent<HTMLFormElement>) => {
+    const target = event.target as HTMLElement;
+    if (target instanceof HTMLSelectElement || (target instanceof HTMLInputElement && target.type === "radio")) event.currentTarget.requestSubmit();
+  };
   return (
-    <form action="/browse" method="get" className="filters card directory-filters" key={[activeQuery, activeCategory, activeParish, activePrice, activeRating, activeSort, activeView].join("|")}>
+    <form action="/browse" method="get" className="filters card directory-filters" onChange={applyOnChange} key={[activeQuery, activeCategory, activeParish, activePrice, activeRating, activeSort, activeView].join("|")}>
       <div className="filter-head">
         <span className="eyebrow">Filters</span>
         <fieldset className="view-controls">
@@ -30,6 +41,10 @@ export function SearchFilters({ activeCategory, activeParish, activePrice, activ
         <span>Search food spots</span>
         <input className="filter-input" defaultValue={activeQuery} name="q" placeholder="What yuh hungry for?" type="search" />
       </label>
+      <button type="button" className="filters-toggle" aria-expanded={moreOpen} aria-controls="browse-more-filters" onClick={() => setMoreOpen(open => !open)}>
+        {moreOpen ? "Hide filters" : "More filters"}{activeCount > 0 && <span className="filters-toggle-count">{activeCount}<span className="sr-only"> active</span></span>}
+      </button>
+      <div id="browse-more-filters" className={`filters-more${moreOpen ? " is-open" : ""}`}>
       <label className="filter-field"><span>Parish</span>
         <select className="filter-input" defaultValue={activeParish ?? ""} name="parish">
           <option value="">All parishes</option>
@@ -61,7 +76,8 @@ export function SearchFilters({ activeCategory, activeParish, activePrice, activ
           <option value="az">A to Z</option><option value="price-low">Price low to high</option><option value="price-high">Price high to low</option>
         </select>
       </label>
-      <button className="btn btn-primary" type="submit">Apply filters</button>
+      </div>
+      <button className="btn btn-primary" type="submit">Search</button>
     </form>
   );
 }

@@ -1,7 +1,8 @@
 import { requireAdmin } from "@/lib/auth/require-admin";
 import Link from "next/link";
 
-export default async function AdminRestaurantsPage() {
+export default async function AdminRestaurantsPage({ searchParams }: { searchParams: Promise<{ refreshed?: string }> }) {
+  const { refreshed } = await searchParams;
   const supabase = await requireAdmin("/admin/restaurants");
   const { data: restaurants, error } = await supabase
     .from("restaurants")
@@ -28,6 +29,7 @@ export default async function AdminRestaurantsPage() {
           </Link>
         </div>
 
+        {refreshed === "1" && <p role="status" style={{ color: "#fff" }}>Public pages refreshed. Visitors will see the latest data on their next visit.</p>}
         {error && <p role="alert">Restaurant data could not be loaded. Refresh to retry.</p>}
         {!error && !restaurants?.length && <p>No restaurants found.</p>}
         <div style={{ background: "var(--wwh-card)", borderRadius: "16px", border: "1px solid var(--wwh-border)", overflow: "hidden" }}>

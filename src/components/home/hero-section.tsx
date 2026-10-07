@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Props = { foodSpotCountLabel?: string | null };
 
 export function HeroSection({ foodSpotCountLabel = null }: Props) {
@@ -13,16 +15,13 @@ export function HeroSection({ foodSpotCountLabel = null }: Props) {
       }}
     >
       {/* Background image */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage:
-            "url('https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=2000')",
-          backgroundSize: "cover",
-          backgroundPosition: "center 40%",
-          opacity: 0.35
-        }}
+      <Image
+        src="https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        style={{ objectFit: "cover", objectPosition: "center 40%", opacity: 0.35 }}
       />
 
       {/* Gradient overlay */}

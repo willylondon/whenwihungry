@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { siteUrl } from "@/lib/site-url";
@@ -200,11 +201,7 @@ export default async function AboutPage() {
               border: "1px solid rgba(255,90,31,0.3)"
             }}
           >
-            <img
-              src="/critic-avatar.png"
-              alt="The Anonymous Critic"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+            <Image src="/critic-avatar.png" alt="The Anonymous Critic" fill sizes="(max-width: 900px) 90vw, 560px" style={{ objectFit: "cover" }} />
             <div
               style={{
                 position: "absolute",

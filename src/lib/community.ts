@@ -1,5 +1,9 @@
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { CATALOG_CACHE_TAG } from "@/lib/cache-tags";
 import { catalogImage } from "@/lib/image-config";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Place } from "@/data/places";
 import { getPublishedCriticReview, getReviewVideoUrl, getTikTokContactUrl, safeWebUrl, validReviewDate } from "@/lib/place-status";
@@ -8,7 +12,7 @@ import { buildRestaurantSearchDocument, rankPlacesForQuery, type RestaurantSearc
 import { normalizeSearchQuery } from "@/lib/search/helpers";
 
 type Row = Record<string, any>;
-type Supabase = Awaited<ReturnType<typeof createSupabaseServerClient>>;
+type Supabase = SupabaseClient<any, any, any>;
 
 export type PlaceV2 = Place & {
   id?: string;
@@ -65,6 +69,8 @@ const PAGE_SIZE = 200;
 const MAX_ROWS = 50_000;
 const QUERY_TIMEOUT_MS = 8_000;
 const PUBLIC_SELECT = "*, admin_reviews(*)";
+/** Editorial writes expire the tag immediately; this is only the fallback refresh. */
+const CATALOG_REVALIDATE_SECONDS = 3600;
 
 function reportUnavailable(operation: string, cause: unknown): never {
   // Do not log queries, personal data or provider error details to public server logs.
@@ -72,8 +78,9 @@ function reportUnavailable(operation: string, cause: unknown): never {
   throw cause instanceof CatalogUnavailableError ? cause : new CatalogUnavailableError(operation, cause);
 }
 
-async function getClient(operation: string): Promise<Supabase> {
-  try { return await createSupabaseServerClient(); }
+/** Public catalog reads are anonymous so they can be shared and cached across visitors. */
+function getClient(operation: string): Supabase {
+  try { return createSupabasePublicClient(); }
   catch (cause) { return reportUnavailable(operation, cause); }
 }
 
@@ -260,19 +267,31 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
   return place;
 }
 
-export const getAllApprovedPlaces = cache(async (): Promise<PlaceV2[]> => {
-  const supabase = await getClient("browse");
+/**
+ * Raw eligible rows are cached rather than mapped places: they are about half the
+ * size (the data cache has a per-entry limit) and mapping is cheap. Failures throw
+ * and are never cached, so an outage cannot be stored as an empty catalog.
+ */
+const loadCatalogRows = unstable_cache(async (): Promise<Row[]> => {
+  const supabase = getClient("browse");
   const rows = await readAllPages((from, to) => publicQuery(supabase).range(from, to), "browse");
-  return (await attachApprovedRatings(supabase, eligibleRows(rows, "browse"), "browse")).map(dbRowToPlace);
-});
+  return attachApprovedRatings(supabase, eligibleRows(rows, "browse"), "browse");
+}, ["public-catalog-rows-v1"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
-export const getApprovedCommunityPlaceBySlug = cache(async (slug: string): Promise<PlaceV2 | null> => {
-  const supabase = await getClient("detail");
+const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> => {
+  const supabase = getClient("detail");
   const rows = await readAllPages((from, to) => publicQuery(supabase).eq("slug", slug).range(from, to), "detail");
   const eligible = eligibleRows(rows, "detail");
   if (!eligible.length) return null;
   if (eligible.length !== 1) return reportUnavailable("detail", new Error("Duplicate restaurant slug"));
-  return dbRowToPlace((await attachApprovedRatings(supabase, eligible, "detail"))[0]);
+  return (await attachApprovedRatings(supabase, eligible, "detail"))[0];
+}, ["public-catalog-detail-v1"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+
+export const getAllApprovedPlaces = cache(async (): Promise<PlaceV2[]> => (await loadCatalogRows()).map(dbRowToPlace));
+
+export const getApprovedCommunityPlaceBySlug = cache(async (slug: string): Promise<PlaceV2 | null> => {
+  const row = await loadPlaceRow(slug);
+  return row ? dbRowToPlace(row) : null;
 });
 
 export async function getApprovedCommunityPlaces(existingSlugs: string[]): Promise<PlaceV2[]> {
@@ -306,7 +325,7 @@ async function hydrateSearchRows(supabase: Supabase, ranked: Row[]): Promise<Pla
 export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
   const normalized = normalizeSearchQuery(query).slice(0, 200);
   if (!normalized) return getAllApprovedPlaces();
-  const supabase = await getClient("search");
+  const supabase = getClient("search");
   let ranked: Row[] = [];
   try {
     ranked = await readAllPages((from, to) => supabase.rpc("search_restaurants", { search_query: normalized }, { count: "exact" })
@@ -333,7 +352,7 @@ export async function getCommunityRestaurant(slug: string): Promise<CommunityRes
 }
 
 export async function getCommunityComments(restaurantId: string): Promise<CommunityComment[]> {
-  const supabase = await getClient("comments");
+  const supabase = getClient("comments");
   try {
     const { data, error } = await supabase.from("restaurant_comments").select("id, body, created_at")
       .eq("restaurant_id", restaurantId).eq("status", "visible").order("created_at", { ascending: false }).limit(12)

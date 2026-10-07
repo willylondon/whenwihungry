@@ -55,8 +55,8 @@ export function RatingExplainer() {
       >
         <SectionHeader
           eyebrow="The System"
-          heading="No Stars. Just Truth."
-          subtext="We don't do star ratings here. Stars are vague. These verdicts say exactly what needs to be said."
+          heading="Plain Verdicts. No Star Soup."
+          subtext="A critic verdict isn't a star average. Every review lands on one of these four calls. Star ratings you see in the directory come from public sources and are labelled that way."
           align="center"
         />
 
