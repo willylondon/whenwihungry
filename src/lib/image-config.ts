@@ -14,24 +14,24 @@ export function imageHosts(supabaseUrl?: string) {
 export const PLACEHOLDER_IMAGE = "/logo.png";
 
 /**
- * Sources we hold rights to. Photos copied from Google Maps/Places belong to their
+ * Sources we hold rights to that show the real place. Photos copied from Google Maps/Places belong to their
  * uploaders and may not be re-hosted, so they stay in the database but aren't shown.
  * To show a listing photo, set image_source to one of these (any case).
  */
 const CLEARED_IMAGE_SOURCES = new Set(["whenwihungry", "restaurant supplied", "owner supplied"]);
-/** Free-licence stock libraries whose terms allow reuse. */
-const LICENSED_STOCK_HOSTS = new Set(["images.unsplash.com", "images.pexels.com"]);
 
-export function hasImageRights(source: unknown, url: unknown): boolean {
-  if (typeof source === "string" && CLEARED_IMAGE_SOURCES.has(source.trim().toLowerCase())) return true;
-  if (typeof url !== "string") return false;
-  try { return LICENSED_STOCK_HOSTS.has(new URL(url).hostname); } catch { return false; }
+/**
+ * Listing photos must show the actual place. Generic stock photos (even free-licence
+ * Unsplash/Pexels ones) are not shown, because visitors would read them as the restaurant.
+ */
+export function hasImageRights(source: unknown): boolean {
+  return typeof source === "string" && CLEARED_IMAGE_SOURCES.has(source.trim().toLowerCase());
 }
 
 /** The image a public listing may display: rights-cleared and from an allowed location. */
 export function listingImage(row: { image_url?: unknown; image?: unknown; image_source?: unknown }, supabaseUrl?: string) {
   const url = row.image_url || row.image;
-  return hasImageRights(row.image_source, url) ? catalogImage(url, supabaseUrl) : PLACEHOLDER_IMAGE;
+  return hasImageRights(row.image_source) ? catalogImage(url, supabaseUrl) : PLACEHOLDER_IMAGE;
 }
 
 export function hasListingPhoto(image: string | null | undefined): boolean {
