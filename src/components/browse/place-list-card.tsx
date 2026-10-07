@@ -16,6 +16,7 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
           ? <Image alt={place.name} src={place.image} width={480} height={320} sizes="(max-width: 640px) 100vw, (max-width: 1080px) 50vw, 400px" loading="lazy" />
           : <ListingPlaceholder category={place.category} parish={place.parish} />}
         {place.is_verified && <span className="verified-label">Verified listing</span>}
+        {hasListingPhoto(place.image) && place.image_credit && <span className="photo-credit">Photo: {place.image_credit}</span>}
       </div>
       <div className="browse-card-body">
         <div className="browse-card-status">

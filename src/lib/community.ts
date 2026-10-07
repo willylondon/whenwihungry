@@ -2,7 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { CATALOG_CACHE_TAG } from "@/lib/cache-tags";
-import { listingImage } from "@/lib/image-config";
+import { listingImage, listingImageCredit } from "@/lib/image-config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Place } from "@/data/places";
@@ -53,6 +53,8 @@ export type PlaceV2 = Place & {
   country?: string | null;
   country_code?: string | null;
   search_document?: RestaurantSearchDocument;
+  /** Third-party source of the listing photo, shown as "Photo: …". */
+  image_credit?: string | null;
 };
 
 /** A catalog outage is different from a successful empty result or a missing slug. */
@@ -215,6 +217,7 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
     features: strings(restaurant.features),
     hours: strings(restaurant.hours),
     image: listingImage(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
+    image_credit: listingImageCredit(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
     lat: validCoordinates ? lat : undefined,
     lng: validCoordinates ? lng : undefined,
     parish: stringValue(restaurant.parish),
