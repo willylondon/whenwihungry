@@ -65,5 +65,6 @@ export const rokReview = {
     officialLink: { href: "https://www.hilton.com/en/hotels/kinocup-rok-hotel-kingston/dining/", label: "Official dining information" }
   },
   address: { street: "2–4 King Street", locality: "Kingston", country: "JM" },
+  placeSlug: "rok-hotel-kingston",
   parishSlug: "kingston"
 } as const satisfies WrittenReview;
