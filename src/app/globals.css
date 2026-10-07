@@ -1859,3 +1859,10 @@ p {
 .dark-section a.card:hover { border-color: rgba(255, 154, 112, 0.5); }
 .reviews-hub-tiktok h2 { color: #fff; font-family: var(--wwh-font-heading); text-transform: uppercase; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; }
 .reviews-hub-tiktok p { color: rgba(255, 255, 255, 0.65); }
+
+/* Listing cards without a rights-cleared photo */
+.listing-placeholder { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16px; text-align: center;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 90, 31, 0.18), transparent 55%), radial-gradient(circle at 80% 90%, rgba(255, 200, 87, 0.10), transparent 50%), #1c1c1c; }
+.listing-placeholder-icon { font-size: 2.6rem; line-height: 1; }
+.listing-placeholder-text { color: #fff; font-family: var(--wwh-font-heading); font-size: 1.35rem; letter-spacing: 0.03em; text-transform: uppercase; }
+.listing-placeholder-note { color: #9ca3af; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }

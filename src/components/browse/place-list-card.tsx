@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
+import { hasListingPhoto } from "@/lib/image-config";
 import { getPlaceStatusLabel, getPlaceCta, getPlaceStatus } from "@/lib/place-status";
 
 export function PlaceListCard({ place, showMatchReason = false }: { place: PlaceV2; showMatchReason?: boolean }) {
@@ -11,7 +12,9 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
   return (
     <Link href={`/places/${place.slug}${status === "tiktok-reviewed" ? "#video" : ""}`} className="browse-card-link">
       <div className="browse-card-image">
-        <Image alt={place.name} src={place.image} width={480} height={320} sizes="(max-width: 640px) 100vw, (max-width: 1080px) 50vw, 400px" loading="lazy" />
+        {hasListingPhoto(place.image)
+          ? <Image alt={place.name} src={place.image} width={480} height={320} sizes="(max-width: 640px) 100vw, (max-width: 1080px) 50vw, 400px" loading="lazy" />
+          : <ListingPlaceholder category={place.category} parish={place.parish} />}
         {place.is_verified && <span className="verified-label">Verified listing</span>}
       </div>
       <div className="browse-card-body">
@@ -32,4 +35,19 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
       </div>
     </Link>
   );
+}
+
+const CATEGORY_ICONS: [RegExp, string][] = [
+  [/jerk|grill|bbq/i, "🔥"], [/sea ?food|fish|lobster/i, "🐟"], [/bak|pastr|patty|patties/i, "🥐"], [/ice cream|dessert|sweet/i, "🍨"],
+  [/bar|lounge|pub/i, "🍹"], [/chinese|asian|sushi|japanese/i, "🥢"], [/pizza|italian/i, "🍕"], [/vegan|vegetarian|ital/i, "🥗"], [/caf|coffee/i, "☕"]
+];
+
+/** Shown instead of a photo we don't have the rights to use. */
+function ListingPlaceholder({ category, parish }: { category?: string; parish?: string }) {
+  const icon = CATEGORY_ICONS.find(([pattern]) => pattern.test(category ?? ""))?.[1] ?? "🍽️";
+  return <div className="listing-placeholder" aria-hidden="true">
+    <span className="listing-placeholder-icon">{icon}</span>
+    <span className="listing-placeholder-text">{category || "Food spot"}{parish ? ` · ${parish}` : ""}</span>
+    <span className="listing-placeholder-note">Photo coming soon</span>
+  </div>;
 }

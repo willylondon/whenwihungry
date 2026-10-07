@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalogImage, imageHosts } from "@/lib/image-config";
+import { catalogImage, hasImageRights, imageHosts, listingImage } from "@/lib/image-config";
 
 describe("catalog image deployment contract", () => {
   const staging = "https://abcdefghijklmnopqrst.supabase.co";
@@ -18,5 +18,21 @@ describe("catalog image deployment contract", () => {
   });
   it("retains supported public photography", () => {
     expect(catalogImage("https://images.unsplash.com/food.jpg")).toBe("https://images.unsplash.com/food.jpg");
+  });
+});
+
+describe("listing photo rights", () => {
+  const storage = "https://abcdefghijklmnopqrst.supabase.co";
+  const stored = `${storage}/storage/v1/object/public/restaurant-images/spot.jpg`;
+  it.each(["Google Places", "Google", "OpenStreetMap", null, ""])("hides re-hosted photos from %s behind the placeholder", (source) => {
+    expect(listingImage({ image_url: stored, image_source: source }, storage)).toBe("/logo.png");
+  });
+  it("shows our own, restaurant-supplied and free-licence stock photos", () => {
+    expect(listingImage({ image_url: "/images/reviews/rok-hotel/salmon.jpg", image_source: "WhenWiHungry" })).toBe("/images/reviews/rok-hotel/salmon.jpg");
+    expect(listingImage({ image_url: stored, image_source: " Restaurant supplied " }, storage)).toBe(stored);
+    expect(listingImage({ image_url: "https://images.unsplash.com/food.jpg", image_source: "Google" })).toBe("https://images.unsplash.com/food.jpg");
+    expect(hasImageRights("whenwihungry", "javascript:alert(1)")).toBe(true);
+    // Rights never bypass the safe-location checks.
+    expect(listingImage({ image_url: "javascript:alert(1)", image_source: "WhenWiHungry" })).toBe("/logo.png");
   });
 });

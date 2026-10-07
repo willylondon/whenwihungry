@@ -2,7 +2,7 @@ import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { CATALOG_CACHE_TAG } from "@/lib/cache-tags";
-import { catalogImage } from "@/lib/image-config";
+import { listingImage } from "@/lib/image-config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Place } from "@/data/places";
@@ -214,7 +214,7 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
     description: stringValue(restaurant.description),
     features: strings(restaurant.features),
     hours: strings(restaurant.hours),
-    image: catalogImage(restaurant.image_url || restaurant.image, process.env.NEXT_PUBLIC_SUPABASE_URL),
+    image: listingImage(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
     lat: validCoordinates ? lat : undefined,
     lng: validCoordinates ? lng : undefined,
     parish: stringValue(restaurant.parish),
