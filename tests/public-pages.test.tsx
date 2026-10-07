@@ -5,7 +5,7 @@ import { siteUrl } from "@/lib/site-url";
 import type { PlaceV2 } from "@/lib/community";
 
 const api = vi.hoisted(() => ({ all: vi.fn(), search: vi.fn(), detail: vi.fn(), user: vi.fn() }));
-vi.mock("@/lib/community", () => ({ getAllApprovedPlaces: api.all, searchRestaurants: api.search, getApprovedCommunityPlaceBySlug: api.detail, getCurrentUser: api.user }));
+vi.mock("@/lib/community", () => ({ getAllApprovedPlaces: api.all, searchRestaurants: api.search, getApprovedCommunityPlaceBySlug: api.detail, getCurrentUser: api.user, getApprovedPlaceReviews: async () => [], CatalogUnavailableError: class extends Error {} }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }), useSearchParams: () => new URLSearchParams(), notFound: () => { throw new Error("NOT_FOUND"); } }));
 vi.mock("next/image", () => ({ default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={src} /> }));
 vi.mock("next/link", () => ({ default: ({ children, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a href={href} {...props}>{children}</a> }));
@@ -103,7 +103,8 @@ describe("public routes", () => {
     expect(doc.querySelector('#video a')?.getAttribute("href")).toContain("/video/123");
     expect(doc.querySelector('time[dateTime="2026-10-01"]')).toBeTruthy();
     expect(doc.querySelector('time[dateTime="2026-10-01"]')?.textContent).toContain("1 October 2026");
-    expect(doc.querySelector('a[href^="/sign-in"]')?.getAttribute("href")).toBe("/sign-in?next=%2Fplaces%2Ffixture-place%23leave-review-heading");
+    // The shared page never embeds one visitor's account state; the browser asks for it.
+    expect(doc.body.textContent).toContain("Checking your account");
     const schema = JSON.parse(doc.querySelector('script[type="application/ld+json"]')!.textContent!);
     expect(schema[1].reviewBody).toBe("Actual critic body");
     expect(doc.body.textContent).toContain("Google: 4.6/5 · 900 ratings");

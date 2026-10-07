@@ -12,12 +12,24 @@ let container: HTMLDivElement;
 beforeEach(() => { vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true); vi.clearAllMocks(); container = document.createElement("div"); document.body.append(container); root = createRoot(container); });
 afterEach(() => { act(() => root.unmount()); container.remove(); vi.unstubAllGlobals(); });
 function render(extra: Partial<React.ComponentProps<typeof ReviewSection>> = {}) {
-  act(() => root.render(<ReviewSection restaurantId="fixture-id" returnPath="/places/fixture#leave-review-heading" reviews={[]} isSignedIn {...extra} />));
+  act(() => root.render(<ReviewSection restaurantId="fixture-id" returnPath="/places/fixture#leave-review-heading" reviews={[]} viewer={{ status: "signed-in", hasReview: false }} {...extra} />));
 }
 function selectRating() { act(() => container.querySelector<HTMLInputElement>('input[value="4"]')!.click()); }
 function submit() { container.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); }
 
 describe("community review form", () => {
+  it("asks the API for the visitor's account state when the page is shared", async () => {
+    const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ signedIn: false }) }); vi.stubGlobal("fetch", fetch);
+    await act(async () => { root.render(<ReviewSection restaurantId="fixture-id" returnPath="/places/fixture" reviews={[]} />); });
+    expect(fetch).toHaveBeenCalledWith("/api/reviews?restaurantId=fixture-id", { cache: "no-store" });
+    expect(container.textContent).toContain("sign in");
+    expect(container.querySelector("form")).toBeNull();
+  });
+  it("hides the form for visitors who already reviewed", () => {
+    render({ viewer: { status: "signed-in", hasReview: true } });
+    expect(container.textContent).toContain("already submitted");
+    expect(container.querySelector("form")).toBeNull();
+  });
   it("exposes a required rating group, selected radio and associated comment label", () => {
     render();
     expect(container.querySelector("legend")?.textContent).toBe("Rating (required)");
@@ -49,7 +61,7 @@ describe("community review form", () => {
     expect(refresh).not.toHaveBeenCalled();
   });
   it("does not claim an empty community feed when reading failed", () => {
-    render({ reviewsUnavailable: true, submissionUnavailable: true });
+    render({ reviewsUnavailable: true, viewer: { status: "unknown" } });
     expect(container.textContent).toContain("Community reviews are temporarily unavailable");
     expect(container.textContent).not.toContain("No approved reviews yet");
     expect(container.querySelector("form")).toBeNull();

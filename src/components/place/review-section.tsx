@@ -1,21 +1,40 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 type Review = { id: string; rating: number; comment: string; created_at?: string };
+/** The visitor's own account state. The page itself is shared and cached, so this is read in the browser. */
+export type ReviewViewer = { status: "checking" } | { status: "signed-out" } | { status: "signed-in"; hasReview: boolean } | { status: "unknown" };
 type ReviewSectionProps = {
   restaurantId: string;
   returnPath: string;
   reviews: Review[];
-  isSignedIn: boolean;
-  userReview?: { id: string } | null;
   reviewsUnavailable?: boolean;
-  submissionUnavailable?: boolean;
+  /** Supplied in tests; otherwise fetched from /api/reviews. */
+  viewer?: ReviewViewer;
 };
 
-export function ReviewSection({ returnPath, restaurantId, reviews, isSignedIn, userReview, reviewsUnavailable = false, submissionUnavailable = false }: ReviewSectionProps) {
+export function ReviewSection({ returnPath, restaurantId, reviews, reviewsUnavailable = false, viewer: initialViewer }: ReviewSectionProps) {
+  const [viewer, setViewer] = useState<ReviewViewer>(initialViewer ?? { status: "checking" });
+  useEffect(() => {
+    if (initialViewer) return;
+    let active = true;
+    fetch(`/api/reviews?restaurantId=${encodeURIComponent(restaurantId)}`, { cache: "no-store" })
+      .then(async response => {
+        const body = response.ok ? await response.json() : null;
+        if (!active) return;
+        if (!body) setViewer({ status: "unknown" });
+        else if (body.signedIn !== true) setViewer({ status: "signed-out" });
+        else setViewer({ status: "signed-in", hasReview: body.hasReview === true });
+      })
+      .catch(() => { if (active) setViewer({ status: "unknown" }); });
+    return () => { active = false; };
+  }, [initialViewer, restaurantId]);
+  const isSignedIn = viewer.status === "signed-in";
+  const submissionUnavailable = viewer.status === "unknown";
+  const userReview = viewer.status === "signed-in" && viewer.hasReview;
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +81,7 @@ export function ReviewSection({ returnPath, restaurantId, reviews, isSignedIn, u
     </section>
     <section className="place-panel" aria-labelledby="leave-review-heading">
       <h2 id="leave-review-heading">Leave your truth</h2>
-      {!isSignedIn ? <p>Please <Link className="text-link" href={`/sign-in?next=${encodeURIComponent(returnPath)}`}>sign in</Link> to leave a review.</p> : submissionUnavailable ? <p role="status">We couldn’t check your existing review. Please reload before submitting.</p> : userReview || submitted ? <p>You’ve already submitted a review for this spot.</p> :
+      {viewer.status === "checking" ? <p role="status">Checking your account…</p> : viewer.status === "signed-out" ? <p>Please <Link className="text-link" href={`/sign-in?next=${encodeURIComponent(returnPath)}`}>sign in</Link> to leave a review.</p> : submissionUnavailable ? <p role="status">We couldn’t check your account. Please reload before submitting.</p> : userReview || submitted ? <p>You’ve already submitted a review for this spot.</p> :
         <form onSubmit={handleSubmit} className="review-form" aria-busy={isSubmitting}>
           <fieldset disabled={isSubmitting} className="review-rating">
             <legend>Rating (required)</legend>

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getApprovedCommunityPlaceBySlug, getCurrentUser } from "@/lib/community";
+import { connection } from "next/server";
+import { CatalogUnavailableError, getApprovedCommunityPlaceBySlug, getApprovedPlaceReviews, type ApprovedPlaceReview } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { SocialShare } from "@/components/place/social-share";
 import { ReviewSection } from "@/components/place/review-section";
@@ -13,6 +13,11 @@ import { serializeJsonLd } from "@/lib/security/json-ld";
 import { siteUrl } from "@/lib/site-url";
 
 type PlacePageProps = { params: Promise<{ slug: string }> };
+
+// Pages are shared by every visitor and built on first request; the review form
+// asks for the visitor's own account state in the browser.
+export const revalidate = 3600;
+export function generateStaticParams() { return []; }
 
 export async function generateMetadata({ params }: PlacePageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -37,11 +42,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const { slug } = await params;
   const place = await getApprovedCommunityPlaceBySlug(slug);
   if (!place?.id) notFound();
-  const [supabase, user] = await Promise.all([createSupabaseServerClient(), getCurrentUser()]);
-  const [reviewResult, existingResult] = await Promise.all([
-    supabase.from("user_reviews").select("id, rating, comment, created_at").eq("restaurant_id", place.id).eq("status", "approved").order("created_at", { ascending: false }).limit(50),
-    user ? supabase.from("user_reviews").select("id").eq("restaurant_id", place.id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null, error: null })
-  ]);
+  let reviews: ApprovedPlaceReview[] = [];
+  let reviewsUnavailable = false;
+  try { reviews = await getApprovedPlaceReviews(place.id); } catch (error) {
+    if (!(error instanceof CatalogUnavailableError)) throw error;
+    reviewsUnavailable = true;
+    // Don't cache a page that says reviews are unavailable.
+    await connection();
+  }
   const parish = normalizeParish(place.parish);
   const hasCriticReview = isCriticReviewed(place);
   const videoUrl = getReviewVideoUrl(place);
@@ -96,7 +104,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             {!hasCriticReview && <p className="listing-notice">No written critic verdict has been published for this listing.</p>}
             <p>{place.description || "A description hasn’t been provided for this listing."}</p>
           </section>
-          <ReviewSection returnPath={`/places/${place.slug}#leave-review-heading`} restaurantId={place.id} reviews={reviewResult.data ?? []} isSignedIn={Boolean(user)} userReview={existingResult.data} reviewsUnavailable={Boolean(reviewResult.error)} submissionUnavailable={Boolean(existingResult.error)} />
+          <ReviewSection returnPath={`/places/${place.slug}#leave-review-heading`} restaurantId={place.id} reviews={reviews} reviewsUnavailable={reviewsUnavailable} />
         </div>
         <aside className="place-panel review-sidebar" aria-labelledby="quick-hits-heading">
           <h2 id="quick-hits-heading">Quick Hits</h2>
