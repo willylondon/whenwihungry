@@ -70,6 +70,10 @@ Using the existing owner-controlled staging admin browser session, `/account` di
 
 The owner subsequently signed in with the ordinary staging account. Its Account page displayed the expected identity and Sign out without an Administration link. Direct `/admin/restaurants` navigation redirected to the public homepage. Sign-in initially returned to the nonexistent `/admin` route and displayed Place not found; a guarded admin index redirect was added in source to route authorized admins to `/admin/restaurants` and apply the existing denial behavior to ordinary users. Hosted verification of that follow-up remains pending deployment.
 
+Follow-up commit `af91a8db83368d72d6a9deccfabe9e8d079d8823` deployed READY as `dpl_87XHDqsX3KJcbmyMoxQiHmFb4TXo`. On that preview the ordinary staging user now reaches the homepage from `/admin`, rather than a missing-page screen. The ordinary Account identity also survived reload and exposed no Administration link. Lint, TypeScript and 31 focused auth/account tests passed locally on Node 25; the release gate remains the full configured Node 24 CI workflow. Admin-success navigation from the new index still requires a hosted admin session.
+
+The full Node 24 launch-readiness CI run `37634491748` passed for `af91a8d`, including the production dependency audit.
+
 ## Required release environment and rollback
 
 Simplest hosted option: a separate `whenwihungry-staging` Supabase project in verified organization `zyytphxrczmfjprmzbcm`, only if a Free slot is available. Stop before any paid plan/compute upgrade. Creating a database creates persistent credentials and needs owner approval; the owner enters any new password. Use schema-only evidence and synthetic accounts/data, never a customer-data clone. Local PGlite and browser fixtures remain usable without staging approval.

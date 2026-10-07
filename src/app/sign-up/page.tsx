@@ -29,6 +29,7 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
           <label>Email<input autoComplete="email" maxLength={254} name="email" required type="email" /></label>
           <PasswordField label="Password (8–128 characters)" minLength={8} name="password" />
           <p>You may need to confirm your email before signing in.</p>
+          <p>Read how we use your information in <Link href="/privacy">Privacy &amp; Contact</Link>.</p>
           <button className="btn btn-primary" type="submit">Sign up</button>
           <p>Already have an account? <Link href={`/sign-in?next=${encodeURIComponent(next)}`}>Sign in</Link></p>
         </form>
