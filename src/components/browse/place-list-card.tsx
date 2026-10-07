@@ -3,12 +3,16 @@ import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
 import { hasListingPhoto } from "@/lib/image-config";
+import { getWrittenReviewForPlace } from "@/data/reviews";
 import { getPlaceStatusLabel, getPlaceCta, getPlaceStatus } from "@/lib/place-status";
 
 export function PlaceListCard({ place, showMatchReason = false }: { place: PlaceV2; showMatchReason?: boolean }) {
   const status = getPlaceStatus(place);
   const hasPublicSignal = (place.public_rating ?? 0) > 0;
-  const summary = status === "critic-reviewed" ? place.headline || place.honest_take || place.critic_review_body : place.description || place.public_listing_summary;
+  const written = getWrittenReviewForPlace(place.slug);
+  const summary = written ? written.teaser : status === "critic-reviewed" ? place.headline || place.honest_take || place.critic_review_body : place.description || place.public_listing_summary;
+  // Only reviewed spots get a status label; "pending" on every card is noise.
+  const statusLabel = written ? "Reviewed by WhenWiHungry" : status === "listed" ? null : getPlaceStatusLabel(place);
   return (
     <Link href={`/places/${place.slug}${status === "tiktok-reviewed" ? "#video" : ""}`} className="browse-card-link">
       <div className="browse-card-image">
@@ -19,12 +23,12 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
         {hasListingPhoto(place.image) && place.image_credit && <span className="photo-credit">Photo: {place.image_credit}</span>}
       </div>
       <div className="browse-card-body">
-        <div className="browse-card-status">
-          <span>{getPlaceStatusLabel(place)}</span>
+        {(statusLabel || (showMatchReason && place.match_reason)) && <div className="browse-card-status">
+          {statusLabel && <span className="browse-card-reviewed">{statusLabel}</span>}
           {showMatchReason && place.match_reason && <span className="match-label">{place.match_reason}</span>}
-        </div>
+        </div>}
         <h2>{place.name || "Unnamed Food Spot"}</h2>
-        {place.verdict && status === "critic-reviewed" && <VerdictBadge verdict={place.verdict} size="sm" />}
+        {written ? <VerdictBadge verdict={written.verdict} size="sm" /> : place.verdict && status === "critic-reviewed" && <VerdictBadge verdict={place.verdict} size="sm" />}
         {summary && <p className="browse-card-summary">{summary}</p>}
         <p className="browse-card-meta">{[place.category, place.priceRange || (place.price_needs_confirmation ? "Price needs confirmation" : "Price not listed"), place.parish].filter(Boolean).join(" · ")}</p>
         {hasPublicSignal && <p className="rating-provenance">
@@ -32,7 +36,7 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
           {(place.public_review_count ?? 0) > 0 && <> · {place.public_review_count!.toLocaleString("en-US")} ratings</>}
         </p>}
         {(place.community_review_count ?? 0) > 0 && <p className="rating-provenance">Community: {place.community_rating?.toFixed(1)}/5 · {place.community_review_count} approved reviews</p>}
-        <span className="browse-card-cta">{getPlaceCta(place)}</span>
+        <span className="browse-card-cta">{written ? "Read Review →" : getPlaceCta(place)}</span>
       </div>
     </Link>
   );
