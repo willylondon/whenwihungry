@@ -51,7 +51,7 @@ export function Footer() {
           className="footer-cols"
         >
           <div>
-            <Image src="/logo.png" alt="WhenWiHungry" width={96} height={96} style={{ marginBottom: "20px" }} />
+            <Image src="/logo-header.png" alt="WhenWiHungry" width={136} height={80} style={{ marginBottom: "20px" }} />
             <p
               style={{
                 color: "var(--wwh-muted)",

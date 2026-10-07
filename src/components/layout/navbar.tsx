@@ -52,7 +52,7 @@ export function Navbar() {
             }}
             aria-label="WhenWiHungry Home"
           >
-            <Image src="/logo.png" alt="WhenWiHungry" width={64} height={64} priority />
+            <Image src="/logo-header.png" alt="WhenWiHungry" width={102} height={60} priority className="nav-logo" />
           </Link>
 
           {/* Desktop nav */}
@@ -205,6 +205,7 @@ export function Navbar() {
 
       <style>{`
         @media (min-width: 1081px) { .mobile-menu { display: none; } }
+        @media (max-width: 640px) { .nav-logo { width: 88px; height: auto; } }
         .nav-dark-link:hover {
           color: #fff !important;
           background: rgba(255,255,255,0.06) !important;
