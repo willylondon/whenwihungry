@@ -13,7 +13,7 @@ export default function PrivacyPage() {
     <h1>Privacy and contact</h1>
     <p>Last updated: 7 October 2026.</p>
     <h2>Browsing and accounts</h2>
-    <p>You can browse the directory without an account. Account features use your email address, display name and sign-in information to identify you and manage your contributions. Supabase provides authentication and database storage; Vercel hosts the website. Sign-in uses cookies to maintain your session.</p>
+    <p>You can browse the directory without an account. Account features use your email address, display name and sign-in information to identify you and manage your contributions. Supabase provides authentication and database storage; Resend delivers account emails; Vercel hosts the website. Sign-in uses cookies to maintain your session.</p>
     <h2>Contributions and public information</h2>
     <p>Restaurant suggestions and community reviews are stored for moderation. Approved listings and reviews may be shown publicly. Do not include private information about yourself or other people in a public review. A directory listing is not an endorsement or evidence of a critic visit.</p>
     <h2>Maps and external services</h2>

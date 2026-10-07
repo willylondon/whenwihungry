@@ -1,6 +1,6 @@
 # Launch verification — 7 October 2026
 
-Status: **release blocked; production unchanged**. Continue draft PR #1 on `fix/launch-readiness-2026-10-07`; do not recreate the prior remediation. The owner confirmed production project `dnlzaduonznhhlmyxrgh` and chose **sign-in required** for future enquiries. `REVIEW_REQUESTS_ENABLED` remains off until privacy, abuse controls and monitoring are verified.
+Status: **historical verification log; see [current production release status](production-release-2026-10-07.md)**. Later entries and the production release record supersede earlier environment observations. Continue draft PR #1 on `fix/launch-readiness-2026-10-07`; do not recreate the prior remediation. The owner confirmed production project `dnlzaduonznhhlmyxrgh` and chose **sign-in required** for future enquiries. `REVIEW_REQUESTS_ENABLED` remains off until privacy, abuse controls and monitoring are verified.
 
 ## Verified environments and remote state
 
