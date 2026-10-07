@@ -206,7 +206,7 @@ export function AboutSection() {
                   lineHeight: 1.75
                 }}
               >
-                Anonymous by design. No PR agencies can find me. No restaurant can recognise me walking in. No face means no bias — just the honest experience everyone else gets.
+                The food comes first. Every review tells the story of an actual visit, with invitations, discounts and complimentary meals clearly disclosed.
               </p>
               <p
                 style={{

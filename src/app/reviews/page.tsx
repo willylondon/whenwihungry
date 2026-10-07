@@ -1,3 +1,4 @@
+import { FirstReviewFeature } from "@/components/reviews/first-review-feature";
 import type { Metadata } from "next";
 import { siteUrl } from "@/lib/site-url";
 import { paginate, normalizeBrowseParams } from "@/lib/browse-pagination";
@@ -67,21 +68,12 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
         </div>
       </section>
 
+      <FirstReviewFeature />
+
       {/* Results */}
       <section style={{ padding: "64px 0 96px" }}>
         <div style={{ width: "min(1200px, calc(100% - 40px))", margin: "0 auto" }}>
-          {reviewed.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "80px 20px", background: "rgba(255,255,255,0.02)", border: "1px solid var(--wwh-border)", borderRadius: "24px" }}>
-              <span style={{ fontSize: "3rem", display: "block", marginBottom: "20px" }}>🎬</span>
-              <h2 style={{ fontFamily: "var(--wwh-font-heading)", fontSize: "1.8rem", color: "#fff", margin: "0 0 12px", textTransform: "uppercase" }}>No reviews published here yet</h2>
-              <p style={{ color: "rgba(255,255,255,0.45)", fontFamily: "var(--wwh-font-body)", fontSize: "1.05rem", lineHeight: 1.7, maxWidth: "520px", margin: "0 auto 28px" }}>
-                There are no published critic verdicts or linked video reviews in the directory yet. You can also find WhenWiHungry on TikTok.
-              </p>
-              <a href="https://tiktok.com/@whenwihungry" target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "12px 28px", background: "var(--wwh-accent)", color: "#fff", fontFamily: "var(--wwh-font-body)", fontWeight: 700, fontSize: "0.95rem", borderRadius: "10px", textDecoration: "none" }}>
-                Follow on TikTok →
-              </a>
-            </div>
-          ) : (
+          {reviewed.length > 0 && (
             <>
               <p className="result-summary">Showing {pagination.offset + 1}–{pagination.offset + pagination.items.length} of {reviewed.length} reviewed spots</p>
               <div className="location-results">{pagination.items.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>

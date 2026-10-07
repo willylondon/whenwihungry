@@ -110,7 +110,7 @@ export function HeroSection({ foodSpotCountLabel = null }: Props) {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. {foodSpotCountLabel ? `${foodSpotCountLabel} Jamaican food spots mapped.` : "Explore Jamaican food spots."} 10+ viral TikTok reviews. More anonymous verdicts loading.
+            Real visits. Honest verdicts. {foodSpotCountLabel ? `${foodSpotCountLabel} Jamaican food spots mapped.` : "Explore Jamaican food spots."} 10+ viral TikTok reviews. More anonymous verdicts loading.
           </p>
 
           {/* Search bar */}

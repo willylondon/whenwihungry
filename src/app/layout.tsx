@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | WhenWiHungry"
   },
   description:
-    "Jamaica's boldest food critic. No fake ratings, no sponsored plates, no corporate nonsense — just honest Jamaican food reviews.",
+    "Jamaica's boldest food critic. Real visits, honest verdicts and clear disclosures — Jamaican food reviews with the full story.",
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "WhenWiHungry | Jamaica's Boldest Food Critic",
     description:
-      "No fake ratings. No sponsored plates. Just honest Jamaican food reviews.",
+      "Real visits. Honest verdicts. Clearly disclosed hosted meals.",
     url: siteUrl,
     siteName: "WhenWiHungry",
     images: [
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "WhenWiHungry | Jamaica's Boldest Food Critic",
     description:
-      "No fake ratings. No sponsored plates. Just honest Jamaican food reviews.",
+      "Real visits. Honest verdicts. Clearly disclosed hosted meals.",
     images: ["/og/whenwihungry-og.png"]
   }
 };
@@ -85,7 +85,7 @@ export default function RootLayout({
                 name: "WhenWiHungry",
                 url: siteUrl,
                 description:
-                  "Jamaica's boldest food critic. No fake ratings, no sponsored plates — just honest Jamaican food reviews.",
+                  "Jamaica's boldest food critic. Real visits and honest Jamaican food reviews, with hosted meals clearly disclosed.",
                 potentialAction: {
                   "@type": "SearchAction",
                   target: {
