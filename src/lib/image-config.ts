@@ -10,7 +10,11 @@ export function imageHosts(supabaseUrl?: string) {
   return hosts;
 }
 
+/** Our own review photography, shipped with the site under public/images/reviews. */
+const EDITORIAL_PHOTO = /^\/images\/reviews\/[a-z0-9-]+\/[a-z0-9-]+\.(?:jpe?g|png|webp)$/;
+
 export function catalogImage(value: unknown, supabaseUrl?: string) {
+  if (typeof value === "string" && EDITORIAL_PHOTO.test(value)) return value;
   if (typeof value === "string") {
     try {
       const url = new URL(value);
