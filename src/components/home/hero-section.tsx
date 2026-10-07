@@ -1,278 +1,38 @@
 import Image from "next/image";
+import Link from "next/link";
+import { VerdictBadge } from "@/components/ui/verdict-badge";
+import type { WrittenReview } from "@/data/reviews";
 
-type Props = { foodSpotCountLabel?: string | null };
+type Props = { foodSpotCountLabel?: string | null; latestReview?: WrittenReview };
 
-export function HeroSection({ foodSpotCountLabel = null }: Props) {
+const TRIES = ["oxtail", "curry goat", "jerk chicken", "ice cream", "date night"];
+
+/** Opens with the critic's voice and the newest real plate, not a stock photo. */
+export function HeroSection({ foodSpotCountLabel = null, latestReview }: Props) {
   return (
-    <section
-      style={{
-        position: "relative",
-        minHeight: "100svh",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        background: "#0b0b0b"
-      }}
-    >
-      {/* Background image */}
-      <Image
-        src="https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg"
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        style={{ objectFit: "cover", objectPosition: "center 40%", opacity: 0.35 }}
-      />
-
-      {/* Gradient overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(110deg, rgba(11,11,11,0.97) 0%, rgba(11,11,11,0.8) 45%, rgba(11,11,11,0.3) 75%, rgba(11,11,11,0.05) 100%)"
-        }}
-      />
-
-      {/* Accent glow */}
-      <div
-        style={{
-          position: "absolute",
-          top: "30%",
-          left: "-10%",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,90,31,0.12) 0%, transparent 70%)",
-          pointerEvents: "none"
-        }}
-      />
-
-      {/* Content */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          width: "min(1200px, calc(100% - 40px))",
-          margin: "0 auto",
-          padding: "80px 0"
-        }}
-      >
-        <div style={{ maxWidth: "820px" }}>
-          {/* Eyebrow */}
-          <span
-            style={{
-              display: "inline-block",
-              marginBottom: "20px",
-              padding: "6px 14px",
-              background: "rgba(255,90,31,0.12)",
-              border: "1px solid rgba(255,90,31,0.3)",
-              borderRadius: "999px",
-              color: "var(--wwh-accent)",
-              fontFamily: "var(--wwh-font-body)",
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              textTransform: "uppercase",
-              letterSpacing: "0.12em"
-            }}
-          >
-            🇯🇲 Jamaica's Boldest Food Critic
-          </span>
-
-          {/* Headline */}
-          <h1
-            style={{
-              margin: "0 0 28px",
-              fontFamily: "var(--wwh-font-heading)",
-              fontSize: "clamp(3.5rem, 8vw, 7rem)",
-              color: "#fff",
-              lineHeight: 0.92,
-              letterSpacing: "0.01em",
-              textTransform: "uppercase"
-            }}
-          >
-            IF THE FOOD BAD…{" "}
-            <span style={{ color: "var(--wwh-accent)", display: "block" }}>
-              ME A GO TELL
-            </span>
-            YOU STRAIGHT.
-          </h1>
-
-          {/* Subtext */}
-          <p
-            style={{
-              margin: "0 0 40px",
-              color: "rgba(255,255,255,0.65)",
-              fontFamily: "var(--wwh-font-body)",
-              fontSize: "clamp(1rem, 2vw, 1.2rem)",
-              lineHeight: 1.7,
-              maxWidth: "580px"
-            }}
-          >
-            Real visits. Honest verdicts. {foodSpotCountLabel ? `${foodSpotCountLabel} Jamaican food spots mapped.` : "Explore Jamaican food spots."} 10+ viral TikTok reviews. More anonymous verdicts loading.
+    <section className="home-hero" aria-labelledby="home-hero-title">
+      <div className="container home-hero-grid">
+        <div>
+          <h1 id="home-hero-title">If the food bad, me a go tell you straight.</h1>
+          <p className="home-hero-intro">
+            Real visits to Jamaican cook shops, jerk pits and restaurants, with honest verdicts and every hosted meal disclosed.
+            {foodSpotCountLabel && <> {foodSpotCountLabel} food spots to explore.</>}
           </p>
-
-          {/* Search bar */}
-          <div style={{ maxWidth: "600px", position: "relative" }}>
-            <form
-              action="/browse"
-              method="GET"
-              style={{
-                display: "flex",
-                gap: "12px",
-                padding: "8px",
-                background: "rgba(255,255,255,0.06)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: "16px",
-                transition: "border-color 200ms ease, box-shadow 200ms ease"
-              }}
-              className="hero-search-form"
-            >
-              <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "center" }}>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.4)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ position: "absolute", left: "16px" }}
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                </svg>
-                <input
-                  type="search"
-                  name="q"
-                  aria-label="Search food spots"
-                  placeholder="What yuh hungry for?"
-                  style={{
-                    width: "100%",
-                    padding: "16px 16px 16px 52px",
-                    background: "none",
-                    border: "none",
-                    color: "#fff",
-                    fontFamily: "var(--wwh-font-body)",
-                    fontSize: "1.1rem",
-                    outline: "none"
-                  }}
-                />
-              </div>
-              <button
-                type="submit"
-                style={{
-                  padding: "0 28px",
-                  background: "var(--wwh-accent)",
-                  color: "#fff",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  borderRadius: "10px",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "transform 160ms ease"
-                }}
-                className="hero-search-btn"
-              >
-                Search
-              </button>
-            </form>
-            <p
-              style={{
-                marginTop: "16px",
-                color: "rgba(255,255,255,0.4)",
-                fontFamily: "var(--wwh-font-body)",
-                fontSize: "0.85rem",
-                letterSpacing: "0.02em"
-              }}
-            >
-              Try: <span style={{ color: "rgba(255,255,255,0.7)" }}>oxtail, curry goat, ice cream, jerk chicken, date night.</span>
-            </p>
-          </div>
-
-          {/* Quick stats */}
-          <div
-            style={{
-              display: "flex",
-              gap: "32px",
-              marginTop: "64px",
-              paddingTop: "32px",
-              borderTop: "1px solid rgba(255,255,255,0.08)",
-              flexWrap: "wrap"
-            }}
-          >
-            {[
-              { value: "3K+", label: "TikTok Followers" },
-              { value: foodSpotCountLabel, label: "Food Spots Listed" },
-              { value: "100%", label: "Unfiltered" }
-            ].filter(stat => stat.value).map((stat) => (
-              <div key={stat.label}>
-                <p
-                  style={{
-                    margin: 0,
-                    fontFamily: "var(--wwh-font-heading)",
-                    fontSize: "2.2rem",
-                    color: "var(--wwh-accent)",
-                    lineHeight: 1
-                  }}
-                >
-                  {stat.value}
-                </p>
-                <p
-                  style={{
-                    margin: "4px 0 0",
-                    color: "rgba(255,255,255,0.4)",
-                    fontFamily: "var(--wwh-font-body)",
-                    fontSize: "0.82rem",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em"
-                  }}
-                >
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
+          <form action="/browse" method="get" role="search" className="hero-search">
+            <label htmlFor="hero-search-input" className="sr-only">Search food spots</label>
+            <input id="hero-search-input" type="search" name="q" placeholder="What yuh hungry for?" autoComplete="off" />
+            <button type="submit">Search</button>
+          </form>
+          <p className="hero-tries">Try {TRIES.map((term, index) => <span key={term}>{index > 0 && ", "}<Link href={`/browse?q=${encodeURIComponent(term)}`}>{term}</Link></span>)}</p>
         </div>
+        {latestReview && <figure className="home-hero-figure">
+          <Link href={latestReview.path} className="home-hero-photo" aria-label={`Read our review of ${latestReview.restaurant}`}>
+            <Image src={latestReview.hero} alt={latestReview.heroAlt} fill priority sizes="(max-width: 900px) 100vw, 560px" />
+          </Link>
+          <VerdictBadge verdict={latestReview.verdict} size="lg" />
+          <figcaption>Latest review: <Link href={latestReview.path}>{latestReview.restaurant}</Link>. {latestReview.title}</figcaption>
+        </figure>}
       </div>
-
-      {/* Scroll indicator */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "32px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "8px",
-          color: "rgba(255,255,255,0.3)"
-        }}
-      >
-        <span style={{ fontSize: "0.72rem", fontFamily: "var(--wwh-font-body)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Scroll</span>
-        <div
-          style={{
-            width: "1px",
-            height: "40px",
-            background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)"
-          }}
-        />
-      </div>
-
-      <style>{`
-        .hero-search-form:focus-within {
-          border-color: var(--wwh-accent) !important;
-          box-shadow: 0 0 0 4px rgba(255,90,31,0.15);
-        }
-        .hero-search-btn:hover {
-          transform: scale(1.04);
-          background: #ff6a35 !important;
-        }
-      `}</style>
     </section>
   );
 }

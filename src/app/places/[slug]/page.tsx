@@ -58,6 +58,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const written = getWrittenReviewForPlace(place.slug);
   const videoUrl = getReviewVideoUrl(place);
   // Plain listings get no status line; "pending" adds nothing for visitors.
+  const where = [place.area && place.area !== place.parish ? place.area : null, place.parish ? getParishDisplayName(place.parish) : null].filter(Boolean).join(", ");
   const statusLabel = written ? "Reviewed by WhenWiHungry" : hasCriticReview || videoUrl ? getPlaceStatusLabel(place) : null;
   const publishedDate = place.published_at || place.reviewed_at;
   const reviewBody = place.honest_take || place.critic_review_body;
@@ -77,30 +78,34 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   return <article className="place-page">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
-    <header className={`place-hero${hasListingPhoto(place.image) ? " has-photo" : ""}`}>
-      {hasListingPhoto(place.image) && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
-      {hasListingPhoto(place.image) && place.image_credit && <p className="photo-credit place-hero-credit">Photo: {place.image_credit}</p>}
-      <div className="place-container">
-        <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
-        {statusLabel && <p className="place-status">{statusLabel}</p>}
-        <h1>{place.name}</h1>
-        {written ? <VerdictBadge verdict={written.verdict} size="lg" /> : hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
-        <p className="place-meta">{[place.category, place.priceRange, place.area && place.area !== place.parish ? place.area : null, place.parish ? getParishDisplayName(place.parish) : null].filter(Boolean).join(" · ")}</p>
-        <p className="place-address">{place.address || place.parish}</p>
-        <div className="place-actions">
-          <a className="place-action place-action-primary" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer">Directions<span className="sr-only"> (opens Google Maps in a new tab)</span></a>
-          {telUrl(place.phone) && <a className="place-action" href={telUrl(place.phone)!}>Call</a>}
-          <a className="place-action" href={googleMapsPlaceUrl(place)} target="_blank" rel="noopener noreferrer">Photos &amp; hours on Google Maps<span className="sr-only"> (opens in a new tab)</span></a>
-          {place.website && <a className="place-action" href={place.website} target="_blank" rel="noopener noreferrer">Website<span className="sr-only"> (opens in a new tab)</span></a>}
+    <header className={`place-hero${hasListingPhoto(place.image) ? "" : " no-photo"}`}>
+      <div className="place-container place-hero-layout">
+        <div>
+          <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
+          {statusLabel && <p className="place-status">{statusLabel}</p>}
+          <h1>{place.name}</h1>
+          {written ? <VerdictBadge verdict={written.verdict} size="lg" /> : hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
+          <p className="place-meta">{place.category || "Food spot"}{where ? ` in ${where}` : ""}</p>
+          <p className="place-address">{place.address || place.parish}</p>
+          <div className="place-actions">
+            <a className="place-action place-action-primary" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer">Directions<span className="sr-only"> (opens Google Maps in a new tab)</span></a>
+            {telUrl(place.phone) && <a className="place-action" href={telUrl(place.phone)!}>Call</a>}
+            <a className="place-action" href={googleMapsPlaceUrl(place)} target="_blank" rel="noopener noreferrer">Photos and hours on Google Maps<span className="sr-only"> (opens in a new tab)</span></a>
+            {place.website && <a className="place-action" href={place.website} target="_blank" rel="noopener noreferrer">Website<span className="sr-only"> (opens in a new tab)</span></a>}
+          </div>
+          <SocialShare name={place.name} url={siteUrl(`/places/${place.slug}`)} />
         </div>
-        <SocialShare name={place.name} url={siteUrl(`/places/${place.slug}`)} />
+        {hasListingPhoto(place.image) && <div className="place-hero-photo">
+          <Image className="place-hero-image" src={place.image} alt={`${place.name}`} fill priority sizes="(max-width: 860px) 100vw, 560px" />
+          {place.image_credit && <p className="photo-credit">Photo: {place.image_credit}</p>}
+        </div>}
       </div>
     </header>
     <div className="place-container place-content">
       <div className="review-layout-grid">
         <div className="place-sections">
           {written && <section className="place-panel place-written-review" aria-labelledby="written-review-heading">
-            <span className="eyebrow">Our review · No. {String(written.number).padStart(3, "0")}</span>
+            <span className="eyebrow">Our review</span>
             <h2 id="written-review-heading"><Link href={written.path}>{written.title}</Link></h2>
             <p>{written.teaser}</p>
             <dl className="place-written-scores">
@@ -125,14 +130,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <a className="btn btn-primary" href={videoUrl} target="_blank" rel="noopener noreferrer">Watch the review <span className="sr-only">(opens in a new tab)</span></a>
           </section>}
           <section className="place-panel" aria-labelledby="listing-heading">
-            <h2 id="listing-heading">Listing information</h2>
+            <h2 id="listing-heading">About this spot</h2>
             {!hasCriticReview && !written && <p className="listing-notice">We haven’t reviewed this spot yet.</p>}
             <p>{place.description || "A description hasn’t been provided for this listing."}</p>
           </section>
           <ReviewSection returnPath={`/places/${place.slug}#leave-review-heading`} restaurantId={place.id} reviews={reviews} reviewsUnavailable={reviewsUnavailable} />
         </div>
         <aside className="place-panel review-sidebar" aria-labelledby="quick-hits-heading">
-          <h2 id="quick-hits-heading">Quick Hits</h2>
+          <h2 id="quick-hits-heading">Quick hits</h2>
           <dl className="place-facts">
             {[{ label: "Cuisine", value: place.category }, { label: "Price", value: place.priceRange || (place.price_needs_confirmation ? "Needs confirmation" : "Not listed") }, { label: "Area", value: place.area || "Not listed" }, { label: "Parish", value: place.parish }, { label: "Phone", value: place.phone || "Not listed" }].map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}
           </dl>

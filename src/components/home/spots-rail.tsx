@@ -5,14 +5,13 @@ import type { PlaceV2 } from "@/lib/community";
 /** Photo-led strip of food spots for the homepage. Scrolls sideways on phones. */
 export function SpotsRail({ places }: { places: PlaceV2[] }) {
   if (!places.length) return null;
-  return <section className="section container dark-section spots-rail" aria-labelledby="spots-rail-heading">
-    <div className="section-heading spots-rail-heading">
+  return <section className="section container" aria-labelledby="spots-rail-heading">
+    <div className="section-heading">
       <div>
-        <span className="eyebrow">Around the island</span>
         <h2 id="spots-rail-heading">Spots worth a look</h2>
         <p>A different corner of Jamaica in every card. Not reviewed yet, but on our radar.</p>
       </div>
-      <Link className="text-link spots-rail-all" href="/browse">Browse all food spots →</Link>
+      <Link className="spots-rail-all" href="/browse">Browse all food spots</Link>
     </div>
     <ul className="spots-rail-list">
       {places.map(place => <li key={place.slug}>

@@ -32,355 +32,69 @@ export const metadata: Metadata = {
   }
 };
 
-const PHILOSOPHY = [
+const PRINCIPLES = [
   {
-    icon: "🎭",
-    heading: "Anonymous by Design",
-    body: "The food takes centre stage. Reviews explain the context of the visit, including when a restaurant knows we are coming or invites us back."
+    heading: "Anonymous by design",
+    body: "The food takes centre stage. Reviews explain the context of the visit, including when a restaurant knows we're coming or invites us back."
   },
   {
-    icon: "💳",
-    heading: "The Full Story, Including the Bill",
-    body: "Complimentary meals, discounts and invitations are disclosed in the review. A hosted visit is identified as such, so you can judge the experience in context."
+    heading: "The full story, including the bill",
+    body: "Complimentary meals, discounts and invitations are disclosed at the top of the review, so you can judge the experience in context."
   },
   {
-    icon: "🚫",
-    heading: "More Than a Number",
-    body: "A score needs a story. When a review includes ratings, the visit, dishes and service behind them matter just as much."
+    heading: "More than a number",
+    body: "A score needs a story. When a review includes scores, the visit, the dishes and the service behind them matter just as much."
   },
   {
-    icon: "📱",
-    heading: "Video First",
-    body: "You can read a review or you can watch my face when the food hits. The video doesn't lie. That's why every review starts there."
+    heading: "Video first",
+    body: "Most reviews start as a short TikTok: the plate, the bite and the reaction, never the face. The written review comes after."
   }
 ];
 
 export default async function AboutPage() {
   const foodSpotCountLabel = await getPublicFoodSpotCountLabel();
-  return (
-    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
-      {/* Hero */}
-      <section
-        style={{
-          position: "relative",
-          padding: "96px 0 80px",
-          background: "var(--wwh-surface)",
-          borderBottom: "1px solid var(--wwh-border)",
-          overflow: "hidden"
-        }}
-      >
-        {/* Red glow */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: "600px",
-            height: "600px",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,90,31,0.08) 0%, transparent 70%)",
-            pointerEvents: "none"
-          }}
-        />
-
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            width: "min(1000px, calc(100% - 40px))",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "1fr 360px",
-            gap: "64px",
-            alignItems: "center"
-          }}
-          className="about-hero-grid"
-        >
-          <div>
-            <span
-              style={{
-                display: "inline-block",
-                marginBottom: "20px",
-                fontFamily: "var(--wwh-font-body)",
-                fontWeight: 700,
-                fontSize: "0.8rem",
-                color: "var(--wwh-accent)",
-                textTransform: "uppercase",
-                letterSpacing: "0.12em"
-              }}
-            >
-              The Critic
-            </span>
-            <h1
-              style={{
-                margin: "0 0 24px",
-                fontFamily: "var(--wwh-font-heading)",
-                fontSize: "clamp(3rem, 6vw, 5.5rem)",
-                color: "#fff",
-                lineHeight: 0.92,
-                textTransform: "uppercase"
-              }}
-            >
-              NO FACE.
-              <br />
-              <span style={{ color: "var(--wwh-accent)" }}>NO BIAS.</span>
-              <br />
-              NO FILTER.
-            </h1>
-            <p
-              style={{
-                margin: "0 0 20px",
-                color: "rgba(255,255,255,0.65)",
-                fontFamily: "var(--wwh-font-body)",
-                fontSize: "1.1rem",
-                lineHeight: 1.75
-              }}
-            >
-              WhenWiHungry is a faceless TikTok food critic account covering Jamaican food — cook shops, jerk stops, seafood runs, patty spots, and everywhere in between.
-            </p>
-            <p
-              style={{
-                margin: 0,
-                color: "var(--wwh-muted)",
-                fontFamily: "var(--wwh-font-body)",
-                fontSize: "1rem",
-                lineHeight: 1.75
-              }}
-            >
-              The identity stays hidden. The opinions stay honest. That's the trade.
-            </p>
-            <div style={{ marginTop: "32px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              <a
-                href="https://tiktok.com/@whenwihungry"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "14px 28px",
-                  background: "var(--wwh-accent)",
-                  color: "#fff",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontWeight: 700,
-                  fontSize: "0.9rem",
-                  borderRadius: "8px",
-                  textDecoration: "none"
-                }}
-              >
-                Follow on TikTok
-              </a>
-              <Link
-                href="/browse"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "14px 28px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  color: "rgba(255,255,255,0.7)",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  borderRadius: "8px",
-                  textDecoration: "none"
-                }}
-              >
-                Browse Food Spots
-              </Link>
-            </div>
-          </div>
-
-          {/* Avatar */}
-          <div
-            style={{
-              position: "relative",
-              borderRadius: "20px",
-              overflow: "hidden",
-              aspectRatio: "1/1",
-              border: "1px solid rgba(255,90,31,0.3)"
-            }}
-          >
-            <Image src="/critic-avatar.png" alt="The Anonymous Critic" fill sizes="(max-width: 900px) 90vw, 560px" style={{ objectFit: "cover" }} />
-            <div
-              style={{
-                position: "absolute",
-                bottom: "16px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                padding: "8px 20px",
-                background: "rgba(0,0,0,0.75)",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,90,31,0.4)",
-                borderRadius: "999px",
-                whiteSpace: "nowrap"
-              }}
-            >
-              <span
-                style={{
-                  color: "var(--wwh-accent)",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontWeight: 700,
-                  fontSize: "0.8rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.15em"
-                }}
-              >
-                Identity: Unknown
-              </span>
-            </div>
+  const stats = [
+    { value: "3K+", label: "TikTok followers" },
+    { value: "100K+", label: "video views" },
+    { value: "10+", label: "viral reviews" },
+    ...(foodSpotCountLabel ? [{ value: foodSpotCountLabel, label: "food spots mapped" }] : [])
+  ];
+  return <>
+    <section className="about-hero" aria-labelledby="about-heading">
+      <div className="container critic-split">
+        <div className="critic-copy">
+          <h1 id="about-heading">No face. No bias. No filter.</h1>
+          <p>WhenWiHungry is a faceless food critic covering Jamaican food: cook shops, jerk stops, seafood runs, patty spots and everywhere in between.</p>
+          <p>The identity stays hidden. The opinions stay honest. That&apos;s the trade.</p>
+          <ul className="critic-stats">
+            {stats.map(stat => <li key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></li>)}
+          </ul>
+          <div className="service-actions">
+            <a className="btn btn-primary" href="https://www.tiktok.com/@whenwihungry" target="_blank" rel="noopener noreferrer">Follow on TikTok<span className="sr-only"> (opens in a new tab)</span></a>
+            <Link className="btn btn-outline" href="/reviews">Read the reviews</Link>
           </div>
         </div>
-      </section>
-
-      {/* Stats */}
-      <section
-        style={{
-          padding: "48px 0",
-          background: "#000",
-          borderBottom: "1px solid var(--wwh-border)"
-        }}
-      >
-        <div
-          style={{
-            width: "min(1000px, calc(100% - 40px))",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "24px",
-            textAlign: "center"
-          }}
-          className="stats-row"
-        >
-          {[
-            { value: "3K+", label: "TikTok Followers" },
-            { value: "100K+", label: "Total Views" },
-            { value: foodSpotCountLabel, label: "Food Spots Listed" },
-            { value: "Clear", label: "Hosted Meal Disclosures" }
-          ].filter(stat => stat.value != null).map((stat) => (
-            <div key={stat.label}>
-              <p
-                style={{
-                  margin: "0 0 4px",
-                  fontFamily: "var(--wwh-font-heading)",
-                  fontSize: "3rem",
-                  color: "var(--wwh-accent)",
-                  lineHeight: 1
-                }}
-              >
-                {stat.value}
-              </p>
-              <p
-                style={{
-                  margin: 0,
-                  color: "var(--wwh-muted)",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontSize: "0.82rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em"
-                }}
-              >
-                {stat.label}
-              </p>
-            </div>
-          ))}
+        <div className="critic-photo">
+          <Image src="/critic-avatar.png" alt="The critic in a bucket hat, face hidden, writing notes at a Kingston jerk stand" fill priority sizes="(max-width: 860px) 100vw, 560px" />
         </div>
-      </section>
-
-      {/* Proof So Far */}
-      <section style={{ padding: "80px 0", background: "rgba(255,90,31,0.03)", borderTop: "1px solid rgba(255,90,31,0.08)", borderBottom: "1px solid rgba(255,90,31,0.08)" }}>
-        <div style={{ width: "min(800px, calc(100% - 40px))", margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{ margin: "0 0 40px", fontFamily: "var(--wwh-font-heading)", fontSize: "clamp(2rem, 3.5vw, 2.8rem)", color: "#fff", textTransform: "uppercase", letterSpacing: "0.02em" }}>
-            The Proof So Far
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "24px", maxWidth: "700px", margin: "0 auto" }} className="proof-grid">
-            {[
-              { value: "10+", label: "Viral TikTok Reviews" },
-              { value: "100K+", label: "Total Views" },
-              { value: foodSpotCountLabel, label: "Food Spots Mapped" },
-              { value: "Clear", label: "Hosted Meal Disclosures" }
-            ].filter(stat => stat.value != null).map((s) => (
-              <div key={s.label} style={{ padding: "24px 16px" }}>
-                <p style={{ margin: "0 0 6px", fontFamily: "var(--wwh-font-heading)", fontSize: "2.5rem", color: "var(--wwh-accent)", lineHeight: 1 }}>{s.value}</p>
-                <p style={{ margin: 0, color: "var(--wwh-muted)", fontFamily: "var(--wwh-font-body)", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-          <p style={{ margin: "36px auto 0", color: "rgba(255,255,255,0.55)", fontFamily: "var(--wwh-font-body)", fontSize: "1rem", lineHeight: 1.7, maxWidth: "560px" }}>
-            The food stays in focus. The visit gets its full context. The opinion stays honest.
-          </p>
+      </div>
+    </section>
+    <section className="section band-concrete" aria-labelledby="principles-heading">
+      <div className="container">
+        <div className="section-heading"><div><h2 id="principles-heading">How the reviews work</h2></div></div>
+        <ul className="about-principles">
+          {PRINCIPLES.map(item => <li key={item.heading}><h3>{item.heading}</h3><p>{item.body}</p></li>)}
+        </ul>
+      </div>
+    </section>
+    <section className="cta-band" aria-labelledby="about-cta-heading">
+      <div className="container cta-band-inner">
+        <div>
+          <h2 id="about-cta-heading">Hungry already?</h2>
+          <p>Start with the reviews, or search the directory by craving and parish.</p>
         </div>
-      </section>
-
-      {/* Philosophy */}
-      <section style={{ padding: "80px 0" }}>
-        <div style={{ width: "min(1000px, calc(100% - 40px))", margin: "0 auto" }}>
-          <h2
-            style={{
-              margin: "0 0 48px",
-              fontFamily: "var(--wwh-font-heading)",
-              fontSize: "clamp(2.2rem, 4vw, 3.2rem)",
-              color: "#fff",
-              textTransform: "uppercase",
-              lineHeight: 0.95
-            }}
-          >
-            The Philosophy
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "24px"
-            }}
-            className="philosophy-grid"
-          >
-            {PHILOSOPHY.map((item) => (
-              <div
-                key={item.heading}
-                style={{
-                  padding: "28px 32px",
-                  background: "var(--wwh-card)",
-                  border: "1px solid var(--wwh-border)",
-                  borderRadius: "16px"
-                }}
-              >
-                <div style={{ marginBottom: "16px", fontSize: "2rem" }}>{item.icon}</div>
-                <h3
-                  style={{
-                    margin: "0 0 12px",
-                    fontFamily: "var(--wwh-font-heading)",
-                    fontSize: "1.5rem",
-                    color: "var(--wwh-text)",
-                    textTransform: "uppercase"
-                  }}
-                >
-                  {item.heading}
-                </h3>
-                <p
-                  style={{
-                    margin: 0,
-                    color: "rgba(255,255,255,0.6)",
-                    fontFamily: "var(--wwh-font-body)",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.75
-                  }}
-                >
-                  {item.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <style>{`
-        @media (max-width: 768px) {
-          .about-hero-grid { grid-template-columns: 1fr !important; }
-          .stats-row { grid-template-columns: repeat(2, 1fr) !important; }
-          .philosophy-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-    </div>
-  );
+        <Link className="btn-board" href="/browse">Find a food spot</Link>
+      </div>
+    </section>
+  </>;
 }

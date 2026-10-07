@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Inter, Bricolage_Grotesque, Fraunces } from "next/font/google";
+import { Alfa_Slab_One, Libre_Franklin } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -11,14 +11,9 @@ import { getSiteUrl } from "@/lib/site-url";
 import { serializeJsonLd } from "@/lib/security/json-ld";
 import "./globals.css";
 
-const bebasNeue = Bebas_Neue({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-bebas"
-});
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
+// Signboard slab for headlines, a sturdy grotesque for everything else.
+const display = Alfa_Slab_One({ subsets: ["latin"], weight: "400", variable: "--font-display" });
+const text = Libre_Franklin({ subsets: ["latin"], variable: "--font-text" });
 
 const siteUrl = getSiteUrl();
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN?.trim();
@@ -73,7 +68,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bebasNeue.variable} ${inter.variable} ${bricolage.variable} ${fraunces.variable}`}
+      className={`${display.variable} ${text.variable}`}
     >
       <head />
       <body>

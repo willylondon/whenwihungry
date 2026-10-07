@@ -72,7 +72,7 @@ export function ReviewSection({ returnPath, restaurantId, reviews, reviewsUnavai
 
   return <div className="place-sections">
     <section className="place-panel" aria-labelledby="community-heading">
-      <h2 id="community-heading">Community Notes</h2>
+      <h2 id="community-heading">What people are saying</h2>
       {reviewsUnavailable ? <p role="status">Community reviews are temporarily unavailable.</p> : reviews.length === 0 ? <p>No approved reviews yet. Be the first to tell the truth.</p> :
         <div className="community-reviews">{reviews.map(review => <article key={review.id} className="community-review">
           <p className="rating-provenance"><span aria-label={`${review.rating} out of 5 stars`}>{"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating))))}</span> · Approved community review</p>
@@ -80,7 +80,7 @@ export function ReviewSection({ returnPath, restaurantId, reviews, reviewsUnavai
         </article>)}</div>}
     </section>
     <section className="place-panel" aria-labelledby="leave-review-heading">
-      <h2 id="leave-review-heading">Leave your truth</h2>
+      <h2 id="leave-review-heading">Tell the truth</h2>
       {viewer.status === "checking" ? <p role="status">Checking your account…</p> : viewer.status === "signed-out" ? <p>Please <Link className="text-link" href={`/sign-in?next=${encodeURIComponent(returnPath)}`}>sign in</Link> to leave a review.</p> : submissionUnavailable ? <p role="status">We couldn’t check your account. Please reload before submitting.</p> : userReview || submitted ? <p>You’ve already submitted a review for this spot.</p> :
         <form onSubmit={handleSubmit} className="review-form" aria-busy={isSubmitting}>
           <fieldset disabled={isSubmitting} className="review-rating">

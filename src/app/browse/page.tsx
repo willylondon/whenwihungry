@@ -135,7 +135,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   };
 
   return (
-    <section className="section directory-page">
+    <section className="directory-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListSchema) }}
@@ -143,13 +143,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       <div className="container">
         <div className="section-heading directory-heading">
           <div>
-            <span className="eyebrow">Discovery</span>
-            <h1>The Honest Shortlist.</h1>
-            <p>
-              Search by cravings, dishes, or parishes. No hype, just the truth about where to eat.
-            </p>
+            <h1>The honest shortlist</h1>
+            <p>Search by craving, dish or parish. No hype, just where to eat.</p>
           </div>
-          <strong>{results.length} items found</strong>
+          <strong>{results.length} food spots</strong>
         </div>
         
         <FilterChips />
@@ -211,60 +208,17 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
 // ── Category SEO Intro Copy ────────────────────────────────────────
 
-function CategoryIntro({ category, resultCount }: { category?: string; resultCount: number }) {
+function CategoryIntro({ category }: { category?: string; resultCount?: number }) {
   const key = category?.toLowerCase() ?? "";
   const intro = Object.hasOwn(CATEGORY_INTRO, key) ? CATEGORY_INTRO[key] : null;
   if (!intro) return null;
-
-  return (
-    <section
-      style={{
-        margin: "0 0 32px",
-        padding: "28px 32px",
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid var(--wwh-border)",
-        borderRadius: "14px"
-      }}
-    >
-      <h2
-        style={{
-          margin: "0 0 18px",
-          fontFamily: "var(--wwh-font-heading)",
-          fontSize: "clamp(1.3rem, 2vw, 1.6rem)",
-          color: "#fff",
-          textTransform: "uppercase",
-          letterSpacing: "0.02em"
-        }}
-      >
-        {intro.heading}
-      </h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-        {intro.paragraphs.map((text, i) => (
-          <p
-            key={i}
-            style={{
-              margin: 0,
-              color: "rgba(255,255,255,0.55)",
-              fontFamily: "var(--wwh-font-body)",
-              fontSize: "clamp(0.85rem, 1.1vw, 0.95rem)",
-              lineHeight: 1.7,
-              maxWidth: "760px"
-            }}
-          >
-            {text}
-          </p>
-        ))}
-      </div>
-      <p
-        style={{
-          margin: "16px 0 0",
-          color: "rgba(255,255,255,0.3)",
-          fontFamily: "var(--wwh-font-body)",
-          fontSize: "0.78rem"
-        }}
-      >
-        {resultCount} mapped food spot{resultCount !== 1 ? "s" : ""} · Public signals for discovery · Critic verdicts where available
-      </p>
-    </section>
-  );
+  const [first, ...rest] = intro.paragraphs;
+  return <div className="category-intro">
+    <h2>{intro.heading}</h2>
+    <p>{first}</p>
+    {rest.length > 0 && <details>
+      <summary>Read more</summary>
+      {rest.map(text => <p key={text.slice(0, 32)}>{text}</p>)}
+    </details>}
+  </div>;
 }

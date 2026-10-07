@@ -26,7 +26,7 @@ export function SearchFilters({ activeCategory, activeParish, activePrice, activ
   return (
     <form action="/browse" method="get" className="filters card directory-filters" onChange={applyOnChange} key={[activeQuery, activeCategory, activeParish, activePrice, activeRating, activeSort, activeView].join("|")}>
       <div className="filter-head">
-        <span className="eyebrow">Filters</span>
+        <span className="eyebrow">Filter</span>
         <fieldset className="view-controls">
           <legend className="sr-only">Results view</legend>
           {["grid", "list", "map"].map((view) => (

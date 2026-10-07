@@ -40,7 +40,8 @@ describe("PlaceListCard production data contract", () => {
       // Plain listings carry no status label at all, and never a verdict.
       expect(card.textContent).not.toContain("Review Pending");
       expect(card.textContent).not.toContain("Mid");
-      expect(card.textContent).toContain("View Listing");
+      // The whole card is the link; plain listings don't repeat it with a call to action.
+      expect(card.textContent).not.toContain("View Listing");
       expect(card.textContent).not.toContain("Critic Reviewed");
     }
   });
@@ -48,7 +49,7 @@ describe("PlaceListCard production data contract", () => {
     const card = render({ slug: "rok-hotel-kingston", name: "ROK Hotel Kingston" });
     expect(card.textContent).toContain("Reviewed by WhenWiHungry");
     expect(card.textContent).toContain("Run Go Get It");
-    expect(card.textContent).toContain("Read Review");
+    expect(card.textContent).toContain("Read the review");
   });
   it("shows accurate price and separates rating provenance", () => {
     const card = render({ community_rating: 3.5, community_review_count: 2 });

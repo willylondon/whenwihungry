@@ -1,10 +1,9 @@
-import { ReviewFeature } from "@/components/reviews/review-feature";
-import { getWrittenReviewForPlace, latestWrittenReview } from "@/data/reviews";
+import { ReviewCard } from "@/components/reviews/review-feature";
+import { getWrittenReviewForPlace, latestWrittenReview, writtenReviews } from "@/data/reviews";
 import { ParishLinks } from "@/components/browse/parish-links";
 import { SpotsRail } from "@/components/home/spots-rail";
 import { pickSpotsWorthALook } from "@/lib/places";
 import { HeroSection } from "@/components/home/hero-section";
-import { FeaturedCritique } from "@/components/home/featured-critique";
 import { LatestReviews } from "@/components/home/latest-reviews";
 import { AboutSection } from "@/components/home/about-section";
 import { RatingExplainer } from "@/components/home/rating-explainer";
@@ -43,15 +42,18 @@ export default async function HomePage() {
     .filter(isCriticReviewed)
     .sort((a, b) => (b.admin_score || 0) - (a.admin_score || 0));
 
-  const featuredReview = reviewed.length > 0 ? reviewed[0] : null;
   const latestReviews = [...reviewed].sort((a, b) => Date.parse(b.published_at || b.reviewed_at || "1970-01-01") - Date.parse(a.published_at || a.reviewed_at || "1970-01-01")).slice(0, 6);
 
   return (
-    <div style={{ background: "var(--wwh-bg)" }}>
-      <HeroSection foodSpotCountLabel={foodSpotCountLabel} />
+    <div>
+      <HeroSection foodSpotCountLabel={foodSpotCountLabel} latestReview={latestWrittenReview} />
       {unavailable && <section className="container service-state" role="status"><h2>Directory temporarily unavailable</h2><p>We couldn’t load the food spots. Please try again shortly.</p><Link className="btn btn-secondary" href="/browse">Try the directory</Link></section>}
-      {latestWrittenReview && <ReviewFeature review={latestWrittenReview} kicker={`Latest review · ${latestWrittenReview.area}`} />}
-      {featuredReview && <FeaturedCritique place={featuredReview} />}
+      {writtenReviews.length > 1 && <section className="section" aria-labelledby="more-reviews-heading">
+        <div className="container">
+          <div className="section-heading"><div><h2 id="more-reviews-heading">More reviews</h2></div><Link className="spots-rail-all" href="/reviews">All reviews</Link></div>
+          <div className="reviews-hub-grid">{writtenReviews.slice(1, 4).map(review => <ReviewCard key={review.slug} review={review} />)}</div>
+        </div>
+      </section>}
       {latestReviews.length > 0 && <LatestReviews places={latestReviews} variant="reviews" />}
       {!unavailable && <SpotsRail places={pickSpotsWorthALook(allPlaces.filter(place => !isCriticReviewed(place) && !getWrittenReviewForPlace(place.slug)))} />}
       {!unavailable && <ParishLinks places={allPlaces} />}

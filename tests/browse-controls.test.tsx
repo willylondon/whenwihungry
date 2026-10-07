@@ -41,8 +41,9 @@ describe("browse navigation and accessibility", () => {
   });
   it("labels the homepage search and does not invent an unavailable count", () => {
     const doc = dom(renderToStaticMarkup(<HeroSection foodSpotCountLabel={null} />));
-    expect(doc.querySelector('input[type="search"]')?.getAttribute("aria-label")).toBe("Search food spots");
+    const input = doc.querySelector('input[type="search"]')!;
+    expect(doc.querySelector(`label[for="${input.id}"]`)?.textContent).toBe("Search food spots");
     expect(doc.body.textContent).not.toContain("400+");
-    expect(doc.body.textContent).not.toContain("Food Spots Listed");
+    expect(doc.body.textContent).not.toContain("food spots to explore");
   });
 });

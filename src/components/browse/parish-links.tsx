@@ -18,11 +18,10 @@ export function ParishLinks({ places }: { places: PlaceV2[] }) {
     };
   }).filter(parish => parish.count > 0).sort((a, b) => b.count - a.count);
   if (!parishes.length) return null;
-  return <section className="section container dark-section" aria-labelledby="parish-heading">
+  return <section className="section container" aria-labelledby="parish-heading">
     <div className="section-heading"><div>
-      <span className="eyebrow">Explore Jamaica</span>
-      <h2 id="parish-heading">Find food spots by parish</h2>
-      <p>Choose a parish to browse its listings. Greater Kingston covers the whole metro area, including its St. Andrew neighbourhoods.</p>
+      <h2 id="parish-heading">Eat your way around the island</h2>
+      <p>Pick a parish. Greater Kingston covers the whole metro area, including its St. Andrew neighbourhoods.</p>
     </div></div>
     <nav aria-label="Restaurants by parish" className="parish-grid">
       {parishes.map(({ parish, name, count, cover }) => <Link className="parish-card" key={parish} href={`/restaurants/${parish.replace(/ /g, "-")}`}>

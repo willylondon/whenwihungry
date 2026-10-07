@@ -36,7 +36,7 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
           {(place.public_review_count ?? 0) > 0 && <> · {place.public_review_count!.toLocaleString("en-US")} ratings</>}
         </p>}
         {(place.community_review_count ?? 0) > 0 && <p className="rating-provenance">Community: {place.community_rating?.toFixed(1)}/5 · {place.community_review_count} approved reviews</p>}
-        <span className="browse-card-cta">{written ? "Read Review →" : getPlaceCta(place)}</span>
+        {(written || status !== "listed") && <span className="browse-card-cta">{written ? "Read the review" : getPlaceCta(place).replace(/\s*→$/, "")}</span>}
       </div>
     </Link>
   );
