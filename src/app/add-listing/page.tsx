@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { submitListingAction } from "@/app/add-listing/actions";
+import { PARISHES as parishes, LISTING_CATEGORIES as categories } from "./validation";
 import { getCurrentUser } from "@/lib/community";
 
 type AddListingPageProps = {
@@ -14,34 +15,6 @@ type AddListingPageProps = {
 export const metadata = {
   title: "Add a Restaurant"
 };
-
-const parishes = [
-  "Kingston",
-  "St. Andrew",
-  "St. Catherine",
-  "St. James",
-  "St. Ann",
-  "Portland",
-  "Manchester",
-  "Clarendon",
-  "Westmoreland",
-  "St. Elizabeth",
-  "Hanover",
-  "Trelawny",
-  "St. Mary",
-  "St. Thomas"
-];
-
-const categories = [
-  "Jerk",
-  "Cook Shop",
-  "Lunch Run",
-  "Seafood",
-  "Patties",
-  "Date Night",
-  "Cheap Eats",
-  "Late Night"
-];
 
 export default async function AddListingPage({ searchParams }: AddListingPageProps) {
   const [params, user] = await Promise.all([searchParams, getCurrentUser()]);
@@ -69,11 +42,11 @@ export default async function AddListingPage({ searchParams }: AddListingPagePro
           {params.welcome ? (
             <p className="form-success">Account ready. Add your first spot below.</p>
           ) : null}
-          {params.error ? <p className="form-alert">{params.error}</p> : null}
+          {params.error ? <p role="alert" className="form-alert">{params.error === "invalid" ? "Check all fields. Use a listed parish/category, 10–500 characters of description, and valid links." : "Your listing could not be confirmed. Please retry later or check for an existing submission before retrying."}</p> : null}
           <fieldset disabled={!user}>
             <label>
               Restaurant name
-              <input name="name" required type="text" />
+              <input name="name" required minLength={2} maxLength={160} type="text" />
             </label>
             <div className="form-grid">
               <label>
@@ -87,7 +60,7 @@ export default async function AddListingPage({ searchParams }: AddListingPagePro
               </label>
               <label>
                 Area
-                <input name="area" placeholder="Half Way Tree, Mobay, Port Royal..." type="text" />
+                <input maxLength={160} name="area" placeholder="Half Way Tree, Mobay, Port Royal..." type="text" />
               </label>
             </div>
             <div className="form-grid">
@@ -107,12 +80,14 @@ export default async function AddListingPage({ searchParams }: AddListingPagePro
                   <option>$</option>
                   <option>$$</option>
                   <option>$$$</option>
+                  <option>$$$$</option>
                 </select>
               </label>
             </div>
             <label>
               Why should people know it?
               <textarea
+                minLength={10}
                 maxLength={500}
                 name="description"
                 required
@@ -121,26 +96,26 @@ export default async function AddListingPage({ searchParams }: AddListingPagePro
             </label>
             <label>
               Address
-              <input name="address" type="text" />
+              <input maxLength={300} name="address" type="text" />
             </label>
             <div className="form-grid">
               <label>
                 Phone
-                <input name="phone" type="tel" />
+                <input maxLength={40} name="phone" type="tel" />
               </label>
               <label>
                 Website
-                <input name="website" type="url" />
+                <input maxLength={2048} name="website" type="url" />
               </label>
             </div>
             <div className="form-grid">
               <label>
                 Instagram
-                <input name="instagram" placeholder="@restaurant" type="text" />
+                <input maxLength={300} name="instagram" placeholder="@restaurant" type="text" />
               </label>
               <label>
                 TikTok
-                <input name="tiktok" placeholder="@restaurant" type="text" />
+                <input maxLength={300} name="tiktok" placeholder="@restaurant" type="text" />
               </label>
             </div>
             <button className="btn btn-primary" type="submit">

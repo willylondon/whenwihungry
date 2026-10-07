@@ -1,222 +1,109 @@
-/**
- * Location / Parish Validation Helpers
- *
- * Used to validate that a place's parish matches the requested location page,
- * and to detect suspicious cross-parish records.
- */
-
-// ── Parish aliases ──────────────────────────────────────────────────
-
+/** Canonical parish keys keep Jamaica's 14 parishes distinct. */
 const PARISH_ALIASES: Record<string, string[]> = {
-  kingston: [
-    "kingston", "st andrew", "st. andrew", "st andrews", "new kingston",
-    "half way tree", "halfway tree", "liguanea", "barbican", "constant spring",
-    "cross roads", "downtown kingston", "harbour view", "port royal",
-    "red hills", "manor park", "papine", "mona", "hope road", "waterloo",
-    "spanish town road", "hagley park", "maxfield", "vineyard town",
-    "old hope road", "kingston & st. andrew", "kingston and st. andrew"
-  ],
-  portland: [
-    "portland", "port antonio", "boston", "boston bay", "fairy hill",
-    "san san", "drapers", "long bay", "manchioneal", "buff bay",
-    "hope bay", "winifred beach", "winnifred beach", "frenchman's cove",
-    "blue lagoon", "rio grande", "norwich", "st. margaret's bay",
-    "st margarets bay"
-  ],
-  "st james": [
-    "st james", "st. james", "montego bay", "mobay", "ironshore",
-    "freeport", "hip strip", "gloucester avenue", "rose hall"
-  ],
-  "st ann": [
-    "st ann", "st. ann", "st anns", "ocho rios", "runaway bay",
-    "discovery bay", "st ann's bay", "st anns bay", "priory", "mammee bay"
-  ],
-  westmoreland: [
-    "westmoreland", "negril", "savanna-la-mar", "sav-la-mar", "whitehouse"
-  ],
-  "st elizabeth": [
-    "st elizabeth", "st. elizabeth", "black river", "treasure beach",
-    "santa cruz", "junction", "malvern"
-  ],
-  manchester: [
-    "manchester", "mandeville", "christiana", "spur tree"
-  ],
-  "st catherine": [
-    "st catherine", "st. catherine", "spanish town", "portmore",
-    "old harbour", "linstead", "bog walk"
-  ],
-  clarendon: [
-    "clarendon", "may pen", "lionel town", "chapelton"
-  ],
-  "st mary": [
-    "st mary", "st. mary", "port maria", "oracabessa", "annotto bay", "highgate"
-  ],
-  hanover: [
-    "hanover", "lucea", "green island", "sandy bay"
-  ],
-  trelawny: [
-    "trelawny", "falmouth", "duncans", "rio bueno"
-  ],
-  "st thomas": [
-    "st thomas", "st. thomas", "morant bay", "yallahs", "lyssons", "seaforth"
-  ]
+  kingston: ["kingston", "downtown kingston", "port royal", "kingston and st andrew", "kingston & st andrew"],
+  "st andrew": ["st andrew", "st andrews", "new kingston", "half way tree", "halfway tree", "liguanea", "barbican", "constant spring", "mona", "papine"],
+  portland: ["portland", "port antonio", "boston bay", "fairy hill", "buff bay", "hope bay", "manchioneal"],
+  "st james": ["st james", "montego bay", "mobay", "ironshore", "rose hall"],
+  "st ann": ["st ann", "st anns", "ocho rios", "runaway bay", "discovery bay", "st anns bay", "priory", "mammee bay"],
+  westmoreland: ["westmoreland", "negril", "savanna la mar", "sav la mar", "whitehouse"],
+  "st elizabeth": ["st elizabeth", "black river", "treasure beach", "santa cruz", "junction", "malvern"],
+  manchester: ["manchester", "mandeville", "christiana", "spur tree"],
+  "st catherine": ["st catherine", "spanish town", "portmore", "old harbour", "linstead", "bog walk"],
+  clarendon: ["clarendon", "may pen", "lionel town", "chapelton"],
+  "st mary": ["st mary", "port maria", "oracabessa", "annotto bay", "highgate"],
+  hanover: ["hanover", "lucea", "green island", "sandy bay"],
+  trelawny: ["trelawny", "falmouth", "duncans", "rio bueno"],
+  "st thomas": ["st thomas", "morant bay", "yallahs", "lyssons", "seaforth"]
 };
 
-// ── Normalize ───────────────────────────────────────────────────────
+function normalizeLocationText(value: string): string {
+  return value.toLowerCase().trim().replace(/\bsaint\b/g, "st").replace(/[.’']/g, "").replace(/[-_]/g, " ").replace(/\s+/g, " ");
+}
 
 export function normalizeParish(input: string | null | undefined): string {
-  const raw = String(input || "").trim().toLowerCase();
+  const raw = normalizeLocationText(input || "").replace(/(?:,?\s+jamaica)?$/, "").replace(/\s+parish$/, "").trim();
   if (!raw) return "";
-
-  for (const [parish, aliases] of Object.entries(PARISH_ALIASES)) {
-    if (aliases.includes(raw)) return parish;
-  }
-
-  // Fuzzy: check if any alias is contained in the input
-  for (const [parish, aliases] of Object.entries(PARISH_ALIASES)) {
-    for (const alias of aliases) {
-      if (raw.includes(alias)) return parish;
-    }
-  }
-
-  return raw;
+  return Object.entries(PARISH_ALIASES).find(([, aliases]) => aliases.includes(raw))?.[0] ?? "";
 }
 
-// ── Check if area/address belongs to a parish ───────────────────────
-
-function areaMatchesParish(area: string, address: string, parish: string): boolean {
-  const combined = `${area} ${address}`.toLowerCase();
-  const aliases = PARISH_ALIASES[parish] ?? [];
-  return aliases.some((a) => combined.includes(a));
-}
-
-// ── Validation result ───────────────────────────────────────────────
-
-export type ValidationResult = {
-  valid: boolean;
-  confidence: "high" | "medium" | "low";
-  reasons: string[];
-  suspectedParish?: string;
-};
-
-export function validatePlaceParish(place: {
-  parish?: string | null;
-  area?: string | null;
-  address?: string | null;
-  name?: string | null;
-  manuallyVerified?: boolean | null;
-  dataQualityStatus?: string | null;
-}): ValidationResult {
-  const reasons: string[] = [];
-  const parish = normalizeParish(place.parish);
-  const area = String(place.area || "").toLowerCase();
-  const address = String(place.address || "").toLowerCase();
-  const name = String(place.name || "").toLowerCase();
-
-  if (!parish) {
-    return { valid: false, confidence: "low", reasons: ["Missing parish"] };
-  }
-
-  // Check if area/address confirms the parish
-  const areaConfirms = areaMatchesParish(area, address, parish);
-
-  // Check if name/area/address suggests a different parish
-  let suspectedParish: string | undefined;
-  for (const [otherParish, aliases] of Object.entries(PARISH_ALIASES)) {
-    if (otherParish === parish) continue;
-    const combined = `${name} ${area} ${address}`;
-    for (const alias of aliases) {
-      if (alias.length > 4 && combined.includes(alias)) {
-        suspectedParish = otherParish;
-        reasons.push(`Name/area/address contains "${alias}" which suggests ${otherParish}, not ${parish}`);
-        break;
-      }
-    }
-    if (suspectedParish) break;
-  }
-
-  if (suspectedParish) {
-    return {
-      valid: false,
-      confidence: "medium",
-      reasons,
-      suspectedParish
-    };
-  }
-
-  if (areaConfirms) {
-    return { valid: true, confidence: "high", reasons: ["Area/address confirms parish"] };
-  }
-
-  return {
-    valid: true,
-    confidence: area || address ? "medium" : "low",
-    reasons: area || address
-      ? ["Parish set but area/address does not strongly confirm"]
-      : ["Parish set but no area/address for confirmation"]
-  };
-}
-
-// ── Safe for parish page ────────────────────────────────────────────
-
-export function isPlaceSafeForParishPage(
-  place: {
-    parish?: string | null;
-    area?: string | null;
-    address?: string | null;
-    name?: string | null;
-    manuallyVerified?: boolean | null;
-    dataQualityStatus?: string | null;
-    businessType?: string | null;
-  },
-  requestedParish: string
-): boolean {
-  const normalized = normalizeParish(requestedParish);
-  if (!normalized) return false;
-
-  // Never show rejected records or confirmed non-food businesses
-  if (place.dataQualityStatus === "rejected") return false;
-  if (place.businessType === "not_food") return false;
-
-  // Never show needs_review on parish pages unless manually verified
-  if (place.dataQualityStatus === "needs_review" && !place.manuallyVerified) return false;
-
-  const placeParish = normalizeParish(place.parish);
-  if (!placeParish) return false;
-
-  // Must match the requested parish
-  if (placeParish !== normalized) return false;
-
-  // Run validation
-  const result = validatePlaceParish(place);
-  if (!result.valid) return false;
-
-  return true;
-}
-
-// ── Get all known parish names ──────────────────────────────────────
-
-export function getAllParishNames(): string[] {
-  return Object.keys(PARISH_ALIASES);
-}
-
-// ── Get display name for a parish ───────────────────────────────────
+export function getAllParishNames(): string[] { return Object.keys(PARISH_ALIASES); }
 
 export function getParishDisplayName(parish: string): string {
-  const map: Record<string, string> = {
-    kingston: "Kingston & St. Andrew",
-    portland: "Portland",
-    "st james": "St. James",
-    "st ann": "St. Ann",
-    westmoreland: "Westmoreland",
-    "st elizabeth": "St. Elizabeth",
-    manchester: "Manchester",
-    "st catherine": "St. Catherine",
-    clarendon: "Clarendon",
-    "st mary": "St. Mary",
-    hanover: "Hanover",
-    trelawny: "Trelawny",
-    "st thomas": "St. Thomas"
-  };
-  return map[parish] ?? parish;
+  const key = normalizeParish(parish);
+  return key ? key.split(" ").map((word) => word === "st" ? "St." : word[0].toUpperCase() + word.slice(1)).join(" ") : parish;
+}
+
+/** The Kingston route is a deliberately labelled metro page, not a parish alias. */
+export function matchesParish(placeParish: string | null | undefined, requested: string, kingstonMetro = false): boolean {
+  const key = normalizeParish(requested);
+  const actual = normalizeParish(placeParish);
+  return Boolean(key && actual && (actual === key || (kingstonMetro && key === "kingston" && actual === "st andrew")));
+}
+
+export type GeographicPlace = {
+  country?: string | null;
+  country_code?: string | null;
+  address?: string | null;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
+  lat?: number | null;
+  lng?: number | null;
+};
+
+/** Exclude only explicit foreign evidence. Missing geography is never invented. */
+export function getForeignLocationReasons(place: GeographicPlace): string[] {
+  const reasons: string[] = [];
+  const country = String(place.country_code || place.country || "").trim().toLowerCase();
+  if (country && !["jm", "jam", "jamaica", "unknown", "n/a", "unspecified"].includes(country)) reasons.push("explicit_foreign_country");
+  const rawLat = place.latitude ?? place.lat;
+  const rawLng = place.longitude ?? place.lng;
+  const lat = rawLat == null || String(rawLat).trim() === "" ? NaN : Number(rawLat);
+  const lng = rawLng == null || String(rawLng).trim() === "" ? NaN : Number(rawLng);
+  // (0,0) is a common missing-coordinate sentinel, not evidence of a foreign listing.
+  if (Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0) &&
+    (lat < 16.5 || lat > 19 || lng < -79 || lng > -75)) reasons.push("coordinates_outside_jamaica");
+  const address = place.address || "";
+  if (/\b(?:united states(?: of america)?|united kingdom|canada|england|scotland|wales|ireland|australia|new zealand|trinidad(?: and tobago)?|barbados|(?:U\.?S\.?\s*)?virgin\s*islands|USVI|USA|U\.S\.A\.|UK)\s*(?:\d{5}(?:-\d{4})?)?\s*$/i.test(address) ||
+    /,\s*(?:AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC)\s+\d{5}(?:-\d{4})?\b/.test(address) ||
+    /,\s*(?:ON|QC|BC|AB|MB|NB|NL|NS|NT|NU|PE|SK|YT)\s+[A-Z]\d[A-Z]\s?\d[A-Z]\d\b/i.test(address)) reasons.push("explicit_foreign_address");
+  return reasons;
+}
+
+export type ValidationResult = { valid: boolean; confidence: "high" | "medium" | "low"; reasons: string[]; suspectedParish?: string };
+
+type ParishPlace = GeographicPlace & {
+  parish?: string | null;
+  area?: string | null;
+  name?: string | null;
+  status?: string | null;
+  is_active?: boolean | null;
+  manuallyVerified?: boolean | null;
+  manually_verified?: boolean | null;
+  dataQualityStatus?: string | null;
+  data_quality_status?: string | null;
+  businessType?: string | null;
+  business_type?: string | null;
+};
+
+export function validatePlaceParish(place: ParishPlace): ValidationResult {
+  const parish = normalizeParish(place.parish);
+  if (!parish) return { valid: false, confidence: "low", reasons: ["Missing or unknown parish"] };
+  const foreign = getForeignLocationReasons(place);
+  if (foreign.length) return { valid: false, confidence: "high", reasons: foreign };
+  const areaParish = normalizeParish(place.area);
+  // Kingston and St. Andrew share metropolitan addresses. Restaurant names are not location evidence.
+  if (areaParish && areaParish !== parish && !(["kingston", "st andrew"].includes(areaParish) && ["kingston", "st andrew"].includes(parish))) {
+    return { valid: false, confidence: "medium", reasons: ["Area suggests a different parish"], suspectedParish: areaParish };
+  }
+  return { valid: true, confidence: areaParish === parish ? "high" : (place.area || place.address ? "medium" : "low"), reasons: [areaParish === parish ? "Area confirms parish" : "Parish set; address not independently verified"] };
+}
+
+export function isPlaceSafeForParishPage(place: ParishPlace, requestedParish: string): boolean {
+  if (!matchesParish(place.parish, requestedParish, true)) return false;
+  if (place.status != null && place.status !== "approved") return false;
+  if (place.is_active === false) return false;
+  const quality = place.data_quality_status ?? place.dataQualityStatus;
+  if (quality === "rejected" || (quality === "needs_review" && !(place.manually_verified ?? place.manuallyVerified))) return false;
+  if ((place.business_type ?? place.businessType) === "not_food") return false;
+  return validatePlaceParish(place).valid;
 }

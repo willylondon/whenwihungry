@@ -1,5 +1,5 @@
 import { moderateListingAction } from "@/app/admin/listings/actions";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 type AdminListingsPageProps = {
   searchParams: Promise<{
@@ -16,44 +16,9 @@ export default async function AdminListingsPage({
   searchParams
 }: AdminListingsPageProps) {
   const params = await searchParams;
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const supabase = await requireAdmin("/admin/listings");
 
-  if (!user) {
-    return (
-      <section className="section">
-        <div className="container">
-          <div className="card empty-state">
-            <h1>Sign in required.</h1>
-            <p>Use the When Wi Hungry admin account to moderate listings.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") {
-    return (
-      <section className="section">
-        <div className="container">
-          <div className="card empty-state">
-            <h1>Admin only.</h1>
-            <p>This page is only for When Wi Hungry moderation.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  const { data: listings } = await supabase
+  const { data: listings, error } = await supabase
     .from("restaurants")
     .select("id, name, parish, area, category, status, description, created_at")
     .order("created_at", { ascending: false });
@@ -69,7 +34,9 @@ export default async function AdminListingsPage({
           </div>
         </div>
         {params.updated ? <p className="form-success">Listing updated.</p> : null}
-        {params.error ? <p className="form-alert">{params.error}</p> : null}
+        {params.error ? <p role="alert" className="form-alert">The listing status could not be saved. Check the record and retry.</p> : null}
+        {error && <p role="alert">Listings could not be loaded. Refresh to retry.</p>}
+        {!error && !listings?.length && <p>No listings found.</p>}
         <div className="admin-list">
           {(listings ?? []).map((listing) => (
             <article className="card admin-listing" key={listing.id}>

@@ -96,12 +96,15 @@ async function applyUpdate(
     location_notes: LOCATION_NOTE,
   };
 
-  const { error: e1 } = await supabase
+  const { data: data1, error: e1 } = await supabase
     .from("restaurants")
     .update(extended)
-    .eq("slug", slug);
+    .eq("slug", slug)
+    .select("id, description");
 
-  if (!e1) return { ok: true, extended: true };
+  if (!e1) return data1?.length === 1 && data1[0].description === newDescription
+    ? { ok: true, extended: true }
+    : { ok: false, extended: true, error: "Expected one matching updated row; no correction confirmed" };
 
   // Column doesn't exist — fall back to core fields only
   if (e1.code === "42703") {
@@ -109,12 +112,15 @@ async function applyUpdate(
       description: newDescription,
       data_quality_status: "corrected",
     };
-    const { error: e2 } = await supabase
+    const { data: data2, error: e2 } = await supabase
       .from("restaurants")
       .update(core)
-      .eq("slug", slug);
+      .eq("slug", slug)
+      .select("id, description");
 
-    if (!e2) return { ok: true, extended: false };
+    if (!e2) return data2?.length === 1 && data2[0].description === newDescription
+      ? { ok: true, extended: false }
+      : { ok: false, extended: false, error: "Expected one matching updated row; no correction confirmed" };
     return { ok: false, extended: false, error: e2.message };
   }
 

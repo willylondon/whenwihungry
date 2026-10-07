@@ -1,144 +1,60 @@
-import { Metadata } from "next";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { dbRowToPlace, type PlaceV2 } from "@/lib/community";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getAllApprovedPlaces } from "@/lib/community";
 import { PlaceListCard } from "@/components/browse/place-list-card";
+import { Pagination } from "@/components/browse/pagination";
 import { SectionHeader } from "@/components/ui/section-header";
-import { normalizeParish, isPlaceSafeForParishPage } from "@/lib/location-validation";
+import { normalizeParish, getAllParishNames, getParishDisplayName, isPlaceSafeForParishPage } from "@/lib/location-validation";
+import { paginate, normalizeBrowseParams } from "@/lib/browse-pagination";
+import { serializeJsonLd } from "@/lib/security/json-ld";
+import { siteUrl } from "@/lib/site-url";
 
-type Props = {
-  params: Promise<{ location: string }>;
-};
+type Props = { params: Promise<{ location: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-// Convert slug to all possible parish name variants to match the DB
-function slugToParishVariants(slug: string): string[] {
-  const base = slug
-    .split("-")
-    .map(word => word === "st" ? "St." : word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-  
-  // e.g. "Kingston" -> ["Kingston", "Kingston Parish", "Kingston & St. Andrew"]
-  const extras: Record<string, string[]> = {
-    "Kingston": ["Kingston", "Kingston Parish", "Kingston & St. Andrew", "Kingston and St. Andrew"],
-    "Portland": ["Portland", "Portland Parish"],
-    "St. Andrew": ["St. Andrew", "St Andrew", "Kingston & St. Andrew"],
-    "St. Ann": ["St. Ann", "Saint Ann", "St Ann"],
-    "St. James": ["St. James", "Saint James", "St James"],
-  };
-
-  return extras[base] ?? [base];
+function parishForSlug(location: string) {
+  const parish = normalizeParish(location.replace(/-/g, " "));
+  if (!getAllParishNames().includes(parish)) notFound();
+  return parish;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { location } = await params;
-  const variants = slugToParishVariants(location);
-  const displayName = variants[0];
-  
+  const displayName = getParishDisplayName(parishForSlug(location));
+  const canonical = `/restaurants/${location.toLowerCase()}`;
+  const query = normalizeBrowseParams(await searchParams);
   return {
-    title: `Best Restaurants in ${displayName}`,
-    description: `Explore top food spots in ${displayName}: local favourites, jerk, grill, seafood, and Jamaican restaurants — honest and unfiltered.`,
-    openGraph: {
-      title: `Best Restaurants in ${displayName}`,
-      description: `Unfiltered reviews for the top food spots in ${displayName}.`,
-      images: [
-        {
-          url: "https://whenwihungry.vercel.app/og/whenwihungry-og.png",
-          width: 1200,
-          height: 630,
-          alt: `WhenWiHungry — Best restaurants in ${displayName}`,
-          type: "image/png"
-        }
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      images: ["https://whenwihungry.vercel.app/og/whenwihungry-og.png"]
-    }
+    title: `Restaurants in ${displayName}`,
+    description: `Explore food spots in ${displayName}, with listing information and critic verdicts where available.`,
+    alternates: { canonical },
+    ...(query.page ? { robots: { index: false, follow: true } } : {}),
+    openGraph: { title: `Restaurants in ${displayName}`, url: siteUrl(canonical), images: [siteUrl("/og/whenwihungry-og.png")] }
   };
 }
 
-export default async function LocationPage({ params }: Props) {
+export default async function LocationPage({ params, searchParams }: Props) {
   const { location } = await params;
-  const supabase = await createSupabaseServerClient();
-  const variants = slugToParishVariants(location);
-  const displayName = variants[0];
-
-  // Direct DB query by parish variants — bypasses the RPC relevance filter
-  const { data, error } = await supabase
-    .from("restaurants")
-    .select(`*, admin_reviews(verdict, admin_score), user_reviews(rating)`)
-    .in("parish", variants)
-    .eq("status", "approved")
-    .neq("data_quality_status", "rejected")
-    .neq("business_type", "not_food")
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false });
-
-  const results: PlaceV2[] = (error || !data) ? [] : data
-    .filter((row: any) => isPlaceSafeForParishPage({
-      parish: row.parish,
-      area: row.area || row.city,
-      address: row.address,
-      name: row.name,
-      dataQualityStatus: row.data_quality_status,
-      manuallyVerified: row.manually_verified,
-      businessType: row.business_type
-    }, location))
-    .map((row: any) => {
-    const adminRev = Array.isArray(row.admin_reviews) ? row.admin_reviews[0] : row.admin_reviews;
-    const userReviews = row.user_reviews || [];
-    const avgCommunity = userReviews.length > 0
-      ? userReviews.reduce((acc: number, cur: any) => acc + (cur.rating || 0), 0) / userReviews.length
-      : 0;
-    return {
-      ...dbRowToPlace(row),
-      verdict: adminRev?.verdict || row.verdict,
-      admin_score: adminRev?.admin_score || row.admin_score,
-      community_score: (row.avg_rating || avgCommunity) * 20,
-      reviewCount: row.rating_count || userReviews.length,
-      is_verified: row.is_verified || row.verified
-    };
-  });
-
+  const query = normalizeBrowseParams(await searchParams);
+  const parish = parishForSlug(location);
+  const displayName = parish === "kingston" ? "Kingston & St. Andrew" : getParishDisplayName(parish);
+  const results = (await getAllApprovedPlaces()).filter(place => isPlaceSafeForParishPage(place, parish));
+  const pagination = paginate(results, query.page);
   const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `Best Restaurants in ${displayName}`,
-    url: `https://whenwihungry.vercel.app/restaurants/${location}`,
-    numberOfItems: results.length,
-    itemListElement: results.slice(0, 20).map((place, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      url: `https://whenwihungry.vercel.app/places/${place.slug}`,
-      name: place.name
+    "@context": "https://schema.org", "@type": "ItemList",
+    name: `Restaurants in ${displayName}`, url: siteUrl(`/restaurants/${location}`), numberOfItems: results.length,
+    itemListElement: pagination.items.map((place, index) => ({
+      "@type": "ListItem", position: pagination.offset + index + 1, url: siteUrl(`/places/${place.slug}`), name: place.name
     }))
   };
-
-  return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
-      />
-      <div style={{ width: "min(1200px, calc(100% - 40px))", margin: "0 auto" }} className="container">
-        <SectionHeader 
-          eyebrow="Local Discovery"
-          heading={`Best in ${displayName}`}
-          subtext={`Showing mapped food spots in ${displayName} ranked by public signals, community activity, and critic verdicts where available.`}
-        />
-
-        {/* ── SEO Intro Copy ── */}
-        <LocationIntro location={location} displayName={displayName} resultCount={results.length} />
-        
-        <div style={{ display: "grid", gap: "24px", marginTop: "48px" }}>
-          {results.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.4)" }}>No restaurants found in {displayName} yet.</p>
-          ) : (
-            results.map((place) => <PlaceListCard key={place.slug} place={place} />)
-          )}
-        </div>
-      </div>
-    </main>
-  );
+  return <section className="directory-page section">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListSchema) }} />
+    <div className="container">
+      <SectionHeader eyebrow="Local Discovery" heading={`Food spots in ${displayName}`} subtext="Explore directory listings, community ratings, and critic verdicts where available." />
+      <LocationIntro location={location} displayName={displayName} resultCount={results.length} />
+      <p className="result-summary">{results.length === 0 ? `No restaurants found in ${displayName} yet.` : `Showing ${pagination.offset + 1}–${pagination.offset + pagination.items.length} of ${results.length} food spots`}</p>
+      <div className="location-results">{pagination.items.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>
+      <Pagination path={`/restaurants/${location}`} params={query} page={pagination.page} totalPages={pagination.totalPages} />
+    </div>
+  </section>;
 }
 
 // ── SEO Intro Copy ──────────────────────────────────────────────────
@@ -158,7 +74,7 @@ const LOCATION_INTRO: Record<string, string[]> = {
 
 function LocationIntro({ location, displayName, resultCount }: { location: string; displayName: string; resultCount: number }) {
   const locationKey = location.toLowerCase().replace(/-/g, "");
-  const paragraphs = LOCATION_INTRO[locationKey];
+  const paragraphs = Object.hasOwn(LOCATION_INTRO, locationKey) ? LOCATION_INTRO[locationKey] : null;
   if (!paragraphs) return null;
 
   return (

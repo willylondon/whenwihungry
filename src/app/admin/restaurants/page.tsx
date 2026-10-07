@@ -1,9 +1,9 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import Link from "next/link";
 
 export default async function AdminRestaurantsPage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: restaurants } = await supabase
+  const supabase = await requireAdmin("/admin/restaurants");
+  const { data: restaurants, error } = await supabase
     .from("restaurants")
     .select("id, name, slug, parish, is_verified")
     .order("name", { ascending: true });
@@ -28,6 +28,8 @@ export default async function AdminRestaurantsPage() {
           </Link>
         </div>
 
+        {error && <p role="alert">Restaurant data could not be loaded. Refresh to retry.</p>}
+        {!error && !restaurants?.length && <p>No restaurants found.</p>}
         <div style={{ background: "var(--wwh-card)", borderRadius: "16px", border: "1px solid var(--wwh-border)", overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", color: "#fff" }}>
             <thead>

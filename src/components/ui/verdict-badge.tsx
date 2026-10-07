@@ -1,5 +1,3 @@
-import type { Verdict } from "@/lib/verdict";
-
 const VERDICT_CONFIG: Record<
   string,
   { emoji: string; label: string; bg: string; text: string; border: string }

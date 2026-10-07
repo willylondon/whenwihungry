@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { catalogDb, restaurant } from "./helpers/catalog-db";
+const state = vi.hoisted(() => ({ client: null as any }));
+vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: vi.fn(async () => state.client) }));
+import { CatalogUnavailableError, searchRestaurants } from "@/lib/community";
 
 import type { Place } from "@/data/places";
 import {
@@ -222,5 +226,58 @@ describe("search helpers", () => {
   it("finds location-led searches without manual aliases", () => {
     expect(rankPlacesForQuery("kingston", fixturePlaces).map((place) => place.name)).toContain("Moby Dick");
     expect(rankPlacesForQuery("st mary", fixturePlaces)[0]?.name).toBe("Chris's Cook Shop");
+  });
+});
+
+
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn(() => { throw new Error("Network is forbidden in unit tests"); }));
+  vi.spyOn(console, "error").mockImplementation(() => {});
+  vi.spyOn(console, "warn").mockImplementation(() => {});
+});
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+
+describe("production searchRestaurants data path", () => {
+  it("hydrates ranked identities using approved full rows, preserving coordinates and provenance", async () => {
+    state.client = catalogDb({
+      search_restaurants: [{ id: "restaurant-1", slug: "wrong-slug", name: "Stale RPC Name", public_rating: 1, admin_score: 40, final_score: 99, match_reason: "Dish match" }],
+      restaurants: [restaurant({ public_rating: 4.8, public_review_count: 900, public_rating_source: "Google", tiktok_url: "https://www.tiktok.com/@wwh/video/123", website: "https://example.com/menu", price_range: "$$$$" })]
+    });
+    const results = await searchRestaurants("jerk");
+    expect(results).toHaveLength(1);
+    expect(results[0]).toMatchObject({ name: "Jamaica Food", slug: "jamaica-food", lat: 18.47, lng: -77.92, priceRange: "$$$$", public_rating_source: "Google", rating: 4.8, rating_source: "public", final_score: 99 });
+    expect(results[0].admin_score).toBeUndefined();
+    expect(results[0].tiktok_url).toContain("tiktok.com");
+    expect(fetch).not.toHaveBeenCalled();
+    expect(state.client.calls.some((call: any) => call.source === "search_logs")).toBe(false);
+  });
+  it("discards unapproved, inactive, rejected and foreign RPC candidates before returning any public data", async () => {
+    const invalid = [restaurant({ id: "pending", slug: "pending", status: "pending" }), restaurant({ id: "inactive", slug: "inactive", is_active: false }),
+      restaurant({ id: "bad", slug: "bad", data_quality_status: "rejected" }), restaurant({ id: "foreign", slug: "foreign", address: "Toronto, Canada" })];
+    state.client = catalogDb({ restaurants: [restaurant(), ...invalid], search_restaurants: [restaurant(), ...invalid].map((row, i) => ({ id: row.id, final_score: 100 - i })) });
+    expect((await searchRestaurants("food")).map((place) => place.id)).toEqual(["restaurant-1"]);
+  });
+  it("supports slug-only RPC identities and paginates ranked/hydrated records", async () => {
+    const restaurants = Array.from({ length: 205 }, (_, i) => restaurant({ id: `id-${i}`, slug: `spot-${i}` }));
+    state.client = catalogDb({ restaurants, search_restaurants: restaurants.map((row, i) => ({ slug: row.slug, final_score: 1000 - i })) }, { cap: 13 });
+    const results = await searchRestaurants("food");
+    expect(results).toHaveLength(205);
+    expect(results[0].slug).toBe("spot-0");
+    expect(results[204].slug).toBe("spot-204");
+  });
+  it("falls back to the shared approved full-row search on an unavailable RPC", async () => {
+    state.client = catalogDb({ restaurants: [restaurant({ name: "Jerk Chicken Hut", description: "Smoky chicken", slug: "chicken" }), restaurant({ id: "dessert", name: "Ice Cream", slug: "dessert", description: "Jamaican dessert" })] }, { errors: { search_restaurants: "RPC not found" } });
+    expect((await searchRestaurants("fry chicken")).map((place) => place.slug)).toEqual(["chicken"]);
+    expect(state.client.rpc.mock.calls[0][1]).toEqual({ search_query: "fried chicken" });
+  });
+  it("propagates a catalog outage instead of pretending search has no matches", async () => {
+    state.client = catalogDb({}, { errors: { search_restaurants: "RPC unavailable", restaurants: "database unavailable" } });
+    await expect(searchRestaurants("food")).rejects.toBeInstanceOf(CatalogUnavailableError);
+  });
+  it("returns all approved places for whitespace without logging the query", async () => {
+    state.client = catalogDb({ restaurants: [restaurant()] });
+    expect(await searchRestaurants("  ")).toHaveLength(1);
+    expect(state.client.rpc).not.toHaveBeenCalled();
+    expect(state.client.calls.every((call: any) => ["restaurants", "user_reviews"].includes(call.source))).toBe(true);
   });
 });

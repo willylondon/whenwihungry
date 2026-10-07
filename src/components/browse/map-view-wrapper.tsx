@@ -12,8 +12,10 @@ const MapView = dynamic(() => import("./map-view"), {
   )
 });
 
+export type MapPlace = Pick<Place, "slug" | "name" | "area" | "parish" | "lat" | "lng">;
+
 type MapViewWrapperProps = {
-  places: Place[];
+  places: MapPlace[];
 };
 
 export function MapViewWrapper({ places }: MapViewWrapperProps) {

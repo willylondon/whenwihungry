@@ -60,10 +60,8 @@ export const JAMAICAN_SEARCH_SYNONYMS: Record<string, string[]> = {
   ],
   "fried chicken": [
     "chicken",
-    "cook shop",
     "crispy chicken",
     "fry chicken",
-    "jamaican",
     "jerk chicken"
   ],
   "fried fish": [

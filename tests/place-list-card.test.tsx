@@ -1,115 +1,56 @@
 // @vitest-environment jsdom
-
-import { act } from "react";
-import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
-
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
 import { PlaceListCard } from "@/components/browse/place-list-card";
 import type { PlaceV2 } from "@/lib/community";
 
-vi.mock("next/image", () => ({
-  default: (props: Record<string, any>) => {
-    const { alt, src, ...rest } = props;
-    return <img alt={alt} src={typeof src === "string" ? src : ""} {...rest} />;
-  }
-}));
+vi.mock("next/image", () => ({ default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={src} /> }));
+vi.mock("next/link", () => ({ default: ({ children, href, ...rest }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => <a href={href} {...rest}>{children}</a> }));
 
-vi.mock("next/link", () => ({
-  default: ({ children, href, ...rest }: Record<string, any>) => (
-    <a href={href} {...rest}>
-      {children}
-    </a>
-  )
-}));
-
-function renderCard(place: Partial<PlaceV2> & Record<string, any>) {
-  const container = document.createElement("div");
-  document.body.append(container);
-  const root = createRoot(container);
-
-  act(() => {
-    root.render(<PlaceListCard place={place as PlaceV2} showMatchReason />);
-  });
-
-  return { container, root };
+const base: PlaceV2 = {
+  id: "fixture-place", slug: "fixture-place", name: "Fixture Food Spot", area: "Negril", parish: "Westmoreland",
+  category: "Jamaican", type: "Restaurant", description: "Directory description", image: "/logo.png",
+  priceRange: "$$$", rating: 4.6, reviewCount: 900, reviews: [], features: [], hours: [], address: "", phone: "", website: "",
+  community_rating: null, community_review_count: 0, rating_source: "public", public_rating: 4.6, public_review_count: 900, public_rating_source: "Google"
+};
+function render(overrides: Partial<PlaceV2> = {}) {
+  const document = new DOMParser().parseFromString(renderToStaticMarkup(<PlaceListCard place={{ ...base, ...overrides }} />), "text/html");
+  return document.body;
 }
 
-function makeBasePlace(overrides: Partial<PlaceV2> & Record<string, any> = {}) {
-  return {
-    area: "Negril",
-    category: "International/Jamaican",
-    description: "Cliffside restaurant with a clear summary block.",
-    image: "https://example.com/ricks-cafe.jpg",
-    match_reason: "Name match",
-    name: "Rick's Cafe",
-    parish: "Westmoreland",
-    priceRange: "$$$",
-    public_review_count: 18231,
-    public_rating: 4.6,
-    rating: 4.6,
-    reviewCount: 18231,
-    slug: "ricks-cafe",
-    type: "International/Jamaican",
-    ...overrides
-  };
-}
-
-afterEach(() => {
-  document.body.innerHTML = "";
-});
-
-describe("PlaceListCard", () => {
-  it("renders the reviewed state with the restaurant name and critic CTA", () => {
-    const { container } = renderCard(
-      makeBasePlace({
-        critic_review_body: "The jerk snapper is worth the stop.",
-        critic_reviewed_at: "2026-05-04T10:00:00.000Z",
-        critic_verdict: "WORTH_IT",
-        name: "",
-        title: "Rick's Cafe"
-      })
-    );
-
-    expect(container.textContent).toContain("THE HONEST TAKE");
-    expect(container.textContent).toContain("Rick's Cafe");
-    expect(container.textContent).toContain("Worth It");
-    expect(container.textContent).toContain("READ TRUTH");
-    expect(container.textContent).toContain("18,000+ public reviews");
+describe("PlaceListCard production data contract", () => {
+  it("requires published authored content, verdict and date for the critic CTA", () => {
+    const card = render({ verdict: "WORTH_IT", headline: "Authored headline", honest_take: "Actual critic body", reviewed_at: "2026-10-01", has_critic_review: true });
+    expect(card.textContent).toContain("Critic Reviewed");
+    expect(card.textContent).toContain("Authored headline");
+    expect(card.textContent).toContain("Worth It");
+    expect(card.textContent).toContain("Read Verdict");
+    expect(card.textContent).not.toContain("Directory description");
   });
-
-  it("renders the listing state for unreviewed search results without legacy critic language", () => {
-    const { container } = renderCard(
-      makeBasePlace({
-        description: "",
-        name: "",
-        public_listing_summary: "Public listing information for Rick's Cafe.",
-        restaurant_name: "Rick's Cafe",
-        source_status: "public_import"
-      })
-    );
-
-    expect(container.textContent).toContain("LISTING INFO");
-    expect(container.textContent).toContain("Rick's Cafe");
-    expect(container.textContent).toContain("NOT YET REVIEWED");
-    expect(container.textContent).toContain("VIEW LISTING");
-    expect(container.textContent).not.toContain("THE HONEST TAKE");
-    expect(container.textContent).not.toContain("READ TRUTH");
+  it("keeps verdict-only and explicit unpublished records as listings", () => {
+    for (const overrides of [{ verdict: "MID" }, { verdict: "MID", headline: "Draft", reviewed_at: "2026-10-01", has_critic_review: false }]) {
+      const card = render(overrides);
+      expect(card.textContent).toContain("Listed — Review Pending");
+      expect(card.textContent).toContain("View Listing");
+      expect(card.textContent).not.toContain("Critic Reviewed");
+    }
   });
-
-  it("keeps needs-verification listings on the same listing-safe language", () => {
-    const { container } = renderCard(
-      makeBasePlace({
-        name: "",
-        needs_review: true,
-        place_name: "Roselle's",
-        source_status: "needs_verification"
-      })
-    );
-
-    expect(container.textContent).toContain("LISTING INFO");
-    expect(container.textContent).toContain("Roselle's");
-    expect(container.textContent).toContain("NOT YET REVIEWED");
-    expect(container.textContent).toContain("VIEW LISTING");
-    expect(container.textContent).not.toContain("THE HONEST TAKE");
+  it("shows accurate price and separates rating provenance", () => {
+    const card = render({ community_rating: 3.5, community_review_count: 2 });
+    expect(card.textContent).toContain("$$$");
+    expect(card.textContent).toContain("Google: 4.6/5 · 900 ratings");
+    expect(card.textContent).toContain("Community: 3.5/5 · 2 approved reviews");
+    expect(render({ priceRange: "" }).textContent).toContain("Price not listed");
+    expect(render({ priceRange: "", price_needs_confirmation: true }).textContent).toContain("Price needs confirmation");
+  });
+  it("routes a video-only place to its visible video section", () => {
+    const card = render({ tiktok_url: "https://www.tiktok.com/@fixture/video/123" });
+    expect(card.querySelector("a")?.getAttribute("href")).toBe("/places/fixture-place#video");
+    expect(card.textContent).toContain("Watch Review");
+  });
+  it("does not turn an unsafe URL into a video review", () => {
+    const card = render({ review_video_url: "javascript:alert(1)" });
+    expect(card.querySelector("a")?.getAttribute("href")).toBe("/places/fixture-place");
+    expect(card.textContent).not.toContain("Watch Review");
   });
 });

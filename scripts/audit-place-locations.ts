@@ -10,7 +10,7 @@
 import { createClient } from "@supabase/supabase-js";
 import * as fs from "fs";
 import * as path from "path";
-import { normalizeParish, validatePlaceParish, getAllParishNames } from "../src/lib/location-validation";
+import { normalizeParish, validatePlaceParish } from "../src/lib/location-validation";
 
 // ── Config ──────────────────────────────────────────────────────────
 

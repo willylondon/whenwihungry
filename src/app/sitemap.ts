@@ -1,54 +1,20 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { supabaseUrl, supabaseAnonKey } from "@/lib/supabase/config";
+import { getAllApprovedPlaces } from "@/lib/community";
 import { categories } from "@/lib/places";
+import { getAllParishNames } from "@/lib/location-validation";
+import { siteUrl } from "@/lib/site-url";
 
-export const revalidate = 21600;
+// Runtime generation avoids freezing an outage or a partial catalog into the build.
+// Fetch failures intentionally propagate as 5xx rather than publishing an empty sitemap.
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://whenwihungry.vercel.app";
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const { data: places } = await supabase
-    .from("restaurants")
-    .select("slug, updated_at")
-    .eq("status", "approved")
-    .neq("data_quality_status", "rejected")
-    .neq("business_type", "not_food")
-    .order("created_at", { ascending: false });
-
-  const placeEntries: MetadataRoute.Sitemap = (places ?? []).map((p) => ({
-    url: `${baseUrl}/places/${p.slug}`,
-    lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.8
-  }));
-
+  const places = await getAllApprovedPlaces();
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1
-    },
-    {
-      url: `${baseUrl}/browse`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9
-    },
-    {
-      url: `${baseUrl}/reviews`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.85
-    },
-    ...categories.map((category) => ({
-      url: `${baseUrl}/browse?category=${encodeURIComponent(category)}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.85
-    })),
-    ...placeEntries
+    { url: siteUrl(), changeFrequency: "weekly", priority: 1 },
+    ...["/browse", "/reviews", "/about"].map(path => ({ url: siteUrl(path), changeFrequency: "weekly" as const, priority: 0.9 })),
+    ...categories.map(category => ({ url: siteUrl(`/browse?category=${encodeURIComponent(category.toLowerCase())}`), changeFrequency: "weekly" as const, priority: 0.8 })),
+    ...getAllParishNames().map(parish => ({ url: siteUrl(`/restaurants/${parish.replace(/ /g, "-")}`), changeFrequency: "weekly" as const, priority: 0.8 })),
+    ...places.map(place => ({ url: siteUrl(`/places/${place.slug}`), changeFrequency: "monthly" as const, priority: 0.8 }))
   ];
 }

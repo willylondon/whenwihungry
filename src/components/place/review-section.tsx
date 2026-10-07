@@ -1,164 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+type Review = { id: string; rating: number; comment: string; created_at?: string };
 type ReviewSectionProps = {
   restaurantId: string;
-  reviews: any[];
+  returnPath: string;
+  reviews: Review[];
   isSignedIn: boolean;
-  userReview?: any;
+  userReview?: { id: string } | null;
+  reviewsUnavailable?: boolean;
+  submissionUnavailable?: boolean;
 };
 
-export function ReviewSection({ restaurantId, reviews, isSignedIn, userReview }: ReviewSectionProps) {
+export function ReviewSection({ returnPath, restaurantId, reviews, isSignedIn, userReview, reviewsUnavailable = false, submissionUnavailable = false }: ReviewSectionProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [message, setMessage] = useState("");
+  const inFlight = useRef(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isSignedIn) return;
-    
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!isSignedIn || inFlight.current || submitted || submissionUnavailable || !rating) return;
+    inFlight.current = true;
     setIsSubmitting(true);
     setMessage("");
-
     try {
-      const res = await fetch("/api/reviews", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch("/api/reviews", {
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ restaurantId, rating, comment })
       });
-      
-      if (res.ok) {
+      if (response.ok) {
         setMessage("Review submitted for moderation. Respect!");
-        setRating(0);
-        setComment("");
+        setSubmitted(true);
         router.refresh();
       } else {
-        const err = await res.json();
-        setMessage(err.message || "Something went wrong.");
+        const body = await response.json().catch(() => ({}));
+        setMessage(typeof body.message === "string" ? body.message : "Your review wasn’t submitted. Please try again.");
       }
-    } catch (err) {
-      setMessage("Failed to submit.");
+    } catch {
+      setMessage("Your review wasn’t submitted. Check your connection and try again.");
     } finally {
+      inFlight.current = false;
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "48px" }}>
-      {/* Review Feed */}
-      <div>
-        <h2 style={{ fontFamily: "var(--wwh-font-heading)", fontSize: "1.8rem", color: "#fff", marginBottom: "24px", textTransform: "uppercase" }}>
-          Community Notes
-        </h2>
-        
-        <div style={{ display: "grid", gap: "20px" }}>
-          {reviews.length === 0 ? (
-            <p style={{ color: "rgba(255,255,255,0.4)" }}>No approved reviews yet. Be the first to tell the truth.</p>
-          ) : (
-            reviews.map((r) => (
-              <div key={r.id} style={{ background: "rgba(255,255,255,0.03)", padding: "20px", borderRadius: "12px", border: "1px solid var(--wwh-border)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                   <div style={{ color: "#FFD700" }}>{"★".repeat(r.rating)}</div>
-                   <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>Approved Community Member</span>
-                </div>
-                <p style={{ color: "rgba(255,255,255,0.8)", lineHeight: 1.6 }}>{r.comment}</p>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Submission Form */}
-      <div style={{ background: "var(--wwh-card)", padding: "32px", borderRadius: "16px", border: "1px solid var(--wwh-border)" }}>
-        <h3 style={{ fontFamily: "var(--wwh-font-heading)", fontSize: "1.4rem", color: "#fff", marginBottom: "12px", textTransform: "uppercase" }}>
-          Leave your truth
-        </h3>
-        
-        {!isSignedIn ? (
-          <p style={{ color: "rgba(255,255,255,0.4)" }}>
-            Please <Link href="/sign-in" style={{ color: "var(--wwh-accent)" }}>sign in</Link> to leave a review.
-          </p>
-        ) : userReview ? (
-          <div style={{ color: "rgba(46,196,182,0.8)" }}>You've already submitted your verdict for this spot. Respect!</div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem", marginBottom: "8px" }}>Rating</label>
-              <div style={{ display: "flex", gap: "10px" }}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => setRating(s)}
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "8px",
-                      background: rating >= s ? "var(--wwh-accent)" : "rgba(255,255,255,0.05)",
-                      border: "none",
-                      color: "#fff",
-                      fontWeight: 700,
-                      cursor: "pointer"
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div style={{ marginBottom: "24px" }}>
-              <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem", marginBottom: "8px" }}>Comment</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Be honest. Was it worth it?"
-                required
-                style={{
-                  width: "100%",
-                  minHeight: "100px",
-                  padding: "16px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  color: "#fff",
-                  fontFamily: "var(--wwh-font-body)",
-                  outline: "none"
-                }}
-              />
-            </div>
-            
-            <button
-              disabled={isSubmitting || rating === 0}
-              style={{
-                width: "100%",
-                padding: "14px",
-                background: "var(--wwh-accent)",
-                color: "#fff",
-                fontWeight: 700,
-                borderRadius: "12px",
-                border: "none",
-                cursor: "pointer",
-                opacity: (isSubmitting || rating === 0) ? 0.5 : 1
-              }}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Verdict"}
-            </button>
-            
-            {message && (
-              <p style={{ marginTop: "16px", color: message.includes("Respect") ? "#2EC4B6" : "#EF476F", fontSize: "0.9rem" }}>
-                {message}
-              </p>
-            )}
-          </form>
-        )}
-      </div>
-    </div>
-  );
+  return <div className="place-sections">
+    <section className="place-panel" aria-labelledby="community-heading">
+      <h2 id="community-heading">Community Notes</h2>
+      {reviewsUnavailable ? <p role="status">Community reviews are temporarily unavailable.</p> : reviews.length === 0 ? <p>No approved reviews yet. Be the first to tell the truth.</p> :
+        <div className="community-reviews">{reviews.map(review => <article key={review.id} className="community-review">
+          <p className="rating-provenance"><span aria-label={`${review.rating} out of 5 stars`}>{"★".repeat(Math.max(0, Math.min(5, Math.round(review.rating))))}</span> · Approved community review</p>
+          <p>{review.comment}</p>
+        </article>)}</div>}
+    </section>
+    <section className="place-panel" aria-labelledby="leave-review-heading">
+      <h2 id="leave-review-heading">Leave your truth</h2>
+      {!isSignedIn ? <p>Please <Link className="text-link" href={`/sign-in?next=${encodeURIComponent(returnPath)}`}>sign in</Link> to leave a review.</p> : submissionUnavailable ? <p role="status">We couldn’t check your existing review. Please reload before submitting.</p> : userReview || submitted ? <p>You’ve already submitted a review for this spot.</p> :
+        <form onSubmit={handleSubmit} className="review-form" aria-busy={isSubmitting}>
+          <fieldset disabled={isSubmitting} className="review-rating">
+            <legend>Rating (required)</legend>
+            <div className="rating-options">{[1, 2, 3, 4, 5].map(value => <label key={value}>
+              <input type="radio" name="rating" value={value} checked={rating === value} onChange={() => setRating(value)} required />
+              <span>{value}<span className="sr-only"> out of 5 stars</span></span>
+            </label>)}</div>
+          </fieldset>
+          <label htmlFor="review-comment">Comment (required)</label>
+          <textarea id="review-comment" value={comment} onChange={event => setComment(event.target.value)} placeholder="Be honest. Was it worth it?" maxLength={500} required disabled={isSubmitting} />
+          <button className="btn btn-primary" type="submit" disabled={isSubmitting || !rating}>{isSubmitting ? "Submitting…" : "Submit review"}</button>
+        </form>}
+      <p role="status" aria-live="polite" className="submission-status">{message}</p>
+    </section>
+  </div>;
 }
-
-import Link from "next/link";

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -14,10 +14,12 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   return (
     <>
       <header
+        onKeyDown={event => { if (event.key === "Escape" && menuOpen) { setMenuOpen(false); menuButton.current?.focus(); } }}
         style={{
           position: "sticky",
           top: 0,
@@ -118,7 +120,10 @@ export function Navbar() {
 
           {/* Hamburger */}
           <button
-            aria-label="Toggle menu"
+            ref={menuButton}
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-controls="mobile-navigation"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(!menuOpen)}
             style={{
@@ -151,6 +156,9 @@ export function Navbar() {
               borderTop: "1px solid var(--wwh-border)",
               padding: "16px 20px 24px"
             }}
+            id="mobile-navigation"
+            role="navigation"
+            aria-label="Mobile primary"
             className="mobile-menu"
           >
             {NAV_LINKS.map((link) => (
@@ -192,6 +200,7 @@ export function Navbar() {
       </header>
 
       <style>{`
+        @media (min-width: 1081px) { .mobile-menu { display: none; } }
         .nav-dark-link:hover {
           color: #fff !important;
           background: rgba(255,255,255,0.06) !important;
@@ -200,7 +209,7 @@ export function Navbar() {
           transform: translateY(-1px);
           box-shadow: 0 8px 24px rgba(255,90,31,0.35);
         }
-        @media (max-width: 768px) {
+        @media (max-width: 1080px) {
           .desktop-nav { display: none !important; }
           .nav-cta-btn { display: none !important; }
           .hamburger-btn { display: block !important; }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { VerdictBadge } from "@/components/ui/verdict-badge";
-import { getPlaceStatus, getPlaceStatusLabel, getPlaceCta, isListedOnly } from "@/lib/place-status";
+import { getPlaceStatusLabel, getPlaceCta, getReviewVideoUrl } from "@/lib/place-status";
 
 type FeaturedCritiqueProps = {
   place: PlaceV2;
@@ -9,7 +9,8 @@ type FeaturedCritiqueProps = {
 
 export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
   const verdict = place.verdict ?? null;
-  const quote = place.description || "A solid spot to grab a bite.";
+  const quote = place.headline || place.honest_take || place.critic_review_body;
+  const videoUrl = getReviewVideoUrl(place);
   return (
     <section
       style={{
@@ -57,6 +58,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
           {/* Image */}
           <div style={{ position: "relative", overflow: "hidden" }}>
             <img
+              loading="lazy"
               src={place.image}
               alt={place.name}
               style={{
@@ -77,7 +79,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
               }}
             />
             {/* Video play hint */}
-            <div
+            {videoUrl && <div
               style={{
                 position: "absolute",
                 bottom: "20px",
@@ -105,7 +107,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
               >
                 Watch Review
               </span>
-            </div>
+            </div>}
           </div>
 
           {/* Content */}
@@ -190,7 +192,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
             >
               {[
                 { label: "Cuisine", value: place.type },
-                { label: "Price", value: place.priceRange }
+                { label: "Price", value: place.priceRange || (place.price_needs_confirmation ? "Needs confirmation" : "Not listed") }
               ].map((item) => (
                 <div
                   key={item.label}
@@ -249,7 +251,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
               >
                 {verdict ? getPlaceCta(place) : getPlaceCta(place)}
               </Link>
-              <Link
+              {videoUrl && <Link
                 href={`/places/${place.slug}#video`}
                 style={{
                   display: "inline-flex",
@@ -272,7 +274,7 @@ export function FeaturedCritique({ place }: FeaturedCritiqueProps) {
                   <path d="M8 5v14l11-7z" />
                 </svg>
                 Watch
-              </Link>
+              </Link>}
             </div>
           </div>
         </div>

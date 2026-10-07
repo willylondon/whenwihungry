@@ -1,8 +1,6 @@
-import Link from "next/link";
+type Props = { foodSpotCountLabel?: string | null };
 
-type Props = { foodSpotCountLabel?: string };
-
-export function HeroSection({ foodSpotCountLabel = "400+" }: Props) {
+export function HeroSection({ foodSpotCountLabel = null }: Props) {
   return (
     <section
       style={{
@@ -112,7 +110,7 @@ export function HeroSection({ foodSpotCountLabel = "400+" }: Props) {
               maxWidth: "580px"
             }}
           >
-            No fake five stars. No sponsored plates. {foodSpotCountLabel} Jamaican food spots mapped. 10+ viral TikTok reviews. More anonymous verdicts loading.
+            No fake five stars. No sponsored plates. {foodSpotCountLabel ? `${foodSpotCountLabel} Jamaican food spots mapped.` : "Explore Jamaican food spots."} 10+ viral TikTok reviews. More anonymous verdicts loading.
           </p>
 
           {/* Search bar */}
@@ -150,6 +148,7 @@ export function HeroSection({ foodSpotCountLabel = "400+" }: Props) {
                 <input
                   type="search"
                   name="q"
+                  aria-label="Search food spots"
                   placeholder="What yuh hungry for?"
                   style={{
                     width: "100%",
@@ -210,7 +209,7 @@ export function HeroSection({ foodSpotCountLabel = "400+" }: Props) {
               { value: "3K+", label: "TikTok Followers" },
               { value: foodSpotCountLabel, label: "Food Spots Listed" },
               { value: "100%", label: "Unfiltered" }
-            ].map((stat) => (
+            ].filter(stat => stat.value).map((stat) => (
               <div key={stat.label}>
                 <p
                   style={{

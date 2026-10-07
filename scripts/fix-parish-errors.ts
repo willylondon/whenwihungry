@@ -2,13 +2,15 @@
  * Apply parish corrections from the audit report.
  * Only updates existing columns (parish, area).
  *
- * Usage: npx tsx scripts/fix-parish-errors.ts
+ * Usage: npx tsx scripts/fix-parish-errors.ts [--apply]
+ * Dry run by default. Existing correction proposals still require owner review.
  */
 
 import { createClient } from "@supabase/supabase-js";
 import { supabaseUrl, supabaseAnonKey } from "../src/lib/supabase/config";
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const APPLY = process.argv.includes("--apply");
 
 // slug → { parish, area? }
 const CORRECTIONS: Record<string, { parish: string; area?: string }> = {
@@ -82,6 +84,7 @@ const NEEDS_REVIEW = [
 ];
 
 async function main() {
+  console.log(APPLY ? `APPLY to ${supabaseUrl}; approved operator access required.` : `DRY RUN for ${supabaseUrl}; no changes will be written.`);
   let corrected = 0;
   let errors = 0;
 
@@ -89,13 +92,21 @@ async function main() {
     const update: Record<string, any> = { parish: fix.parish };
     if (fix.area) update.area = fix.area;
 
-    const { error } = await supabase
+    if (!APPLY) {
+      console.log(`[DRY] ${slug}: ${JSON.stringify(update)}`);
+      continue;
+    }
+    const { data, error } = await supabase
       .from("restaurants")
       .update(update)
-      .eq("slug", slug);
+      .eq("slug", slug)
+      .select("id, parish, area");
 
     if (error) {
       console.error(`  ✗ ${slug}: ${error.message}`);
+      errors++;
+    } else if (data?.length !== 1 || data[0].parish !== fix.parish || (fix.area && data[0].area !== fix.area)) {
+      console.error(`  ✗ ${slug}: expected one matching updated row; no correction confirmed`);
       errors++;
     } else {
       console.log(`  ✓ ${slug}: parish → ${fix.parish}${fix.area ? `, area → ${fix.area}` : ""}`);
@@ -109,7 +120,8 @@ async function main() {
   console.log(`\nNeeds manual review: ${NEEDS_REVIEW.length}`);
   for (const s of NEEDS_REVIEW) console.log(`  - ${s}`);
 
-  console.log(`\nDone. Corrected: ${corrected} | Skipped (false positive): ${FALSE_POSITIVES.length} | Needs review: ${NEEDS_REVIEW.length} | Errors: ${errors}`);
+  if (errors) process.exitCode = 1;
+  console.log(`\n${APPLY ? "Done" : "Dry run complete"}. Corrected: ${corrected} | Skipped (false positive): ${FALSE_POSITIVES.length} | Needs review: ${NEEDS_REVIEW.length} | Errors: ${errors}`);
 }
 
 main().catch((err) => {

@@ -1,15 +1,9 @@
-/**
- * Place visibility predicates.
- *
- * Single source of truth for whether a record should appear on public routes.
- * These are client-side predicates applied to data already fetched from Supabase.
- *
- * NOTE: data_quality_status and business_type columns were added to the
- * restaurants table and seeded via scripts/fix-place-data-quality.ts --apply.
- */
+import { getForeignLocationReasons, type GeographicPlace } from "@/lib/location-validation";
+import { isReviewed, type PlaceStatusLike } from "@/lib/place-status";
 
-type VisibilityPlace = {
+export type VisibilityPlace = GeographicPlace & {
   status?: string | null;
+  is_active?: boolean | null;
   data_quality_status?: string | null;
   dataQualityStatus?: string | null;
   business_type?: string | null;
@@ -18,69 +12,19 @@ type VisibilityPlace = {
   manuallyVerified?: boolean | null;
 };
 
-function getDataQualityStatus(place: VisibilityPlace): string | null {
-  return place.data_quality_status ?? place.dataQualityStatus ?? null;
+/** NULL active/quality/type fields mean unspecified, matching public SQL filters. */
+export function getPublicExclusionReasons(place: VisibilityPlace): string[] {
+  const reasons = getForeignLocationReasons(place);
+  if (place.status !== "approved") reasons.push("not_approved");
+  if (place.is_active === false) reasons.push("inactive");
+  if ((place.data_quality_status ?? place.dataQualityStatus) === "rejected") reasons.push("rejected_quality");
+  if ((place.business_type ?? place.businessType) === "not_food") reasons.push("not_food");
+  return reasons;
 }
 
-function getBusinessType(place: VisibilityPlace): string | null {
-  return place.business_type ?? place.businessType ?? null;
-}
-
-function isManuallyVerified(place: VisibilityPlace): boolean {
-  return Boolean(place.manually_verified ?? place.manuallyVerified);
-}
-
-/**
- * Returns true if the record is a confirmed public food spot.
- * Used as the baseline filter for browse, search, and count queries.
- *
- * Rules:
- * - status must be 'approved'
- * - data_quality_status must not be 'rejected'
- * - business_type must not be 'not_food'
- */
-export function isPublicFoodSpot(place: VisibilityPlace): boolean {
-  if (place.status !== "approved") return false;
-  if (getDataQualityStatus(place) === "rejected") return false;
-  if (getBusinessType(place) === "not_food") return false;
-  return true;
-}
-
-/**
- * Returns true if the record is safe to show on the main browse and search pages.
- * Slightly more permissive than parish pages — shows 'needs_review' records unless rejected.
- */
-export function isSafeForBrowse(place: VisibilityPlace): boolean {
-  return isPublicFoodSpot(place);
-}
-
-/**
- * Returns true if the record is safe to show on parish-specific pages.
- * More strict: excludes 'needs_review' records unless manually verified.
- */
+export function isPublicFoodSpot(place: VisibilityPlace): boolean { return getPublicExclusionReasons(place).length === 0; }
+export function isSafeForBrowse(place: VisibilityPlace): boolean { return isPublicFoodSpot(place); }
 export function isSafeForParishPage(place: VisibilityPlace): boolean {
-  if (!isPublicFoodSpot(place)) return false;
-  const dqs = getDataQualityStatus(place);
-  if (dqs === "needs_review" && !isManuallyVerified(place)) return false;
-  return true;
+  return isPublicFoodSpot(place) && ((place.data_quality_status ?? place.dataQualityStatus) !== "needs_review" || Boolean(place.manually_verified ?? place.manuallyVerified));
 }
-
-/**
- * Returns true if the record has been reviewed (TikTok or critic verdict).
- * Used for /reviews route filtering.
- */
-export function isReviewedPlace(place: {
-  tiktok_url?: string | null;
-  tiktokUrl?: string | null;
-  tiktok?: string | null;
-  review_video_url?: string | null;
-  verdict?: string | null;
-  has_critic_review?: boolean | null;
-  hasCriticReview?: boolean | null;
-}): boolean {
-  if (place.has_critic_review === true || place.hasCriticReview === true) return true;
-  if (place.verdict?.trim() && place.verdict !== "No Verdict Yet" && place.verdict !== "Verdict Pending") return true;
-  const tiktok = place.tiktok_url || place.tiktokUrl || place.tiktok || place.review_video_url;
-  if (tiktok?.trim()) return true;
-  return false;
-}
+export function isReviewedPlace(place: PlaceStatusLike): boolean { return isReviewed(place); }

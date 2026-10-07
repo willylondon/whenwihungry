@@ -127,14 +127,19 @@ async function main() {
       continue;
     }
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("restaurants")
       .update(update)
-      .eq("slug", slug);
+      .eq("slug", slug)
+      .select("id, business_type, data_quality_status");
 
     if (error) {
       console.error(`  ✗ ${slug}: ${error.message}`);
       skipped++;
+    } else if (data?.length !== 1 || Object.entries(update).some(([key, value]) => (data[0] as Record<string, unknown>)[key] !== value)) {
+      console.error(`  ✗ ${slug}: expected one matching updated row; no correction confirmed`);
+      skipped++;
+      process.exitCode = 1;
     } else {
       console.log(`  ✓ ${slug} (${record.name}): ${changes}`);
       applied++;
