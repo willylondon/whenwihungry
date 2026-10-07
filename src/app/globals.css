@@ -1762,13 +1762,24 @@ p {
 .place-page h2 { font-size: 2rem; }
 .place-page p { color: #c3c6cd; }
 .place-container { width: min(1040px, calc(100% - 40px)); margin: 0 auto; }
-.place-hero { position: relative; isolation: isolate; overflow: hidden; background: #0b0b0b; padding: 72px 0 48px; }
+.place-hero { position: relative; isolation: isolate; overflow: hidden; background: #0b0b0b; padding: 72px 0 40px; }
+.place-hero.has-photo { display: flex; align-items: flex-end; min-height: min(560px, 72svh); padding-top: 120px; }
+.place-hero.has-photo > .place-container { width: min(1040px, calc(100% - 40px)); }
 .place-hero-image { object-fit: cover; z-index: -2; }
-.place-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, #0b0b0b, rgba(11,11,11,.65)); }
+/* Keep the photo visible: darken only behind the text at the bottom. */
+.place-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, #0b0b0b 0%, rgba(11,11,11,.82) 32%, rgba(11,11,11,.25) 70%, rgba(11,11,11,.1) 100%); }
+.place-hero:not(.has-photo)::before { background: radial-gradient(circle at 20% 0%, rgba(255,90,31,.16), transparent 55%); }
+.place-meta { margin: -12px 0 6px; color: #ffc9b3; font-weight: 700; font-size: .95rem; }
+.place-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.place-action { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,.3); background: rgba(0,0,0,.5); color: #fff; font-weight: 700; font-size: .9rem; text-decoration: none; backdrop-filter: blur(6px); }
+.place-action:hover, .place-action:focus-visible { border-color: #ff9a70; color: #ff9a70; }
+.place-action:focus-visible { outline: 3px solid #ffc857; outline-offset: 2px; }
+.place-action-primary { background: #ff5a1f; border-color: #ff5a1f; }
+.place-action-primary:hover, .place-action-primary:focus-visible { background: #e94e15; color: #fff; }
 .place-hero nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; color: #e4e4e7; }
 .place-hero h1 { font-size: clamp(2.8rem,6vw,5rem); margin: 16px 0 24px; overflow-wrap: anywhere; }
 .place-status { font-weight: 700; }
-.place-address { margin: 24px 0; }
+.place-address { margin: 0 0 18px; color: #e4e4e7; }
 .place-content { padding: 48px 0 72px; }
 .review-layout-grid { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: start; gap: 32px; }
 .place-sections { display: grid; gap: 28px; min-width: 0; }
@@ -1853,7 +1864,7 @@ p {
 
 /* Shared tweaks for sections on the dark critic theme */
 .dark-section .eyebrow { color: #ff9a70; letter-spacing: 0.1em; font-size: 0.78rem; }
-.dark-section .section-heading h2 { color: #fff; }
+.dark-section .section-heading h2 { color: #fff; font-family: var(--wwh-font-heading); font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(2rem, 4vw, 3rem); line-height: 1; }
 .dark-section .section-heading p { color: rgba(255, 255, 255, 0.6); }
 .dark-section .card { background: var(--wwh-card); border-color: var(--wwh-border); color: #fff; box-shadow: none; }
 .dark-section a.card:hover { border-color: rgba(255, 154, 112, 0.5); }
@@ -1869,7 +1880,7 @@ p {
 
 /* Credit for third-party listing photos */
 .photo-credit { position: absolute; right: 8px; bottom: 8px; margin: 0; padding: 3px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.65); color: #e5e7eb; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; pointer-events: none; }
-.place-hero-credit { right: 16px; bottom: 12px; z-index: 1; }
+.place-hero-credit { top: 12px; right: 16px; bottom: auto; z-index: 1; }
 
 /* Reviewed status on cards and the written-review panel on listing pages */
 .browse-card-reviewed { color: #ff9a70; }
@@ -1888,3 +1899,34 @@ p {
 .share-pill:focus-visible { outline: 3px solid #ffc857; outline-offset: 2px; }
 .share-pill-primary { background: #ff5a1f; border-color: #ff5a1f; }
 .share-pill-primary:hover, .share-pill-primary:focus-visible { color: #fff; background: #e94e15; }
+
+/* Homepage: photo-led spots rail */
+.spots-rail-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.spots-rail-all { color: #ff9a70; font-weight: 700; white-space: nowrap; }
+.spots-rail-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.spots-rail-card { display: block; height: 100%; border-radius: 14px; overflow: hidden; background: var(--wwh-card); border: 1px solid var(--wwh-border); color: #fff; text-decoration: none; transition: border-color 160ms ease, transform 160ms ease; }
+.spots-rail-card:hover, .spots-rail-card:focus-visible { border-color: rgba(255, 154, 112, 0.6); transform: translateY(-2px); }
+.spots-rail-image { position: relative; display: block; aspect-ratio: 4 / 3; background: #222; }
+.spots-rail-image img { object-fit: cover; }
+.spots-rail-body { display: grid; gap: 4px; padding: 14px 16px 16px; }
+.spots-rail-body strong { font-family: var(--wwh-font-heading); font-size: 1.35rem; font-weight: 400; line-height: 1.1; letter-spacing: 0.02em; text-transform: uppercase; }
+.spots-rail-body span { color: #b8bdc6; font-size: 0.85rem; }
+@media (max-width: 900px) { .spots-rail-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .spots-rail-list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; margin: 0 -12px; padding: 0 12px 8px; }
+  .spots-rail-list li { flex: 0 0 72%; scroll-snap-align: start; }
+}
+@media (prefers-reduced-motion: reduce) { .spots-rail-card { transition: none; } .spots-rail-card:hover { transform: none; } }
+
+/* Parish cards with a cover photo */
+.parish-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.parish-card { position: relative; isolation: isolate; display: flex; align-items: flex-end; min-height: 128px; padding: 16px; border-radius: 14px; overflow: hidden; background: #1c1c1c; border: 1px solid var(--wwh-border); color: #fff; text-decoration: none; }
+.parish-card img { object-fit: cover; z-index: -2; transition: transform 400ms ease; }
+.parish-card::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.25)); }
+.parish-card:hover img, .parish-card:focus-visible img { transform: scale(1.05); }
+.parish-card:hover, .parish-card:focus-visible { border-color: rgba(255, 154, 112, 0.6); }
+.parish-card-text { display: grid; gap: 2px; }
+.parish-card-text strong { font-family: var(--wwh-font-heading); font-size: 1.5rem; font-weight: 400; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1; }
+.parish-card-text span { color: #e4e4e7; font-size: 0.85rem; font-weight: 600; }
+@media (max-width: 640px) { .parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .parish-card { min-height: 104px; } .parish-card-text strong { font-size: 1.2rem; } }
+@media (prefers-reduced-motion: reduce) { .parish-card img { transition: none; } .parish-card:hover img { transform: none; } }

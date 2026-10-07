@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Place } from "@/data/places";
 import type { PlaceV2 } from "@/lib/community";
-import { getFilteredPlaces, getParishStats } from "@/lib/places";
+import { getFilteredPlaces, getParishStats, pickSpotsWorthALook } from "@/lib/places";
 
 function place(overrides: Partial<PlaceV2>): Place & Partial<PlaceV2> {
   return { slug: "spot", name: "Spot", parish: "St. James", area: "Montego Bay", category: "Jerk", type: "Jamaican",
@@ -62,5 +62,18 @@ describe("active directory facets and sorting", () => {
   it("returns honest empty results for an empty supplied catalog", () => {
     expect(getFilteredPlaces({}, [])).toEqual([]);
     expect(getParishStats([])).toEqual([]);
+  });
+});
+
+describe("homepage spots selection", () => {
+  it("uses only photos, one per parish first, then fills up", () => {
+    const photo = "https://images.unsplash.com/x.jpg";
+    const picks = pickSpotsWorthALook([
+      place({ slug: "k1", parish: "Kingston", image: photo }), place({ slug: "k2", parish: "Kingston", image: photo }),
+      place({ slug: "j1", parish: "St. James", image: photo }), place({ slug: "nophoto", parish: "Portland", image: "/logo.png" })
+    ], 3);
+    expect(picks.map((p) => p.slug)).not.toContain("nophoto");
+    expect(new Set(picks.slice(0, 2).map((p) => p.parish))).toEqual(new Set(["Kingston", "St. James"]));
+    expect(picks).toHaveLength(3);
   });
 });
