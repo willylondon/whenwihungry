@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Inter, Bricolage_Grotesque, Fraunces } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
@@ -118,6 +120,9 @@ export default function RootLayout({
         <Navbar />
         <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
+        {/* Cookieless, aggregate visit counts and real-visitor page speed (Vercel). */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

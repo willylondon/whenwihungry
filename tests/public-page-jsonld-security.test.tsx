@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ allPlaces: vi.fn(), place: vi.fn(), user: vi.fn(), createClient: vi.fn() }));
-vi.mock("@/lib/community", () => ({ getAllApprovedPlaces: mocks.allPlaces, searchRestaurants: mocks.allPlaces, getApprovedCommunityPlaceBySlug: mocks.place, getCurrentUser: mocks.user }));
+vi.mock("@/lib/community", () => ({ getAllApprovedPlaces: mocks.allPlaces, searchRestaurants: mocks.allPlaces, getApprovedCommunityPlaceBySlug: mocks.place, getCurrentUser: mocks.user, getApprovedPlaceReviews: async () => [], CatalogUnavailableError: class extends Error {} }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: mocks.createClient }));
 vi.mock("@/lib/places", () => ({ categories: [], getFilteredPlaces: () => [], getParishStats: () => [] }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NOT_FOUND"); } }));

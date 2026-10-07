@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ createClient: vi.fn(), getUser: vi.fn(), from: vi.fn(), select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn(), insert: vi.fn() }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: mocks.createClient }));
 
-import { POST } from "@/app/api/reviews/route";
+import { GET, POST } from "@/app/api/reviews/route";
 import { REVIEW_BODY_MAX_BYTES, readBoundedJson } from "@/lib/validation";
 
 const restaurantId = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
@@ -104,5 +104,29 @@ describe("bounded JSON reader", () => {
   it("does not trust a falsely small Content-Length", async () => {
     const req = new Request("https://app.example", { method: "POST", headers: { "Content-Type": "application/json", "Content-Length": "2" }, body: JSON.stringify({ value: "x".repeat(9000) }) });
     await expect(readBoundedJson(req, 8192)).rejects.toMatchObject({ status: 413 });
+  });
+});
+
+describe("viewer review state", () => {
+  const get = (id: string) => GET(new Request(`https://app.example/api/reviews?restaurantId=${id}`));
+  it("rejects malformed ids before authentication and never caches the answer", async () => {
+    const response = await get("not-a-uuid");
+    expect(response.status).toBe(400);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(mocks.createClient).not.toHaveBeenCalled();
+  });
+  it("reports signed-out visitors without reading reviews", async () => {
+    mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    const response = await get(restaurantId);
+    expect(await response.json()).toEqual({ signedIn: false });
+    expect(mocks.from).not.toHaveBeenCalled();
+  });
+  it("only looks up the signed-in visitor's own review", async () => {
+    mocks.from.mockReturnValue({ select: mocks.select });
+    mocks.maybeSingle.mockResolvedValue({ data: { id: "review" }, error: null });
+    const response = await get(restaurantId);
+    expect(await response.json()).toEqual({ signedIn: true, hasReview: true });
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(mocks.eq).toHaveBeenCalledWith("user_id", "verified-user");
   });
 });

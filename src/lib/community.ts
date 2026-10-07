@@ -294,6 +294,20 @@ export const getApprovedCommunityPlaceBySlug = cache(async (slug: string): Promi
   return row ? dbRowToPlace(row) : null;
 });
 
+export type ApprovedPlaceReview = { id: string; rating: number; comment: string; created_at?: string };
+
+/** Approved community reviews for one place, shared across visitors and expired with the catalog. */
+export const getApprovedPlaceReviews = cache(unstable_cache(async (restaurantId: string): Promise<ApprovedPlaceReview[]> => {
+  const supabase = getClient("place-reviews");
+  try {
+    const { data, error } = await supabase.from("user_reviews").select("id, rating, comment, created_at")
+      .eq("restaurant_id", restaurantId).eq("status", "approved").order("created_at", { ascending: false }).limit(50)
+      .abortSignal(AbortSignal.timeout(QUERY_TIMEOUT_MS));
+    if (error) return reportUnavailable("place-reviews", error);
+    return (data ?? []) as ApprovedPlaceReview[];
+  } catch (cause) { return reportUnavailable("place-reviews", cause); }
+}, ["public-place-reviews-v1"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] }));
+
 export async function getApprovedCommunityPlaces(existingSlugs: string[]): Promise<PlaceV2[]> {
   const existing = new Set(existingSlugs);
   return (await getAllApprovedPlaces()).filter((place) => !existing.has(place.slug));
