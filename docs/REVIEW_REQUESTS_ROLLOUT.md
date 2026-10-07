@@ -1,12 +1,12 @@
 # Restaurant inquiries and editorial publishing: draft rollout
 
-Status: **code prepared and isolated tests passed; not deployed; no production migration applied**.
+Status: **code deployed to protected synthetic staging; no production migration applied; enquiry intake disabled**.
 
 Update: the owner confirmed sign-in-required intake on 7 October. Production read-only inspection found unprotected profile roles and unrelated public write/RLS gaps; neither original migration is applied. See [current verification](launch-verification-2026-10-07.md) and the additional draft `20261007120640_verified_launch_security_baseline.sql`. All three drafts must pass hosted staging verification before production approval or intake enablement.
 
 ## Product decision to review
 
-The former `/get-reviewed` form only changed local UI state and discarded every request. This draft replaces it with **signed-in, durable requests**, using the existing Supabase backend and a private admin queue at `/admin/requests`. Requiring sign-in is a new UX tradeoff, not an existing user preference: it gives each request an owner, allows private status lookup, blocks unauthenticated/anonymous-auth submissions, and supports database-enforced one-open-request-per-account backpressure. There is no anonymous mail endpoint. Accounts can still be abused, so this is not a replacement for provider abuse controls.
+The former `/get-reviewed` form only changed local UI state and discarded every request. This draft replaces it with **signed-in, durable requests**, using the existing Supabase backend and a private admin queue at `/admin/requests`. The owner confirmed the sign-in tradeoff: it gives each request an owner, allows private status lookup, blocks unauthenticated/anonymous-auth submissions, and supports database-enforced one-open-request-per-account backpressure. There is no anonymous mail endpoint. Accounts can still be abused, so this is not a replacement for provider abuse controls.
 
 The form is disabled by default. `REVIEW_REQUESTS_ENABLED=true` is a **server-only** rollout switch, not proof of readiness. Do not enable it merely because this code builds. While disabled, there are no inert data-entry fields and the page links the existing TikTok/Instagram contact channels. Nothing is emailed automatically.
 

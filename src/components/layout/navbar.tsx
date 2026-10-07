@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/browse?category=jerk", label: "Jerk" },
   { href: "/browse?category=seafood", label: "Seafood" },
   { href: "/about", label: "About" },
+  { href: "/account", label: "Account" },
 ];
 
 export function Navbar() {

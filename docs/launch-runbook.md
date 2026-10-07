@@ -10,7 +10,7 @@ Read [the current verification and deployed schema findings](launch-verification
 - Obtain a credential-free current schema/RLS/grants export through approved read-only access. `scripts/audit-database-permissions.sql` contains read-only catalog queries; it does not dump table contents, auth users or secrets.
 - Reconcile the out-of-band migrations listed by `supabase/README.md`. Historic SQL files are not a replayable baseline. Do not blindly apply them.
 - Review new migrations against the actual schema. Test them on a disposable staging copy, including forward/rollback/restore behavior. Keep production application pending explicit approval.
-- New durable review-request intake is an optional feature, disabled by default until its schema/policies and monitoring are verified. Its new sign-in requirement is a proposed UX choice to provide identity, ownership and moderation boundaries, not an owner-selected product requirement. Review that tradeoff before enabling it; the disabled flow must provide the existing contact route rather than fake success.
+- New durable review-request intake is disabled by default until its schema/policies and monitoring are verified. The owner confirmed sign-in is required to provide identity, ownership and moderation boundaries. The disabled flow must provide the existing contact route rather than fake success.
 
 ## 2. Authentication and permission tests
 
