@@ -62,6 +62,14 @@ Hosted responsive measurement at 250 CSS pixels showed no horizontal overflow. T
 
 The owner authorized their Gmail inbox as a safe test recipient. Use two aliases routed to that inbox for distinct staging identities; the owner enters new passwords. Enquiry intake remains disabled. Named queue ownership, alerting, retention/abuse protections, CAPTCHA/rate limits and restoration evidence remain gates before enabling it.
 
+## Account preview follow-up — 7 October 2026
+
+Commit `560c14d769c44c9efacf364aca0ddd28486c19ce` was pushed to the existing draft PR branch. GitHub Actions run `37633837733` passed the launch-readiness workflow (clean install, lint, TypeScript, unit/component tests, isolated database tests, build and production dependency audit). Vercel preview deployment `dpl_Fc1tGFbFPTWryzjFKmkUaojNT7Nk` is READY for that exact commit and serves the existing branch alias.
+
+Using the existing owner-controlled staging admin browser session, `/account` displayed the verified staging admin identity, Administration link and Sign out button. Clicking Sign out returned to the public homepage. Following Account redirected to `/sign-in?next=%2Faccount`; reloading retained the signed-out state. Direct navigation to `/admin/restaurants` redirected to `/sign-in?next=%2Fadmin`. These hosted checks close the admin Account/sign-out and post-sign-out protected-route checks. They do not prove natural session expiry, token refresh, ordinary-user Account rendering, password recovery or real-token private enquiry isolation. The browser is left at staging sign-in for the owner to continue with their ordinary staging account. No production configuration or data was changed.
+
+The owner subsequently signed in with the ordinary staging account. Its Account page displayed the expected identity and Sign out without an Administration link. Direct `/admin/restaurants` navigation redirected to the public homepage. Sign-in initially returned to the nonexistent `/admin` route and displayed Place not found; a guarded admin index redirect was added in source to route authorized admins to `/admin/restaurants` and apply the existing denial behavior to ordinary users. Hosted verification of that follow-up remains pending deployment.
+
 ## Required release environment and rollback
 
 Simplest hosted option: a separate `whenwihungry-staging` Supabase project in verified organization `zyytphxrczmfjprmzbcm`, only if a Free slot is available. Stop before any paid plan/compute upgrade. Creating a database creates persistent credentials and needs owner approval; the owner enters any new password. Use schema-only evidence and synthetic accounts/data, never a customer-data clone. Local PGlite and browser fixtures remain usable without staging approval.
