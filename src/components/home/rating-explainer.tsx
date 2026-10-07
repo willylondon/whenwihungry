@@ -1,125 +1,26 @@
-import { SectionHeader } from "@/components/ui/section-header";
+import { VerdictBadge } from "@/components/ui/verdict-badge";
 
 const VERDICTS = [
-  {
-    emoji: "🔥",
-    label: "Run Go Get It",
-    color: "#ff5a1f",
-    bg: "rgba(255,90,31,0.1)",
-    border: "rgba(255,90,31,0.25)",
-    description:
-      "This one hit different. The food was exceptional, the experience was right, and you need to move quickly. No second chances — this is the one."
-  },
-  {
-    emoji: "👍",
-    label: "Worth It",
-    color: "#ffc857",
-    bg: "rgba(255,200,87,0.1)",
-    border: "rgba(255,200,87,0.25)",
-    description:
-      "Solid food. No major complaints. Not life-changing but it delivered on what it promised. Go when you're ready — it'll be there."
-  },
-  {
-    emoji: "😐",
-    label: "Mid",
-    color: "#9ca3af",
-    bg: "rgba(156,163,175,0.08)",
-    border: "rgba(156,163,175,0.2)",
-    description:
-      "Could've been better, could've been worse. The potential is there but something is missing. If it's convenient, fine. If you're making a trip? Skip it."
-  },
-  {
-    emoji: "🚫",
-    label: "Save Your Money",
-    color: "#ef4444",
-    bg: "rgba(239,68,68,0.08)",
-    border: "rgba(239,68,68,0.2)",
-    description:
-      "I'm telling you now. Put your wallet back. This one didn't earn it and your hard-earned money deserves better."
-  }
+  { code: "RUN_GO_GET_IT", text: "This one hit different. Exceptional food, the experience was right, and you need to move quickly." },
+  { code: "WORTH_IT", text: "Solid food, no major complaints. Not life-changing, but it delivered on what it promised." },
+  { code: "MID", text: "Could've been better, could've been worse. If it's convenient, fine. Making a trip? Skip it." },
+  { code: "SAVE_YOUR_MONEY", text: "Put your wallet back. This one didn't earn it, and your hard-earned money deserves better." }
 ];
 
+/** How the four verdicts read, shown as the signs themselves. */
 export function RatingExplainer() {
-  return (
-    <section
-      style={{
-        background: "var(--wwh-surface)",
-        padding: "96px 0"
-      }}
-    >
-      <div
-        style={{
-          width: "min(1200px, calc(100% - 40px))",
-          margin: "0 auto"
-        }}
-      >
-        <SectionHeader
-          eyebrow="The System"
-          heading="Plain Verdicts. No Star Soup."
-          subtext="A critic verdict isn't a star average. Every review lands on one of these four calls. Star ratings you see in the directory come from public sources and are labelled that way."
-          align="center"
-        />
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "20px",
-            maxWidth: "900px",
-            margin: "0 auto"
-          }}
-          className="verdict-explainer-grid"
-        >
-          {VERDICTS.map((verdict) => (
-            <div
-              key={verdict.label}
-              style={{
-                padding: "28px 32px",
-                background: verdict.bg,
-                border: `1px solid ${verdict.border}`,
-                borderRadius: "16px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px"
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <span style={{ fontSize: "2rem" }}>{verdict.emoji}</span>
-                <span
-                  style={{
-                    fontFamily: "var(--wwh-font-heading)",
-                    fontSize: "1.5rem",
-                    color: verdict.color,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.02em"
-                  }}
-                >
-                  {verdict.label}
-                </span>
-              </div>
-              <p
-                style={{
-                  margin: 0,
-                  color: "rgba(255,255,255,0.65)",
-                  fontFamily: "var(--wwh-font-body)",
-                  fontSize: "0.92rem",
-                  lineHeight: 1.7
-                }}
-              >
-                {verdict.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 640px) {
-          .verdict-explainer-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
-    </section>
-  );
+  return <section className="section band-concrete" aria-labelledby="verdicts-heading">
+    <div className="container">
+      <div className="section-heading"><div>
+        <h2 id="verdicts-heading">Four verdicts, no star soup</h2>
+        <p>Every review ends on one plain call. Star ratings in the directory come from public sources and are labelled that way.</p>
+      </div></div>
+      <ul className="verdict-guide">
+        {VERDICTS.map(verdict => <li key={verdict.code}>
+          <VerdictBadge verdict={verdict.code} size="lg" />
+          <p>{verdict.text}</p>
+        </li>)}
+      </ul>
+    </div>
+  </section>;
 }

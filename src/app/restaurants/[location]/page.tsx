@@ -53,7 +53,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
   return <section className="directory-page section">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListSchema) }} />
     <div className="container">
-      <SectionHeader headingLevel={1} eyebrow="Local Discovery" heading={`Food spots in ${displayName}`} subtext="Explore directory listings, community ratings, and critic verdicts where available." />
+      <SectionHeader headingLevel={1} heading={`Food spots in ${displayName}`} subtext="Directory listings, with our verdicts marked wherever we've reviewed." />
       <LocationIntro location={location} displayName={displayName} resultCount={results.length} />
       <p className="result-summary">{results.length === 0 ? `No restaurants found in ${displayName} yet.` : `Showing ${pagination.offset + 1}–${pagination.offset + pagination.items.length} of ${results.length} food spots`}</p>
       <div className="location-results">{pagination.items.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>
@@ -77,60 +77,16 @@ const LOCATION_INTRO: Record<string, string[]> = {
   ]
 };
 
-function LocationIntro({ location, displayName, resultCount }: { location: string; displayName: string; resultCount: number }) {
+function LocationIntro({ location, displayName }: { location: string; displayName: string; resultCount?: number }) {
   const locationKey = location.toLowerCase().replace(/-/g, "");
   const paragraphs = Object.hasOwn(LOCATION_INTRO, locationKey) ? LOCATION_INTRO[locationKey] : null;
   if (!paragraphs) return null;
-
-  return (
-    <section
-      style={{
-        marginTop: "40px",
-        padding: "32px 36px",
-        background: "rgba(255,255,255,0.02)",
-        border: "1px solid var(--wwh-border)",
-        borderRadius: "16px"
-      }}
-    >
-      <h2
-        style={{
-          margin: "0 0 20px",
-          fontFamily: "var(--wwh-font-heading)",
-          fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)",
-          color: "#fff",
-          textTransform: "uppercase",
-          letterSpacing: "0.02em"
-        }}
-      >
-        {displayName} Food Spots Worth Mapping
-      </h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-        {paragraphs.map((text, i) => (
-          <p
-            key={i}
-            style={{
-              margin: 0,
-              color: "rgba(255,255,255,0.55)",
-              fontFamily: "var(--wwh-font-body)",
-              fontSize: "clamp(0.88rem, 1.2vw, 0.98rem)",
-              lineHeight: 1.75,
-              maxWidth: "780px"
-            }}
-          >
-            {text}
-          </p>
-        ))}
-      </div>
-      <p
-        style={{
-          margin: "18px 0 0",
-          color: "rgba(255,255,255,0.3)",
-          fontFamily: "var(--wwh-font-body)",
-          fontSize: "0.8rem"
-        }}
-      >
-        {resultCount} food spot{resultCount !== 1 ? "s" : ""} mapped · Critic verdicts where available · NYAAM RATING
-      </p>
-    </section>
-  );
+  const [first, ...rest] = paragraphs;
+  return <div className="location-intro">
+    <p>{first}</p>
+    {rest.length > 0 && <details>
+      <summary>More about eating in {displayName}</summary>
+      {rest.map(text => <p key={text.slice(0, 32)}>{text}</p>)}
+    </details>}
+  </div>;
 }

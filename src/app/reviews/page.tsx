@@ -47,9 +47,8 @@ export default async function ReviewsPage() {
   const [latest, ...earlier] = writtenReviews;
 
   return (
-    <div className="reviews-hub dark-section">
+    <div className="reviews-hub">
       <header className="reviews-hub-header container">
-        <span className="eyebrow">Reviews</span>
         <h1>Real visits. Honest verdicts.</h1>
         <p>
           Every written review is based on an actual visit, with photos from our table. Invitations, discounts and
@@ -57,12 +56,11 @@ export default async function ReviewsPage() {
         </p>
       </header>
 
-      {latest && <ReviewFeature review={latest} kicker={`Latest review · No. ${String(latest.number).padStart(3, "0")}`} />}
+      {latest && <ReviewFeature review={latest} kicker="Latest review" />}
 
       {earlier.length > 0 && (
         <section className="section container" aria-labelledby="earlier-reviews-heading">
           <div className="section-heading"><div>
-            <span className="eyebrow">The archive</span>
             <h2 id="earlier-reviews-heading">More written reviews</h2>
           </div></div>
           <div className="reviews-hub-grid">{earlier.map(review => <ReviewCard key={review.slug} review={review} />)}</div>
@@ -72,7 +70,6 @@ export default async function ReviewsPage() {
       {reviewedSpots.length > 0 && (
         <section className="section container" aria-labelledby="reviewed-spots-heading">
           <div className="section-heading"><div>
-            <span className="eyebrow">In the directory</span>
             <h2 id="reviewed-spots-heading">Reviewed food spots</h2>
             <p>Directory listings with a critic verdict or a TikTok review attached.</p>
           </div></div>
@@ -83,7 +80,6 @@ export default async function ReviewsPage() {
       <section className="section container" aria-labelledby="tiktok-heading">
         <div className="card reviews-hub-tiktok">
           <div>
-            <span className="eyebrow">On TikTok</span>
             <h2 id="tiktok-heading">Watch the video verdicts</h2>
             <p>Most of our reviews start as short videos. Catch the latest ones on TikTok before they get the full write-up here.</p>
           </div>

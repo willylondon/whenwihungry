@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { VERDICT_LABELS, formatReviewDate, type WrittenReview } from "@/data/reviews";
+import { formatReviewDate, type WrittenReview } from "@/data/reviews";
+import { VerdictBadge } from "@/components/ui/verdict-badge";
 import styles from "./food-story.module.css";
 
 /** Large editorial feature for one written review. */
@@ -15,10 +16,10 @@ export function ReviewFeature({ review, kicker, headingLevel = 2 }: { review: Wr
       <p className={styles.kicker}>{kicker}</p>
       <Heading id={titleId}><Link href={review.path} className={styles.featureTitleLink}>{review.title}</Link></Heading>
       <p>{review.teaser}</p>
-      <p className={styles.scorecardVerdict}><span aria-hidden="true">{VERDICT_LABELS[review.verdict].emoji}</span> {VERDICT_LABELS[review.verdict].label}</p>
+      <VerdictBadge verdict={review.verdict} />
       <ReviewScores review={review} />
-      <p className={styles.featureDisclosure}>{review.restaurant} · Visited {formatReviewDate(review.visited)}{review.hosted && review.disclosureShort ? ` · ${review.disclosureShort}` : ""}</p>
-      <Link href={review.path} className={styles.readLink}>Read the full review <span aria-hidden="true">→</span></Link>
+      <p className={styles.featureDisclosure}>{review.restaurant}, visited {formatReviewDate(review.visited)}.{review.hosted && review.disclosureShort ? ` ${review.disclosureShort}.` : ""}</p>
+      <Link href={review.path} className={styles.readLink}>Read the full review</Link>
     </div>
   </section>;
 }
@@ -29,10 +30,10 @@ export function ReviewCard({ review }: { review: WrittenReview }) {
     <Link href={review.path} className={styles.cardLink}>
       <div className={styles.cardImage}><Image src={review.hero} alt={review.heroAlt} fill sizes="(max-width: 760px) 100vw, 380px" /></div>
       <div className={styles.cardBody}>
-        <p className={styles.kicker}>No. {String(review.number).padStart(3, "0")} · {review.area}</p>
+        <p className={styles.kicker}>{review.restaurant}, {review.area}</p>
         <h3>{review.title}</h3>
-        <p className={styles.scorecardVerdict}><span aria-hidden="true">{VERDICT_LABELS[review.verdict].emoji}</span> {VERDICT_LABELS[review.verdict].label}</p>
-        <p>{review.restaurant}{review.hosted ? " · Hosted visit" : ""}</p>
+        <VerdictBadge verdict={review.verdict} size="sm" />
+        <p>Visited {formatReviewDate(review.visited)}{review.hosted ? ", hosted visit" : ""}</p>
       </div>
     </Link>
   </article>;

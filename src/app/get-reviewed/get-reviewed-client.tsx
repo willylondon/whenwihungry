@@ -24,16 +24,16 @@ export function GetReviewedClient({ foodSpotCountLabel, signedIn, enabled, reque
       <section style={{ padding: "72px 0", background: "var(--wwh-surface)", borderBottom: "1px solid var(--wwh-border)" }}>
         <div className="container" style={{ maxWidth: 1080 }}>
           <span className="eyebrow">For restaurants</span>
-          <h1 style={{ fontFamily: "var(--wwh-font-heading)", fontSize: "clamp(3rem, 6vw, 5rem)", lineHeight: 1, maxWidth: 750 }}>THINK YOUR FOOD<br /><span style={{ color: "var(--wwh-accent)" }}>CAN HANDLE IT?</span></h1>
+          <h1 style={{ maxWidth: "14ch" }}>Think your food can handle it?</h1>
           <p style={{ maxWidth: 660 }}>Request consideration for an independent review. Your restaurant may be selected for an anonymous visit; a request never guarantees coverage or a positive verdict.</p>
           {foodSpotCountLabel && <p>{foodSpotCountLabel} food spots in the directory</p>}
         </div>
       </section>
       <section className="section">
-        <div className="container get-reviewed-grid" style={{ maxWidth: 1080, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+        <div className="container get-reviewed-grid" style={{ maxWidth: 1080 }}>
           <div>
             <h2>Real visits. Honest opinions.</h2>
-            <p>I arrive unannounced and pay my own bill. If selected, the visit may happen without notice.</p>
+            <p>I arrive unannounced and pay my own bill. If selected, the visit may happen without notice. If a meal is ever hosted or discounted, the review says so up front.</p>
             <p>A directory listing is not a critic endorsement. To suggest a place for the directory, <Link href="/add-listing">add a listing</Link>.</p>
             <h3>What happens to your request?</h3>
             <ol style={{ lineHeight: 1.9 }}>
