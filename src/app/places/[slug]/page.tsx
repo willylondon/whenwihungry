@@ -11,6 +11,7 @@ import { ReviewSection } from "@/components/place/review-section";
 import { getPlaceStatusLabel, isCriticReviewed, getReviewVideoUrl } from "@/lib/place-status";
 import { serializeJsonLd } from "@/lib/security/json-ld";
 import { siteUrl } from "@/lib/site-url";
+import { hasListingPhoto } from "@/lib/image-config";
 
 type PlacePageProps = { params: Promise<{ slug: string }> };
 
@@ -28,8 +29,8 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   const title = `${place.name}${place.parish ? ` in ${getParishDisplayName(place.parish)}` : ""}`;
   return {
     title, description, alternates: { canonical },
-    openGraph: { title: `${title} | WhenWiHungry`, description, url: siteUrl(canonical), siteName: "WhenWiHungry", images: [{ url: place.image, alt: place.name }], type: "website" },
-    twitter: { card: "summary_large_image", title, description, images: [place.image] }
+    openGraph: { title: `${title} | WhenWiHungry`, description, url: siteUrl(canonical), siteName: "WhenWiHungry", images: [hasListingPhoto(place.image) ? { url: place.image, alt: place.name } : { url: "/og/whenwihungry-og.png", width: 1200, height: 630, alt: "WhenWiHungry" }], type: "website" },
+    twitter: { card: "summary_large_image", title, description, images: [hasListingPhoto(place.image) ? place.image : "/og/whenwihungry-og.png"] }
   };
 }
 
@@ -57,7 +58,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const reviewBody = place.honest_take || place.critic_review_body;
   const restaurantSchema = {
     "@context": "https://schema.org", "@type": "Restaurant", name: place.name,
-    description: place.description || undefined, url: siteUrl(`/places/${place.slug}`), image: place.image,
+    description: place.description || undefined, url: siteUrl(`/places/${place.slug}`), image: hasListingPhoto(place.image) ? siteUrl(place.image) : undefined,
     servesCuisine: place.category || undefined, priceRange: place.priceRange || undefined,
     address: { "@type": "PostalAddress", streetAddress: place.address || undefined, addressRegion: place.parish || undefined }
   };
@@ -72,7 +73,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
   return <article className="place-page">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
     <header className="place-hero">
-      {place.image !== "/logo.png" && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
+      {hasListingPhoto(place.image) && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
       <div className="place-container">
         <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
         <p className="place-status">{getPlaceStatusLabel(place)}</p>

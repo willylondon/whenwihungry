@@ -2,6 +2,7 @@ import { categories, latestPosts, places, testimonials, type Place } from "@/dat
 import { matchesParish, normalizeParish, getParishDisplayName } from "@/lib/location-validation";
 import type { PlaceV2 } from "@/lib/community";
 import { getPlaceStatus } from "@/lib/place-status";
+import { hasListingPhoto } from "@/lib/image-config";
 
 export function getFeaturedPlaces() {
   return [...places]
@@ -124,7 +125,7 @@ export function recommendationScore(place: Place & Partial<PlaceV2>): number {
   const rating = count > 0 && place.rating > 0 ? place.rating : 0;
   const PRIOR_VOTES = 50, PRIOR_RATING = 4;
   const weightedRating = rating ? (count * rating + PRIOR_VOTES * PRIOR_RATING) / (count + PRIOR_VOTES) : 0;
-  const hasPhoto = place.image && place.image !== "/logo.png" ? 10 : 0;
+  const hasPhoto = hasListingPhoto(place.image) ? 10 : 0;
   return STATUS_WEIGHT[getPlaceStatus(place)] + hasPhoto + weightedRating;
 }
 
