@@ -74,6 +74,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
     <header className="place-hero">
       {hasListingPhoto(place.image) && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
+      {hasListingPhoto(place.image) && place.image_credit && <p className="photo-credit place-hero-credit">Photo: {place.image_credit}</p>}
       <div className="place-container">
         <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
         <p className="place-status">{getPlaceStatusLabel(place)}</p>

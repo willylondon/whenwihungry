@@ -10,28 +10,35 @@ export function imageHosts(supabaseUrl?: string) {
   return hosts;
 }
 
-/** Shown wherever a listing has no photo we're entitled to use. */
+/** Shown wherever a listing has no usable photo. */
 export const PLACEHOLDER_IMAGE = "/logo.png";
 
-/**
- * Sources we hold rights to that show the real place. Photos copied from Google Maps/Places belong to their
- * uploaders and may not be re-hosted, so they stay in the database but aren't shown.
- * To show a listing photo, set image_source to one of these (any case).
- */
-const CLEARED_IMAGE_SOURCES = new Set(["whenwihungry", "restaurant supplied", "owner supplied"]);
+/** Our own or restaurant-supplied photos: shown without a third-party credit. */
+const OWN_IMAGE_SOURCES = new Set(["whenwihungry", "restaurant supplied", "owner supplied"]);
 
-/**
- * Listing photos must show the actual place. Generic stock photos (even free-licence
- * Unsplash/Pexels ones) are not shown, because visitors would read them as the restaurant.
- */
-export function hasImageRights(source: unknown): boolean {
-  return typeof source === "string" && CLEARED_IMAGE_SOURCES.has(source.trim().toLowerCase());
+type ImageRow = { image_url?: unknown; image?: unknown; image_source?: unknown };
+
+/** The image a public listing displays, from an allowed location (otherwise the placeholder). */
+export function listingImage(row: ImageRow, supabaseUrl?: string) {
+  return catalogImage(row.image_url || row.image, supabaseUrl);
 }
 
-/** The image a public listing may display: rights-cleared and from an allowed location. */
-export function listingImage(row: { image_url?: unknown; image?: unknown; image_source?: unknown }, supabaseUrl?: string) {
-  const url = row.image_url || row.image;
-  return hasImageRights(row.image_source) ? catalogImage(url, supabaseUrl) : PLACEHOLDER_IMAGE;
+/**
+ * Who a displayed third-party photo comes from, e.g. "Google". Our own photos need no credit.
+ * Imported photos were collected from Google Places; the credit makes that visible to visitors.
+ */
+export function listingImageCredit(row: ImageRow, supabaseUrl?: string): string | null {
+  const image = listingImage(row, supabaseUrl);
+  if (!hasListingPhoto(image)) return null;
+  const source = typeof row.image_source === "string" ? row.image_source.trim() : "";
+  if (OWN_IMAGE_SOURCES.has(source.toLowerCase())) return null;
+  try {
+    const host = new URL(image).hostname;
+    if (host === "images.unsplash.com") return "Unsplash";
+    if (host === "images.pexels.com") return "Pexels";
+  } catch { /* Local images are ours. */ }
+  if (/google/i.test(source)) return "Google";
+  return source ? source.slice(0, 40) : "Google";
 }
 
 export function hasListingPhoto(image: string | null | undefined): boolean {

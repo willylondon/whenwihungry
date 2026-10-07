@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { catalogImage, hasImageRights, imageHosts, listingImage } from "@/lib/image-config";
+import { catalogImage, imageHosts, listingImage, listingImageCredit } from "@/lib/image-config";
 
 describe("catalog image deployment contract", () => {
   const staging = "https://abcdefghijklmnopqrst.supabase.co";
@@ -21,22 +21,22 @@ describe("catalog image deployment contract", () => {
   });
 });
 
-describe("listing photo rights", () => {
+describe("listing photos and credits", () => {
   const storage = "https://abcdefghijklmnopqrst.supabase.co";
   const stored = `${storage}/storage/v1/object/public/restaurant-images/spot.jpg`;
-  it.each(["Google Places", "Google", "OpenStreetMap", null, ""])("hides re-hosted photos from %s behind the placeholder", (source) => {
-    expect(listingImage({ image_url: stored, image_source: source }, storage)).toBe("/logo.png");
+  it.each([["Google Places", "Google"], ["Google", "Google"], ["OpenStreetMap", "OpenStreetMap"], [null, "Google"]])("shows imported photos from %s credited as %s", (source, credit) => {
+    expect(listingImage({ image_url: stored, image_source: source }, storage)).toBe(stored);
+    expect(listingImageCredit({ image_url: stored, image_source: source }, storage)).toBe(credit);
   });
-  it("shows only our own and restaurant-supplied photos of the actual place", () => {
-    expect(listingImage({ image_url: "/images/reviews/rok-hotel/salmon.jpg", image_source: "WhenWiHungry" })).toBe("/images/reviews/rok-hotel/salmon.jpg");
-    expect(listingImage({ image_url: stored, image_source: " Restaurant supplied " }, storage)).toBe(stored);
-    expect(hasImageRights("whenwihungry")).toBe(true);
+  it("credits stock libraries by where the image is hosted", () => {
+    expect(listingImageCredit({ image_url: "https://images.unsplash.com/food.jpg", image_source: "Google" })).toBe("Unsplash");
   });
-  it.each(["https://images.unsplash.com/food.jpg", "https://images.pexels.com/food.jpg"])("hides generic stock photo %s", (url) => {
-    expect(listingImage({ image_url: url, image_source: "Google" })).toBe("/logo.png");
-    expect(listingImage({ image_url: url, image_source: "OpenStreetMap" })).toBe("/logo.png");
+  it("needs no credit for our own or restaurant-supplied photos", () => {
+    expect(listingImageCredit({ image_url: "/images/reviews/rok-hotel/salmon.jpg", image_source: "WhenWiHungry" })).toBeNull();
+    expect(listingImageCredit({ image_url: stored, image_source: "Restaurant supplied" }, storage)).toBeNull();
   });
-  it("never lets rights bypass the safe-location checks", () => {
+  it("never credits or shows an unsafe or missing image", () => {
     expect(listingImage({ image_url: "javascript:alert(1)", image_source: "WhenWiHungry" })).toBe("/logo.png");
+    expect(listingImageCredit({ image_url: null, image_source: "Google" })).toBeNull();
   });
 });

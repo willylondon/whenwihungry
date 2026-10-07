@@ -19,6 +19,13 @@ function render(overrides: Partial<PlaceV2> = {}) {
 }
 
 describe("PlaceListCard production data contract", () => {
+  it("credits third-party photos and shows the placeholder without a photo", () => {
+    const photo = render({ image: "https://images.unsplash.com/spot.jpg", image_credit: "Google" });
+    expect(photo.querySelector(".photo-credit")?.textContent).toBe("Photo: Google");
+    const none = render({ image: "/logo.png", image_credit: null });
+    expect(none.querySelector(".photo-credit")).toBeNull();
+    expect(none.querySelector(".listing-placeholder")).toBeTruthy();
+  });
   it("requires published authored content, verdict and date for the critic CTA", () => {
     const card = render({ verdict: "WORTH_IT", headline: "Authored headline", honest_take: "Actual critic body", reviewed_at: "2026-10-01", has_critic_review: true });
     expect(card.textContent).toContain("Critic Reviewed");
