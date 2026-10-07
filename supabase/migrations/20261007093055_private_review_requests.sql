@@ -1,4 +1,4 @@
--- DRAFT: not applied to any Supabase project.
+-- DRAFT FOR PRODUCTION: verified on disposable staging ctmzxgkccxkgeuzntltc only.
 -- Enable the app only after verifying profiles.role is protected from self-escalation,
 -- this migration's direct-API permission matrix, and a named queue monitoring owner.
 -- Only the NEW inquiry table is changed; no existing-table policies are replaced.

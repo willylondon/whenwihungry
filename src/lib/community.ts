@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { catalogImage } from "@/lib/image-config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Place } from "@/data/places";
 import { getPublishedCriticReview, getReviewVideoUrl, getTikTokContactUrl, safeWebUrl, validReviewDate } from "@/lib/place-status";
@@ -206,7 +207,7 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
     description: stringValue(restaurant.description),
     features: strings(restaurant.features),
     hours: strings(restaurant.hours),
-    image: safeWebUrl(restaurant.image_url || restaurant.image) || "https://whenwihungry.vercel.app/logo.png",
+    image: catalogImage(restaurant.image_url || restaurant.image, process.env.NEXT_PUBLIC_SUPABASE_URL),
     lat: validCoordinates ? lat : undefined,
     lng: validCoordinates ? lng : undefined,
     parish: stringValue(restaurant.parish),

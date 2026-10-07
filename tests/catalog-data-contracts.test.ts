@@ -19,6 +19,10 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 const realReview = { verdict: "WORTH_IT", admin_score: 80, headline: "Worth the detour", honest_take: "Smoky jerk, crisp festival.", visit_date: "2026-10-01", created_at: "2026-10-02T10:00:00Z" };
 
 describe("public record mapping", () => {
+  it("uses a local image fallback that Next Image can render on any deployment", () => {
+    expect(dbRowToPlace(restaurant({ image_url: null })).image).toBe("/logo.png");
+    expect(dbRowToPlace(restaurant({ image_url: "javascript:alert(1)" })).image).toBe("/logo.png");
+  });
   it("preserves critic content, dates, video, public provenance, coordinates, contact and price", () => {
     const mapped = dbRowToPlace(restaurant({ public_rating: 4.8, public_review_count: 900, public_rating_source: "Google", price_range: "$$$$", price_level: 4,
       tiktok_url: "https://www.tiktok.com/@whenwihungry/video/123", website: "https://example.com/menu", phone: "876-555-0100", features: ["Outdoor"], hours: ["Mon 10–8"],

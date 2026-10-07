@@ -1,4 +1,4 @@
--- DRAFT: not applied to any Supabase project.
+-- DRAFT FOR PRODUCTION: verified on disposable staging ctmzxgkccxkgeuzntltc only.
 -- Requires verified existing restaurants/admin_reviews schema, admin RLS/grants,
 -- and protected profiles.role. No existing table policies or rows are replaced.
 BEGIN;

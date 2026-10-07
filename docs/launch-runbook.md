@@ -2,6 +2,8 @@
 
 This change is a reviewed-source candidate, not production approval. Do not merge/deploy, apply SQL, change DNS/account settings, or send real customer inquiries merely to complete this checklist.
 
+Read [the current verification and deployed schema findings](launch-verification-2026-10-07.md) first. Production catalog inspection found mutable profile roles, five tables without RLS, and a missing critic visit-date column. The additional draft baseline migration must pass hosted staging checks before release. The owner has selected sign-in for enquiries; intake remains disabled.
+
 ## 1. Environment and schema prerequisites
 
 - Use Node 24 and the committed lockfile. Set explicit project-specific Supabase URL/publishable key and `NEXT_PUBLIC_SITE_URL`; preview/staging and CI must not share production write access.

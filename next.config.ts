@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { imageHosts } from "./src/lib/image-config";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -16,20 +17,7 @@ const nextConfig: NextConfig = {
     }];
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com"
-      },
-      {
-        protocol: "https",
-        hostname: "dnlzaduonznhhlmyxrgh.supabase.co"
-      },
-      {
-        protocol: "https",
-        hostname: "images.pexels.com"
-      }
-    ]
+    remotePatterns: imageHosts(process.env.NEXT_PUBLIC_SUPABASE_URL).map((hostname) => ({ protocol: "https" as const, hostname }))
   }
 };
 
