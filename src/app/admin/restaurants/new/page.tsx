@@ -3,7 +3,7 @@ import { createRestaurantAction } from "@/app/admin/restaurants/actions";
 export default async function NewRestaurantPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container" style={{ maxWidth: "800px" }}>
         <h1 style={{ color: "#fff", marginBottom: "40px" }}>Add New Restaurant</h1>
         <p>Creates a pending directory listing. Approve it separately when ready. Critic reviews are published separately.</p>
@@ -70,7 +70,7 @@ export default async function NewRestaurantPage({ searchParams }: { searchParams
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
 

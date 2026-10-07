@@ -6,13 +6,13 @@ export const dynamic = "force-dynamic";
 export default async function ReviewRequestsPage({ searchParams }: { searchParams: Promise<{ status?: string; page?: string; error?: string; updated?: string }> }) {
   const supabase = await requireAdmin("/admin/requests");
   const params = await searchParams;
-  if (process.env.REVIEW_REQUESTS_ENABLED !== "true") return <main className="section container"><h1>Restaurant inquiries are not enabled</h1><p>Apply and verify the review_requests migration, confirm profile role protection and the admin monitoring owner, then enable REVIEW_REQUESTS_ENABLED. The public form is disabled until then.</p></main>;
+  if (process.env.REVIEW_REQUESTS_ENABLED !== "true") return <div className="section container"><h1>Restaurant inquiries are not enabled</h1><p>Apply and verify the review_requests migration, confirm profile role protection and the admin monitoring owner, then enable REVIEW_REQUESTS_ENABLED. The public form is disabled until then.</p></div>;
   const status = ["pending", "in_review", "closed", "all"].includes(params.status ?? "") ? params.status! : "pending";
   const page = Math.min(10000, Math.max(1, Number.parseInt(params.page ?? "1", 10) || 1));
   let query = supabase.from("review_requests").select("id,contact_name,restaurant_name,location,contact_email,contact_phone,message,status,created_at", { count: "exact" }).order("created_at", { ascending: true });
   if (status !== "all") query = query.eq("status", status);
   const { data: requests, error, count } = await query.range((page - 1) * 25, page * 25 - 1);
-  return <main className="section container">
+  return <div className="section container">
     <h1>Restaurant inquiries</h1>
     <p>Private requests, oldest first. Mark a request under consideration when reviewing it; close it when finished. Status changes do not send email or promise coverage.</p>
     <nav aria-label="Inquiry status" style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>{["pending", "in_review", "closed", "all"].map(value => <Link key={value} href={`/admin/requests?status=${value}`} aria-current={status === value ? "page" : undefined}>{value.replaceAll("_", " ")}</Link>)}</nav>
@@ -32,5 +32,5 @@ export default async function ReviewRequestsPage({ searchParams }: { searchParam
       </article>)}</div>
       <nav aria-label="Queue pages" style={{ display: "flex", gap: 20 }}>{page > 1 && <Link href={`/admin/requests?status=${status}&page=${page - 1}`}>Previous</Link>}{page * 25 < (count ?? 0) && <Link href={`/admin/requests?status=${status}&page=${page + 1}`}>Next</Link>}</nav>
     </>}
-  </main>;
+  </div>;
 }

@@ -9,7 +9,7 @@ export default async function AdminRestaurantsPage() {
     .order("name", { ascending: true });
 
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "40px" }}>
           <h1 style={{ color: "#fff", margin: 0 }}>Restaurant Database</h1>
@@ -63,6 +63,6 @@ export default async function AdminRestaurantsPage() {
           </table>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

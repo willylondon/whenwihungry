@@ -18,7 +18,7 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
     .order("created_at", { ascending: false });
 
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container">
         <h1 style={{ color: "#fff", marginBottom: "32px" }}>Moderate User Reviews</h1>
         
@@ -45,6 +45,6 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -20,7 +20,7 @@ export function GetReviewedClient({ foodSpotCountLabel, signedIn, enabled, reque
   const [state, action, pending] = useActionState(submitReviewRequestAction, initialState);
   const hasOpenRequest = existingRequest && ["pending", "in_review"].includes(existingRequest.status);
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh" }}>
       <section style={{ padding: "72px 0", background: "var(--wwh-surface)", borderBottom: "1px solid var(--wwh-border)" }}>
         <div className="container" style={{ maxWidth: 1080 }}>
           <span className="eyebrow">For restaurants</span>
@@ -79,6 +79,6 @@ export function GetReviewedClient({ foodSpotCountLabel, signedIn, enabled, reque
         </div>
       </section>
       <style jsx>{`@media(max-width: 760px) { .get-reviewed-grid { grid-template-columns: 1fr !important; gap: 28px !important; } }`}</style>
-    </main>
+    </div>
   );
 }

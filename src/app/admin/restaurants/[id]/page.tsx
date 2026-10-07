@@ -21,11 +21,11 @@ export default async function EditRestaurantPage({ params, searchParams }: { par
     supabase.from("search_keywords").select("*").eq("restaurant_id", id)
   ]);
 
-  if (restaurantError) return <main className="container section"><h1>Restaurant unavailable</h1><p>We could not load this listing. Refresh to try again.</p></main>;
+  if (restaurantError) return <div className="container section"><h1>Restaurant unavailable</h1><p>We could not load this listing. Refresh to try again.</p></div>;
   if (!r) notFound();
 
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container" style={{ maxWidth: "800px" }}>
         <h1 style={{ color: "#fff", marginBottom: "40px" }}>Edit: {r.name}</h1>
         {feedback.error && <p role="alert" className="form-alert">{ERRORS[feedback.error] || "This change could not be saved. Check the form and retry."}</p>}
@@ -169,7 +169,7 @@ export default async function EditRestaurantPage({ params, searchParams }: { par
            </form>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
