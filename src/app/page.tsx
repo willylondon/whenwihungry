@@ -1,3 +1,4 @@
+import { FirstReviewFeature } from "@/components/reviews/first-review-feature";
 import { ParishLinks } from "@/components/browse/parish-links";
 import { HeroSection } from "@/components/home/hero-section";
 import { FeaturedCritique } from "@/components/home/featured-critique";
@@ -48,6 +49,7 @@ export default async function HomePage() {
     <div style={{ background: "var(--wwh-bg)" }}>
       <HeroSection foodSpotCountLabel={foodSpotCountLabel} />
       {unavailable && <section className="container service-state" role="status"><h2>Directory temporarily unavailable</h2><p>We couldn’t load the food spots. Please try again shortly.</p><Link className="btn btn-secondary" href="/browse">Try the directory</Link></section>}
+      <FirstReviewFeature />
       {featuredReview && <FeaturedCritique place={featuredReview} />}
       {latestReviews.length > 0 && <LatestReviews places={latestReviews} variant="reviews" />}
       {recentListings.length > 0 && <LatestReviews places={recentListings} variant="listings" />}

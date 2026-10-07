@@ -188,7 +188,7 @@ export function Footer() {
               fontSize: "0.82rem"
             }}
           >
-            No stars. No sponsored content. No free meals.
+            Real visits. Honest verdicts. Hosted meals disclosed.
           </p>
         </div>
       </div>

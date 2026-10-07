@@ -9,12 +9,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about" },
   title: "About the Anonymous Food Critic",
   description:
-    "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
+    "The anonymous food critic behind WhenWiHungry. Real visits, honest opinions and clear disclosures about Jamaican food.",
   openGraph: {
     url: siteUrl("/about"),
     title: "About the Anonymous Food Critic | WhenWiHungry",
     description:
-      "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
+      "The anonymous food critic behind WhenWiHungry. Real visits, honest opinions and clear disclosures about Jamaican food.",
     images: [
       {
         url: siteUrl("/og/whenwihungry-og.png"),
@@ -35,17 +35,17 @@ const PHILOSOPHY = [
   {
     icon: "🎭",
     heading: "Anonymous by Design",
-    body: "No face means no recognition. No recognition means the restaurant treats me like everyone else. That's the only way to get a real review."
+    body: "The food takes centre stage. Reviews explain the context of the visit, including when a restaurant knows we are coming or invites us back."
   },
   {
     icon: "💳",
-    heading: "I Pay My Own Bill",
-    body: "Always. No free meals in exchange for a review. No 'media discount'. If I'm paying, I'm experiencing what you experience — which is the whole point."
+    heading: "The Full Story, Including the Bill",
+    body: "Complimentary meals, discounts and invitations are disclosed in the review. A hosted visit is identified as such, so you can judge the experience in context."
   },
   {
     icon: "🚫",
-    heading: "No Stars. No Scales.",
-    body: "Star ratings are vague. A 3-star restaurant could mean brilliance or tragedy depending on who's rating. My verdicts say exactly what I mean."
+    heading: "More Than a Number",
+    body: "A score needs a story. When a review includes ratings, the visit, dishes and service behind them matter just as much."
   },
   {
     icon: "📱",
@@ -259,7 +259,7 @@ export default async function AboutPage() {
             { value: "3K+", label: "TikTok Followers" },
             { value: "100K+", label: "Total Views" },
             { value: foodSpotCountLabel, label: "Food Spots Listed" },
-            { value: "0", label: "Free Meals Accepted" }
+            { value: "Clear", label: "Hosted Meal Disclosures" }
           ].filter(stat => stat.value != null).map((stat) => (
             <div key={stat.label}>
               <p
@@ -301,7 +301,7 @@ export default async function AboutPage() {
               { value: "10+", label: "Viral TikTok Reviews" },
               { value: "100K+", label: "Total Views" },
               { value: foodSpotCountLabel, label: "Food Spots Mapped" },
-              { value: "0", label: "Free Meals Accepted" }
+              { value: "Clear", label: "Hosted Meal Disclosures" }
             ].filter(stat => stat.value != null).map((s) => (
               <div key={s.label} style={{ padding: "24px 16px" }}>
                 <p style={{ margin: "0 0 6px", fontFamily: "var(--wwh-font-heading)", fontSize: "2.5rem", color: "var(--wwh-accent)", lineHeight: 1 }}>{s.value}</p>
@@ -310,7 +310,7 @@ export default async function AboutPage() {
             ))}
           </div>
           <p style={{ margin: "36px auto 0", color: "rgba(255,255,255,0.55)", fontFamily: "var(--wwh-font-body)", fontSize: "1rem", lineHeight: 1.7, maxWidth: "560px" }}>
-            Still anonymous. Still paying. Still telling the truth. No face. No bias. No filter.
+            The food stays in focus. The visit gets its full context. The opinion stays honest.
           </p>
         </div>
       </section>
