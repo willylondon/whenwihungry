@@ -276,7 +276,7 @@ const loadCatalogRows = unstable_cache(async (): Promise<Row[]> => {
   const supabase = getClient("browse");
   const rows = await readAllPages((from, to) => publicQuery(supabase).range(from, to), "browse");
   return attachApprovedRatings(supabase, eligibleRows(rows, "browse"), "browse");
-}, ["public-catalog-rows-v1"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-rows-v2"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> => {
   const supabase = getClient("detail");
@@ -285,7 +285,7 @@ const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> =>
   if (!eligible.length) return null;
   if (eligible.length !== 1) return reportUnavailable("detail", new Error("Duplicate restaurant slug"));
   return (await attachApprovedRatings(supabase, eligible, "detail"))[0];
-}, ["public-catalog-detail-v1"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-detail-v2"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 export const getAllApprovedPlaces = cache(async (): Promise<PlaceV2[]> => (await loadCatalogRows()).map(dbRowToPlace));
 

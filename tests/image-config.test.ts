@@ -12,6 +12,10 @@ describe("catalog image deployment contract", () => {
   it.each(["http://images.unsplash.com/x.jpg", "https://unknown.example/x.jpg", "https://images.unsplash.com:4430/x.jpg", "https://user:password@images.unsplash.com/x.jpg", "javascript:alert(1)", null])("uses a renderable local fallback for unsupported %s", (image) => {
     expect(catalogImage(image, staging)).toBe("/logo.png");
   });
+  it("allows only our shipped review photography as a local listing image", () => {
+    expect(catalogImage("/images/reviews/rok-hotel/salmon.jpg")).toBe("/images/reviews/rok-hotel/salmon.jpg");
+    for (const path of ["/images/reviews/../../secret.jpg", "/images/restaurants/x.jpg", "//evil.example/images/reviews/a/b.jpg", "/images/reviews/a/b.svg"]) expect(catalogImage(path)).toBe("/logo.png");
+  });
   it("retains supported public photography", () => {
     expect(catalogImage("https://images.unsplash.com/food.jpg")).toBe("https://images.unsplash.com/food.jpg");
   });
