@@ -1762,7 +1762,9 @@ p {
 .place-page h2 { font-size: 2rem; }
 .place-page p { color: #c3c6cd; }
 .place-container { width: min(1040px, calc(100% - 40px)); margin: 0 auto; }
-.place-hero { background-position: center; background-size: cover; padding: 72px 0 48px; }
+.place-hero { position: relative; isolation: isolate; overflow: hidden; background: #0b0b0b; padding: 72px 0 48px; }
+.place-hero-image { object-fit: cover; z-index: -2; }
+.place-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, #0b0b0b, rgba(11,11,11,.65)); }
 .place-hero nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; color: #e4e4e7; }
 .place-hero h1 { font-size: clamp(2.8rem,6vw,5rem); margin: 16px 0 24px; overflow-wrap: anywhere; }
 .place-status { font-weight: 700; }
@@ -1824,3 +1826,36 @@ p {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   a:hover, button:hover, img:hover { transform: none !important; }
 }
+
+/* ─────────────────────────────────────────
+   REVIEWS HUB
+──────────────────────────────────────────── */
+.reviews-hub { background: var(--wwh-bg); min-height: 100svh; padding-bottom: 48px; }
+.reviews-hub-header { padding: 72px 0 8px; max-width: 820px; }
+.reviews-hub-header h1 { margin: 12px 0 18px; font-family: var(--wwh-font-heading); font-size: clamp(2.8rem, 6vw, 4.8rem); line-height: 0.95; color: #fff; text-transform: uppercase; }
+.reviews-hub-header p { margin: 0; color: rgba(255, 255, 255, 0.65); font-size: clamp(1rem, 1.5vw, 1.12rem); line-height: 1.7; max-width: 640px; }
+.reviews-hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.reviews-hub-tiktok { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 32px; flex-wrap: wrap; }
+.reviews-hub-tiktok h2 { margin: 8px 0; }
+.reviews-hub-tiktok p { margin: 0; max-width: 560px; }
+@media (max-width: 720px) { .reviews-hub-header { padding-top: 44px; } .reviews-hub-tiktok { padding: 24px; } }
+
+/* Browse filters: compact on phones, everything visible on larger screens */
+.filters-toggle { display: none; }
+.filters-more { display: contents; }
+@media (max-width: 640px) {
+  .directory-filters { gap: 14px; }
+  .filters-toggle { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 48px; padding: 0 16px; background: #222; border: 1px solid #666; border-radius: 8px; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  .filters-toggle-count { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: 999px; background: #ff9a70; color: #171717; font-size: .8rem; }
+  .filters-more { display: none; }
+  .filters-more.is-open { display: grid; gap: 14px; }
+}
+
+/* Shared tweaks for sections on the dark critic theme */
+.dark-section .eyebrow { color: #ff9a70; letter-spacing: 0.1em; font-size: 0.78rem; }
+.dark-section .section-heading h2 { color: #fff; }
+.dark-section .section-heading p { color: rgba(255, 255, 255, 0.6); }
+.dark-section .card { background: var(--wwh-card); border-color: var(--wwh-border); color: #fff; box-shadow: none; }
+.dark-section a.card:hover { border-color: rgba(255, 154, 112, 0.5); }
+.reviews-hub-tiktok h2 { color: #fff; font-family: var(--wwh-font-heading); text-transform: uppercase; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 400; }
+.reviews-hub-tiktok p { color: rgba(255, 255, 255, 0.65); }

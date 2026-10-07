@@ -45,3 +45,20 @@
 @media(max-width:900px) { .introGrid { grid-template-columns:minmax(0,1fr); gap:30px; } .scorecard { grid-row:1; } .scorecard dl { display:flex; gap:30px; } .scorecard dl div { flex:1; } }
 @media(max-width:760px) { .feature { grid-template-columns:1fr; margin:42px auto; } .featureImage { min-height:360px; } .header { padding-top:30px; } .breadcrumb { margin-bottom:26px; } .hero { min-height:400px; } .pair { gap:14px; } .prose { font-size:16px; } }
 @media(prefers-reduced-motion:reduce) { .story *, .feature * { scroll-behavior:auto; } }
+.featureTitleLink { color:inherit; text-decoration:none; }
+.featureTitleLink:hover, .featureTitleLink:focus-visible { text-decoration:underline; text-underline-offset:6px; text-decoration-thickness:2px; }
+.featureScores { display:flex; gap:28px; margin:22px 0 4px; padding:14px 0; border-top:1px solid #d8cebf; border-bottom:1px solid #d8cebf; }
+.featureScores div { display:flex; flex-direction:column; gap:2px; }
+.featureScores dt { font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#6d6559; }
+.featureScores dd { margin:0; font-family:var(--font-fraunces),serif; font-size:26px; color:#27251f; }
+.card { background:#f7f2e9; color:#27251f; border-radius:5px; overflow:hidden; }
+.cardLink { display:block; color:inherit; text-decoration:none; height:100%; }
+.cardImage { position:relative; aspect-ratio:4/3; }
+.cardImage img { object-fit:cover; transition:transform 400ms ease; }
+.cardLink:hover .cardImage img { transform:scale(1.03); }
+.cardBody { padding:20px 22px 24px; }
+.cardBody h3 { font-family:var(--font-fraunces),serif; font-size:24px; line-height:1.2; font-weight:500; letter-spacing:-.02em; text-transform:none; color:#27251f; margin:10px 0 8px; }
+.cardBody p:last-child { color:#655c4f; font-size:14px; margin:0; }
+@media(prefers-reduced-motion:reduce) { .cardImage img { transition:none; } }
+.verdict { display:inline-block; margin:6px 0 4px!important; padding:8px 16px; border-radius:999px; background:#fff6e8; color:#233f34!important; font-weight:700; font-size:15px; letter-spacing:.02em; }
+.scorecardVerdict { display:inline-block; margin:0 0 16px!important; padding:6px 14px; border-radius:999px; background:#27251f; color:#fff6e8!important; font-weight:700; font-size:13px!important; }

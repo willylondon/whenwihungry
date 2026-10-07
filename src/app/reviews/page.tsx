@@ -1,22 +1,24 @@
-import { FirstReviewFeature } from "@/components/reviews/first-review-feature";
 import type { Metadata } from "next";
-import { siteUrl } from "@/lib/site-url";
-import { paginate, normalizeBrowseParams } from "@/lib/browse-pagination";
-import { Pagination } from "@/components/browse/pagination";
+import { connection } from "next/server";
+import { ReviewCard, ReviewFeature } from "@/components/reviews/review-feature";
 import { PlaceListCard } from "@/components/browse/place-list-card";
-import { getAllApprovedPlaces } from "@/lib/community";
+import { TIKTOK_PROFILE_URL, writtenReviews } from "@/data/reviews";
+import { CatalogUnavailableError, getAllApprovedPlaces, type PlaceV2 } from "@/lib/community";
 import { isReviewed } from "@/lib/place-status";
+import { siteUrl } from "@/lib/site-url";
 
-const baseMetadata: Metadata = {
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
   alternates: { canonical: "/reviews" },
-  title: "Viral Jamaican Food Reviews",
+  title: "Jamaican Food Reviews",
   description:
-    "Watch WhenWiHungry's viral Jamaican food reviews, anonymous verdicts, and honest food reactions.",
+    "Every WhenWiHungry review in one place: written critic reviews with photos and scores, plus our TikTok food verdicts. Hosted meals are always disclosed.",
   openGraph: {
     url: siteUrl("/reviews"),
-    title: "Viral Jamaican Food Reviews | WhenWiHungry",
+    title: "Jamaican Food Reviews | WhenWiHungry",
     description:
-      "Watch WhenWiHungry's viral Jamaican food reviews, anonymous verdicts, and honest food reactions.",
+      "Written critic reviews with photos and scores, plus our TikTok food verdicts. Hosted meals are always disclosed.",
     images: [
       {
         url: siteUrl("/og/whenwihungry-og.png"),
@@ -33,53 +35,61 @@ const baseMetadata: Metadata = {
   }
 };
 
-export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }): Promise<Metadata> {
-  const params = normalizeBrowseParams(await searchParams);
-  return { ...baseMetadata, ...(params.page ? { robots: { index: false, follow: true } } : {}) };
-}
-
-export default async function ReviewsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const params = normalizeBrowseParams(await searchParams);
-  const allPlaces = await getAllApprovedPlaces();
-  const reviewed = allPlaces.filter(isReviewed);
-  const pagination = paginate(reviewed, params.page);
+export default async function ReviewsPage() {
+  let reviewedSpots: PlaceV2[] = [];
+  try {
+    reviewedSpots = (await getAllApprovedPlaces()).filter(isReviewed);
+  } catch (error) {
+    if (!(error instanceof CatalogUnavailableError)) throw error;
+    // Render the written reviews without the directory, and never cache the outage.
+    await connection();
+  }
+  const [latest, ...earlier] = writtenReviews;
 
   return (
-    <div style={{ background: "var(--wwh-bg)", minHeight: "100svh" }}>
-      {/* Hero */}
-      <section
-        style={{
-          position: "relative",
-          padding: "100px 0 64px",
-          textAlign: "center",
-          borderBottom: "1px solid var(--wwh-border)"
-        }}
-      >
-        <div style={{ width: "min(800px, calc(100% - 40px))", margin: "0 auto" }}>
-          <span style={{ display: "inline-block", marginBottom: "16px", padding: "6px 16px", background: "rgba(255,90,31,0.10)", border: "1px solid rgba(255,90,31,0.25)", borderRadius: "999px", color: "var(--wwh-accent)", fontFamily: "var(--wwh-font-body)", fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.10em" }}>
-            Viral Reviews
-          </span>
-          <h1 style={{ margin: "0 0 20px", fontFamily: "var(--wwh-font-heading)", fontSize: "clamp(2.8rem, 6vw, 5rem)", color: "#fff", lineHeight: 0.94, textTransform: "uppercase" }}>
-            Real Food Reactions.<span style={{ color: "var(--wwh-accent)", display: "block" }}>Viral Jamaican Reviews.</span>No Fake Ratings.
-          </h1>
-          <p style={{ margin: "0 auto 0", color: "rgba(255,255,255,0.55)", fontFamily: "var(--wwh-font-body)", fontSize: "clamp(1rem, 1.5vw, 1.15rem)", lineHeight: 1.7, maxWidth: "600px" }}>
-            Browse the WhenWiHungry spots that have already been reviewed on TikTok or given a critic verdict.
-          </p>
-        </div>
-      </section>
+    <div className="reviews-hub dark-section">
+      <header className="reviews-hub-header container">
+        <span className="eyebrow">Reviews</span>
+        <h1>Real visits. Honest verdicts.</h1>
+        <p>
+          Every written review is based on an actual visit, with photos from our table. Invitations, discounts and
+          complimentary meals are disclosed at the top of the review, never hidden.
+        </p>
+      </header>
 
-      <FirstReviewFeature />
+      {latest && <ReviewFeature review={latest} kicker={`Latest review · No. ${String(latest.number).padStart(3, "0")}`} />}
 
-      {/* Results */}
-      <section style={{ padding: "64px 0 96px" }}>
-        <div style={{ width: "min(1200px, calc(100% - 40px))", margin: "0 auto" }}>
-          {reviewed.length > 0 && (
-            <>
-              <p className="result-summary">Showing {pagination.offset + 1}–{pagination.offset + pagination.items.length} of {reviewed.length} reviewed spots</p>
-              <div className="location-results">{pagination.items.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>
-              <Pagination path="/reviews" params={params} page={pagination.page} totalPages={pagination.totalPages} />
-            </>
-          )}
+      {earlier.length > 0 && (
+        <section className="section container" aria-labelledby="earlier-reviews-heading">
+          <div className="section-heading"><div>
+            <span className="eyebrow">The archive</span>
+            <h2 id="earlier-reviews-heading">More written reviews</h2>
+          </div></div>
+          <div className="reviews-hub-grid">{earlier.map(review => <ReviewCard key={review.slug} review={review} />)}</div>
+        </section>
+      )}
+
+      {reviewedSpots.length > 0 && (
+        <section className="section container" aria-labelledby="reviewed-spots-heading">
+          <div className="section-heading"><div>
+            <span className="eyebrow">In the directory</span>
+            <h2 id="reviewed-spots-heading">Reviewed food spots</h2>
+            <p>Directory listings with a critic verdict or a TikTok review attached.</p>
+          </div></div>
+          <div className="location-results">{reviewedSpots.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>
+        </section>
+      )}
+
+      <section className="section container" aria-labelledby="tiktok-heading">
+        <div className="card reviews-hub-tiktok">
+          <div>
+            <span className="eyebrow">On TikTok</span>
+            <h2 id="tiktok-heading">Watch the video verdicts</h2>
+            <p>Most of our reviews start as short videos. Catch the latest ones on TikTok before they get the full write-up here.</p>
+          </div>
+          <a className="btn btn-primary" href={TIKTOK_PROFILE_URL} target="_blank" rel="noopener noreferrer">
+            Watch on TikTok <span className="sr-only">(opens in a new tab)</span>
+          </a>
         </div>
       </section>
     </div>

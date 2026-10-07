@@ -24,7 +24,16 @@ describe("active directory facets and sorting", () => {
   });
   it("uses relevance only for the default search sort", () => {
     expect(getFilteredPlaces({ query: "jerk" }, fixtures).map((p) => p.slug)).toEqual(["zulu", "beta", "alpha", "unknown"]);
-    expect(getFilteredPlaces({}, fixtures)[0].slug).toBe("zulu");
+    // Without a query: confidence-weighted rating, so 300 votes at 3★ don't outrank strong ratings.
+    expect(getFilteredPlaces({}, fixtures).map((p) => p.slug)).toEqual(["alpha", "beta", "zulu", "unknown"]);
+  });
+  it("recommends our own reviews, then listings with real photos, by default", () => {
+    const ranked = getFilteredPlaces({}, [
+      place({ slug: "popular", name: "Popular", rating: 4.9, reviewCount: 2000, image: "/logo.png" }),
+      place({ slug: "photo", name: "Photo", rating: 4.2, reviewCount: 40, image: "https://images.pexels.com/x.jpg" }),
+      place({ slug: "video", name: "Video", review_video_url: "https://www.tiktok.com/@whenwihungry/video/1" })
+    ]);
+    expect(ranked.map((p) => p.slug)).toEqual(["video", "photo", "popular"]);
   });
   it("uses one 0–5 scale instead of critic scores for rating filters", () => {
     expect(getFilteredPlaces({ rating: "4.4" }, fixtures).map((p) => p.slug)).toEqual(["alpha"]);

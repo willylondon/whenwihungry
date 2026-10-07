@@ -1,5 +1,6 @@
 import { normalizeParish, getParishDisplayName } from "@/lib/location-validation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -62,7 +63,8 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   return <article className="place-page">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
-    <header className="place-hero" style={{ backgroundImage: `linear-gradient(to top, #0b0b0b, rgba(11,11,11,.65)), url(${place.image})` }}>
+    <header className="place-hero">
+      {place.image !== "/logo.png" && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
       <div className="place-container">
         <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
         <p className="place-status">{getPlaceStatusLabel(place)}</p>

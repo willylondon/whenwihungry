@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CATALOG_CACHE_TAG } from "@/lib/cache-tags";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { isUuid, getFormString } from "@/lib/validation";
@@ -9,6 +10,7 @@ import { parseRestaurant, parseCriticReview } from "./validation";
 
 function refreshPublic(id: string) {
   revalidatePath(`/admin/restaurants/${id}`);
+  updateTag(CATALOG_CACHE_TAG);
   for (const path of ["/", "/browse", "/reviews", "/admin/restaurants"]) revalidatePath(path);
   revalidatePath("/places/[slug]", "page");
   revalidatePath("/restaurants/[location]", "page");

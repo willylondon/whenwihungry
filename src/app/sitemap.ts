@@ -1,4 +1,4 @@
-import { rokReview } from "@/data/reviews/rok-hotel";
+import { writtenReviews } from "@/data/reviews";
 import type { MetadataRoute } from "next";
 import { getAllApprovedPlaces } from "@/lib/community";
 import { categories, getFilteredPlaces } from "@/lib/places";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const places = await getAllApprovedPlaces();
   return [
-    { url: siteUrl(rokReview.path), changeFrequency: "monthly", priority: 0.9 },
+    ...writtenReviews.map(review => ({ url: siteUrl(review.path), changeFrequency: "monthly" as const, priority: 0.9 })),
     { url: siteUrl(), changeFrequency: "weekly", priority: 1 },
     ...["/browse", "/reviews", "/about"].map(path => ({ url: siteUrl(path), changeFrequency: "weekly" as const, priority: 0.9 })),
     ...categories.filter(category => getFilteredPlaces({ category }, places).length > 0).map(category => ({ url: siteUrl(`/browse?category=${encodeURIComponent(category.toLowerCase())}`), changeFrequency: "weekly" as const, priority: 0.8 })),

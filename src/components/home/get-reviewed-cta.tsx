@@ -78,7 +78,7 @@ export function GetReviewedCta() {
             maxWidth: "600px"
           }}
         >
-          If you're confident in what you're serving, request a review. We come unannounced, pay our own bill, and tell the truth — all of it.
+          If you're confident in what you're serving, request a review. We come unannounced and pay our own bill. If a meal is ever hosted or discounted, the review says so up front — and we still tell the truth, all of it.
         </p>
 
         <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>

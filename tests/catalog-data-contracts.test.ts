@@ -2,6 +2,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { catalogDb, restaurant } from "./helpers/catalog-db";
 const state = vi.hoisted(() => ({ client: null as any }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: vi.fn(async () => state.client) }));
+vi.mock("@/lib/supabase/public", () => ({ createSupabasePublicClient: vi.fn(() => state.client) }));
 import { CatalogUnavailableError, dbRowToPlace, getAllApprovedPlaces, getApprovedCommunityPlaceBySlug, normalizePriceRange } from "@/lib/community";
 import { parseListing } from "@/app/add-listing/validation";
 import { formatFoodSpotCount, getPublicFoodSpotCount } from "@/lib/place-counts";

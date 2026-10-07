@@ -1,9 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const FOOTER_LINKS = {
   Directory: [
     { href: "/browse", label: "All Food Spots" },
-    { href: "/reviews", label: "Viral Reviews" },
+    { href: "/reviews", label: "Reviews" },
     { href: "/browse?category=jerk", label: "Jerk" },
     { href: "/browse?category=seafood", label: "Seafood" },
     { href: "/browse?category=local-food", label: "Local Food" },
@@ -50,16 +51,7 @@ export function Footer() {
           className="footer-cols"
         >
           <div>
-            <img
-              src="/logo.png"
-              alt="WhenWiHungry"
-              style={{
-                height: "96px",
-                width: "auto",
-                objectFit: "contain",
-                marginBottom: "20px"
-              }}
-            />
+            <Image src="/logo.png" alt="WhenWiHungry" width={96} height={96} style={{ marginBottom: "20px" }} />
             <p
               style={{
                 color: "var(--wwh-muted)",
@@ -69,7 +61,7 @@ export function Footer() {
                 margin: 0
               }}
             >
-              Jamaica's boldest food critic. No fake ratings, no sponsored opinions, no corporate nonsense. Just real talk about real food.
+              Jamaica's boldest food critic. No fake ratings, no paid verdicts, and every hosted meal disclosed. Just real talk about real food.
             </p>
             {/* Social icons */}
             <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>

@@ -6,7 +6,7 @@ import { parseReviewRequest } from "@/app/get-reviewed/validation";
 const mocks = vi.hoisted(() => ({ guard: vi.fn(), client: vi.fn(), refresh: vi.fn() }));
 vi.mock("@/lib/auth/require-admin", () => ({ requireAdmin: mocks.guard }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: mocks.client }));
-vi.mock("next/cache", () => ({ revalidatePath: mocks.refresh }));
+vi.mock("next/cache", () => ({ revalidatePath: mocks.refresh, updateTag: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => { throw new Error(`REDIRECT:${url}`); } }));
 import { saveRestaurantAction, createRestaurantAction, addDishAction, addKeywordAction, publishCriticReviewAction } from "@/app/admin/restaurants/actions";
 import { moderateListingAction } from "@/app/admin/listings/actions";

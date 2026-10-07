@@ -1,16 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/browse", label: "Food Spots" },
-  { href: "/reviews", label: "Viral Reviews" },
   { href: "/browse?category=jerk", label: "Jerk" },
   { href: "/browse?category=seafood", label: "Seafood" },
   { href: "/about", label: "About" },
-  { href: "/account", label: "Account" },
 ];
 
 export function Navbar() {
@@ -53,14 +52,7 @@ export function Navbar() {
             }}
             aria-label="WhenWiHungry Home"
           >
-            <img
-              src="/logo.png"
-              alt="WhenWiHungry"
-              style={{ height: "64px", width: "auto", objectFit: "contain" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
+            <Image src="/logo.png" alt="WhenWiHungry" width={64} height={64} priority />
           </Link>
 
           {/* Desktop nav */}
@@ -95,6 +87,10 @@ export function Navbar() {
               </Link>
             ))}
           </nav>
+
+          <Link href="/account" className="nav-dark-link nav-account-link" style={{ padding: "8px 12px", color: "var(--wwh-muted)", fontFamily: "var(--wwh-font-body)", fontWeight: 600, fontSize: "0.88rem", textDecoration: "none", borderRadius: "8px", whiteSpace: "nowrap" }}>
+            Account
+          </Link>
 
           {/* CTA */}
           <Link
@@ -196,6 +192,13 @@ export function Navbar() {
             >
               Get Reviewed
             </Link>
+            <Link
+              href="/account"
+              onClick={() => setMenuOpen(false)}
+              style={{ display: "block", padding: "14px 0 0", color: "var(--wwh-muted)", fontFamily: "var(--wwh-font-body)", fontWeight: 600, fontSize: "1rem", textDecoration: "none" }}
+            >
+              Account
+            </Link>
           </div>
         )}
       </header>
@@ -212,7 +215,7 @@ export function Navbar() {
         }
         @media (max-width: 1080px) {
           .desktop-nav { display: none !important; }
-          .nav-cta-btn { display: none !important; }
+          .nav-cta-btn, .nav-account-link { display: none !important; }
           .hamburger-btn { display: block !important; }
         }
       `}</style>
