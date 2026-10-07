@@ -12,6 +12,7 @@ import { getPlaceStatusLabel, isCriticReviewed, getReviewVideoUrl } from "@/lib/
 import { serializeJsonLd } from "@/lib/security/json-ld";
 import { siteUrl } from "@/lib/site-url";
 import { hasListingPhoto } from "@/lib/image-config";
+import { directionsUrl, googleMapsPlaceUrl, telUrl } from "@/lib/maps-links";
 import { VERDICT_LABELS, formatReviewDate, getWrittenReviewForPlace } from "@/data/reviews";
 
 type PlacePageProps = { params: Promise<{ slug: string }> };
@@ -76,7 +77,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
 
   return <article className="place-page">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
-    <header className="place-hero">
+    <header className={`place-hero${hasListingPhoto(place.image) ? " has-photo" : ""}`}>
       {hasListingPhoto(place.image) && <Image className="place-hero-image" src={place.image} alt="" fill priority sizes="100vw" />}
       {hasListingPhoto(place.image) && place.image_credit && <p className="photo-credit place-hero-credit">Photo: {place.image_credit}</p>}
       <div className="place-container">
@@ -84,7 +85,14 @@ export default async function PlacePage({ params }: PlacePageProps) {
         {statusLabel && <p className="place-status">{statusLabel}</p>}
         <h1>{place.name}</h1>
         {written ? <VerdictBadge verdict={written.verdict} size="lg" /> : hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
+        <p className="place-meta">{[place.category, place.priceRange, place.area && place.area !== place.parish ? place.area : null, place.parish ? getParishDisplayName(place.parish) : null].filter(Boolean).join(" · ")}</p>
         <p className="place-address">{place.address || place.parish}</p>
+        <div className="place-actions">
+          <a className="place-action place-action-primary" href={directionsUrl(place)} target="_blank" rel="noopener noreferrer">Directions<span className="sr-only"> (opens Google Maps in a new tab)</span></a>
+          {telUrl(place.phone) && <a className="place-action" href={telUrl(place.phone)!}>Call</a>}
+          <a className="place-action" href={googleMapsPlaceUrl(place)} target="_blank" rel="noopener noreferrer">Photos &amp; hours on Google Maps<span className="sr-only"> (opens in a new tab)</span></a>
+          {place.website && <a className="place-action" href={place.website} target="_blank" rel="noopener noreferrer">Website<span className="sr-only"> (opens in a new tab)</span></a>}
+        </div>
         <SocialShare name={place.name} url={siteUrl(`/places/${place.slug}`)} />
       </div>
     </header>

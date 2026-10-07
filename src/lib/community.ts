@@ -55,6 +55,8 @@ export type PlaceV2 = Place & {
   search_document?: RestaurantSearchDocument;
   /** Third-party source of the listing photo, shown as "Photo: …". */
   image_credit?: string | null;
+  /** Google Maps place id, used only to build links to Google Maps. */
+  google_place_id?: string | null;
 };
 
 /** A catalog outage is different from a successful empty result or a missing slug. */
@@ -218,6 +220,7 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
     hours: strings(restaurant.hours),
     image: listingImage(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
     image_credit: listingImageCredit(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
+    google_place_id: /^[A-Za-z0-9_-]{10,300}$/.test(stringValue(restaurant.google_place_id)) ? stringValue(restaurant.google_place_id) : null,
     lat: validCoordinates ? lat : undefined,
     lng: validCoordinates ? lng : undefined,
     parish: stringValue(restaurant.parish),

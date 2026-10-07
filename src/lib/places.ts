@@ -150,3 +150,25 @@ export function getSiteStats() {
 
 export { categories, latestPosts, testimonials };
 export { places };
+
+/**
+ * A photo-led selection for the homepage: recommendation order, at most one spot per
+ * parish until every parish is represented, then the next best.
+ */
+export function pickSpotsWorthALook<T extends Place & Partial<PlaceV2>>(allPlaces: T[], count = 8): T[] {
+  const ranked = getFilteredPlaces({}, allPlaces).filter((place) => hasListingPhoto(place.image)) as T[];
+  const picked: T[] = [];
+  const parishes = new Set<string>();
+  for (const place of ranked) {
+    if (picked.length >= count) break;
+    const parish = normalizeParish(place.parish) || place.parish;
+    if (parishes.has(parish)) continue;
+    parishes.add(parish);
+    picked.push(place);
+  }
+  for (const place of ranked) {
+    if (picked.length >= count) break;
+    if (!picked.includes(place)) picked.push(place);
+  }
+  return picked;
+}
