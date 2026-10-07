@@ -37,10 +37,18 @@ describe("PlaceListCard production data contract", () => {
   it("keeps verdict-only and explicit unpublished records as listings", () => {
     for (const overrides of [{ verdict: "MID" }, { verdict: "MID", headline: "Draft", reviewed_at: "2026-10-01", has_critic_review: false }]) {
       const card = render(overrides);
-      expect(card.textContent).toContain("Listed — Review Pending");
+      // Plain listings carry no status label at all, and never a verdict.
+      expect(card.textContent).not.toContain("Review Pending");
+      expect(card.textContent).not.toContain("Mid");
       expect(card.textContent).toContain("View Listing");
       expect(card.textContent).not.toContain("Critic Reviewed");
     }
+  });
+  it("marks a listing with a published written review and links to it", () => {
+    const card = render({ slug: "rok-hotel-kingston", name: "ROK Hotel Kingston" });
+    expect(card.textContent).toContain("Reviewed by WhenWiHungry");
+    expect(card.textContent).toContain("Run Go Get It");
+    expect(card.textContent).toContain("Read Review");
   });
   it("shows accurate price and separates rating provenance", () => {
     const card = render({ community_rating: 3.5, community_review_count: 2 });

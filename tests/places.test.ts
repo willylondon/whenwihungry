@@ -35,6 +35,13 @@ describe("active directory facets and sorting", () => {
     ]);
     expect(ranked.map((p) => p.slug)).toEqual(["video", "photo", "popular"]);
   });
+  it("puts our written reviews first and mixes otherwise-equal listings instead of A to Z", () => {
+    const equal = ["a-spot", "b-spot", "c-spot", "d-spot", "e-spot", "f-spot"].map((slug) => place({ slug, name: slug }));
+    const ranked = getFilteredPlaces({}, [...equal, place({ slug: "rok-hotel-kingston", name: "ROK" })]).map((p) => p.slug);
+    expect(ranked[0]).toBe("rok-hotel-kingston");
+    expect(ranked.slice(1)).not.toEqual(equal.map((p) => p.slug));
+    expect(getFilteredPlaces({}, equal).map((p) => p.slug)).toEqual(getFilteredPlaces({}, [...equal].reverse()).map((p) => p.slug));
+  });
   it("uses one 0–5 scale instead of critic scores for rating filters", () => {
     expect(getFilteredPlaces({ rating: "4.4" }, fixtures).map((p) => p.slug)).toEqual(["alpha"]);
     expect(getFilteredPlaces({ price: "$$", category: "jerk", parish: "st-james" }, fixtures).map((p) => p.slug)).toEqual(["beta"]);

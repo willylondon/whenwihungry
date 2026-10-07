@@ -12,6 +12,7 @@ import { getPlaceStatusLabel, isCriticReviewed, getReviewVideoUrl } from "@/lib/
 import { serializeJsonLd } from "@/lib/security/json-ld";
 import { siteUrl } from "@/lib/site-url";
 import { hasListingPhoto } from "@/lib/image-config";
+import { VERDICT_LABELS, formatReviewDate, getWrittenReviewForPlace } from "@/data/reviews";
 
 type PlacePageProps = { params: Promise<{ slug: string }> };
 
@@ -53,7 +54,10 @@ export default async function PlacePage({ params }: PlacePageProps) {
   }
   const parish = normalizeParish(place.parish);
   const hasCriticReview = isCriticReviewed(place);
+  const written = getWrittenReviewForPlace(place.slug);
   const videoUrl = getReviewVideoUrl(place);
+  // Plain listings get no status line; "pending" adds nothing for visitors.
+  const statusLabel = written ? "Reviewed by WhenWiHungry" : hasCriticReview || videoUrl ? getPlaceStatusLabel(place) : null;
   const publishedDate = place.published_at || place.reviewed_at;
   const reviewBody = place.honest_take || place.critic_review_body;
   const restaurantSchema = {
@@ -77,9 +81,9 @@ export default async function PlacePage({ params }: PlacePageProps) {
       {hasListingPhoto(place.image) && place.image_credit && <p className="photo-credit place-hero-credit">Photo: {place.image_credit}</p>}
       <div className="place-container">
         <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
-        <p className="place-status">{getPlaceStatusLabel(place)}</p>
+        {statusLabel && <p className="place-status">{statusLabel}</p>}
         <h1>{place.name}</h1>
-        {hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
+        {written ? <VerdictBadge verdict={written.verdict} size="lg" /> : hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
         <p className="place-address">{place.address || place.parish}</p>
         <SocialShare name={place.name} url={siteUrl(`/places/${place.slug}`)} />
       </div>
@@ -87,6 +91,17 @@ export default async function PlacePage({ params }: PlacePageProps) {
     <div className="place-container place-content">
       <div className="review-layout-grid">
         <div className="place-sections">
+          {written && <section className="place-panel place-written-review" aria-labelledby="written-review-heading">
+            <span className="eyebrow">Our review · No. {String(written.number).padStart(3, "0")}</span>
+            <h2 id="written-review-heading"><Link href={written.path}>{written.title}</Link></h2>
+            <p>{written.teaser}</p>
+            <dl className="place-written-scores">
+              <div><dt>Verdict</dt><dd>{VERDICT_LABELS[written.verdict].emoji} {VERDICT_LABELS[written.verdict].label}</dd></div>
+              {written.scores.map(score => <div key={score.label}><dt>{score.label}</dt><dd>{score.value}</dd></div>)}
+            </dl>
+            <p className="rating-provenance">Visited {formatReviewDate(written.visited)}{written.hosted && written.disclosureShort ? ` · ${written.disclosureShort}` : ""}</p>
+            <Link className="btn btn-primary" href={written.path}>Read the full review</Link>
+          </section>}
           {hasCriticReview && <section className="place-panel" aria-labelledby="critic-heading">
             <span className="eyebrow">Critic verdict</span>
             <h2 id="critic-heading">{place.headline || "The honest take"}</h2>
@@ -103,7 +118,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
           </section>}
           <section className="place-panel" aria-labelledby="listing-heading">
             <h2 id="listing-heading">Listing information</h2>
-            {!hasCriticReview && <p className="listing-notice">No written critic verdict has been published for this listing.</p>}
+            {!hasCriticReview && !written && <p className="listing-notice">We haven’t reviewed this spot yet.</p>}
             <p>{place.description || "A description hasn’t been provided for this listing."}</p>
           </section>
           <ReviewSection returnPath={`/places/${place.slug}#leave-review-heading`} restaurantId={place.id} reviews={reviews} reviewsUnavailable={reviewsUnavailable} />

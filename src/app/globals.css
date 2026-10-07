@@ -1870,3 +1870,21 @@ p {
 /* Credit for third-party listing photos */
 .photo-credit { position: absolute; right: 8px; bottom: 8px; margin: 0; padding: 3px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.65); color: #e5e7eb; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; pointer-events: none; }
 .place-hero-credit { right: 16px; bottom: 12px; z-index: 1; }
+
+/* Reviewed status on cards and the written-review panel on listing pages */
+.browse-card-reviewed { color: #ff9a70; }
+.place-written-review { border-color: rgba(255, 154, 112, 0.45); background: linear-gradient(160deg, rgba(255, 90, 31, 0.10), #1a1a1a 55%); }
+.place-written-review h2 a { color: #fff; text-decoration: none; }
+.place-written-review h2 a:hover { text-decoration: underline; text-underline-offset: 6px; }
+.place-written-scores { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 20px 0; padding: 14px 0; border-top: 1px solid #3a3a3a; border-bottom: 1px solid #3a3a3a; }
+.place-written-scores div { display: grid; gap: 2px; }
+.place-written-scores dt { color: #b8bdc6; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.place-written-scores dd { margin: 0; color: #fff; font-size: 1.15rem; font-weight: 700; }
+
+/* Share row on listing pages */
+.share-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
+.share-pill { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 999px; background: rgba(0, 0, 0, 0.45); color: #fff; font: inherit; font-size: 0.85rem; font-weight: 700; text-decoration: none; cursor: pointer; backdrop-filter: blur(6px); }
+.share-pill:hover, .share-pill:focus-visible { border-color: #ff9a70; color: #ff9a70; }
+.share-pill:focus-visible { outline: 3px solid #ffc857; outline-offset: 2px; }
+.share-pill-primary { background: #ff5a1f; border-color: #ff5a1f; }
+.share-pill-primary:hover, .share-pill-primary:focus-visible { color: #fff; background: #e94e15; }

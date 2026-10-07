@@ -3,6 +3,7 @@ import { matchesParish, normalizeParish, getParishDisplayName } from "@/lib/loca
 import type { PlaceV2 } from "@/lib/community";
 import { getPlaceStatus } from "@/lib/place-status";
 import { hasListingPhoto } from "@/lib/image-config";
+import { getWrittenReviewForPlace } from "@/data/reviews";
 
 export function getFeaturedPlaces() {
   return [...places]
@@ -109,15 +110,24 @@ export function getFilteredPlaces(filters: {
         return byName;
       default:
         if (filters.query?.trim()) return (right.final_score ?? 0) - (left.final_score ?? 0) || byName;
-        return recommendationScore(right) - recommendationScore(left) || byName;
+        // Ties (most listings) use a stable shuffle so the list mixes parishes instead of reading A to Z.
+        return recommendationScore(right) - recommendationScore(left) || mixOrder(left.slug) - mixOrder(right.slug) || byName;
     }
   });
 }
 
 const STATUS_WEIGHT = { "critic-reviewed": 1000, "tiktok-reviewed": 500, listed: 0 } as const;
+const WRITTEN_REVIEW_WEIGHT = 2000;
+
+/** Deterministic pseudo-random rank from the slug (FNV-1a), so pages stay stable between visits. */
+function mixOrder(slug: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < slug.length; index++) hash = Math.imul(hash ^ slug.charCodeAt(index), 0x01000193);
+  return hash >>> 0;
+}
 
 /**
- * Default browse order: our own reviews first, then listings with a real photo,
+ * Default browse order: our written reviews first, then critic/TikTok reviews, then listings with a real photo,
  * then a confidence-weighted rating so 4.9 from 8 votes doesn't beat 4.6 from 900.
  */
 export function recommendationScore(place: Place & Partial<PlaceV2>): number {
@@ -126,7 +136,8 @@ export function recommendationScore(place: Place & Partial<PlaceV2>): number {
   const PRIOR_VOTES = 50, PRIOR_RATING = 4;
   const weightedRating = rating ? (count * rating + PRIOR_VOTES * PRIOR_RATING) / (count + PRIOR_VOTES) : 0;
   const hasPhoto = hasListingPhoto(place.image) ? 10 : 0;
-  return STATUS_WEIGHT[getPlaceStatus(place)] + hasPhoto + weightedRating;
+  const writtenReview = getWrittenReviewForPlace(place.slug) ? WRITTEN_REVIEW_WEIGHT : 0;
+  return writtenReview + STATUS_WEIGHT[getPlaceStatus(place)] + hasPhoto + weightedRating;
 }
 
 export function getSiteStats() {

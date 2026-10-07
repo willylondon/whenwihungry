@@ -15,6 +15,11 @@ export function getWrittenReview(slug: string): WrittenReview | undefined {
   return writtenReviews.find(review => review.slug === slug);
 }
 
+/** The written review for a directory listing, if we've published one. */
+export function getWrittenReviewForPlace(slug: string | undefined): WrittenReview | undefined {
+  return slug ? writtenReviews.find(review => review.placeSlug === slug) : undefined;
+}
+
 export const latestWrittenReview: WrittenReview | undefined = writtenReviews[0];
 
 export const TIKTOK_PROFILE_URL = "https://www.tiktok.com/@whenwihungry";
