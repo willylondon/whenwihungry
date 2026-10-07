@@ -67,6 +67,8 @@ describe("public routes", () => {
   });
   it("renders St. James route using normalized public catalog data", async () => {
     const doc = parse(renderToStaticMarkup(await LocationPage({ params: Promise.resolve({ location: "st-james" }), searchParams: Promise.resolve({}) })));
+    expect(doc.querySelectorAll("h1")).toHaveLength(1);
+    expect(doc.querySelector("h1")?.textContent).toContain("St. James");
     expect(doc.querySelectorAll("a.browse-card-link")).toHaveLength(1);
     expect(doc.body.textContent).toContain("Fixture Food Spot");
   });

@@ -48,7 +48,7 @@ export default async function LocationPage({ params, searchParams }: Props) {
   return <section className="directory-page section">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListSchema) }} />
     <div className="container">
-      <SectionHeader eyebrow="Local Discovery" heading={`Food spots in ${displayName}`} subtext="Explore directory listings, community ratings, and critic verdicts where available." />
+      <SectionHeader headingLevel={1} eyebrow="Local Discovery" heading={`Food spots in ${displayName}`} subtext="Explore directory listings, community ratings, and critic verdicts where available." />
       <LocationIntro location={location} displayName={displayName} resultCount={results.length} />
       <p className="result-summary">{results.length === 0 ? `No restaurants found in ${displayName} yet.` : `Showing ${pagination.offset + 1}–${pagination.offset + pagination.items.length} of ${results.length} food spots`}</p>
       <div className="location-results">{pagination.items.map(place => <PlaceListCard key={place.slug} place={place} />)}</div>

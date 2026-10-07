@@ -4,6 +4,7 @@ type SectionHeaderProps = {
   subtext?: string;
   align?: "left" | "center";
   accentWord?: string;
+  headingLevel?: 1 | 2;
 };
 
 export function SectionHeader({
@@ -11,8 +12,10 @@ export function SectionHeader({
   heading,
   subtext,
   align = "left",
-  accentWord
+  accentWord,
+  headingLevel = 2
 }: SectionHeaderProps) {
+  const Heading = headingLevel === 1 ? "h1" : "h2";
   const textAlign = align === "center" ? "center" : "left";
 
   const headingParts = accentWord
@@ -37,7 +40,7 @@ export function SectionHeader({
           {eyebrow}
         </span>
       )}
-      <h2
+      <Heading
         style={{
           margin: 0,
           fontFamily: "var(--wwh-font-heading)",
@@ -57,7 +60,7 @@ export function SectionHeader({
         ) : (
           heading
         )}
-      </h2>
+      </Heading>
       {subtext && (
         <p
           style={{
