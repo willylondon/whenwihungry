@@ -14,7 +14,8 @@ const FOOTER_LINKS = {
     { href: "/get-reviewed", label: "Get Reviewed" },
     { href: "/restaurants/kingston", label: "Best in Kingston" },
     { href: "/restaurants/portland", label: "Best in Portland" },
-    { href: "/browse", label: "Restaurant Directory" }
+    { href: "/browse", label: "Restaurant Directory" },
+    { href: "/privacy", label: "Privacy & Contact" }
   ],
   Social: [
     { href: "https://tiktok.com/@whenwihungry", label: "TikTok" },

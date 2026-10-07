@@ -1,13 +1,9 @@
-# Next Actions
+# Next actions
 
-## High Priority
-- [ ] **Manual SQL Apply**: Copy and run the contents of `supabase/v2_upgrade.sql` in the Supabase SQL Editor to activate the new search ranking engine.
-- [ ] **Final Verification**: After SQL application, search for "jerk" and "Moby Dick" to verify match reasons and ranking logic.
-- [ ] **Verify Verified Status**: Confirm that restaurants marked as `is_verified` or `verified` in the DB are displaying the new badge correctly.
+1. Review the launch-readiness draft PR and its test results.
+2. Obtain a credential-free current database policy/schema export; reconcile migration prerequisites.
+3. Apply approved migration work to a disposable staging database and execute `docs/launch-runbook.md` acceptance cases.
+4. Confirm the intended first-launch scope and owner-reviewed catalog/critic content.
+5. Separately approve any production database, domain or deployment steps after staging and rollback evidence pass.
 
-## Medium Priority
-- [ ] **Parish Stats Unification**: Update `getParishStats` in `places.ts` to derive stats from Supabase data instead of static fallback.
-- [ ] **Category Chips**: Ensure the filter chips at the top of the browse page use the same normalized lowercase logic as the main search.
-
-## Low Priority
-- [ ] **SEO Review**: Check metadata for location pages to ensure "Best Restaurants in [Location]" titles are being indexed correctly.
+Do not replay legacy SQL or use older status documents as release approval.

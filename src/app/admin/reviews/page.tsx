@@ -1,21 +1,11 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 import { moderateReviewAction } from "@/app/admin/reviews/actions";
 
-export default async function AdminReviewsPage() {
-  const supabase = await createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default async function AdminReviewsPage({ searchParams }: { searchParams: Promise<{ error?: string; updated?: string }> }) {
+  const supabase = await requireAdmin("/admin/reviews");
+  const params = await searchParams;
 
-  if (!user) return <div>Access Denied</div>;
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") return <div>Access Denied</div>;
-
-  const { data: reviews } = await supabase
+  const { data: reviews, error } = await supabase
     .from("user_reviews")
     .select(`
       id,
@@ -28,15 +18,19 @@ export default async function AdminReviewsPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container">
         <h1 style={{ color: "#fff", marginBottom: "32px" }}>Moderate User Reviews</h1>
         
+        {params.error && <p role="alert">Review status could not be saved. Check the record and retry.</p>}
+        {params.updated && <p role="status">Review status saved.</p>}
+        {error && <p role="alert">Reviews could not be loaded. Refresh to retry.</p>}
+        {!error && !reviews?.length && <p>No reviews found.</p>}
         <div style={{ display: "grid", gap: "16px" }}>
-          {(reviews ?? []).map((review: any) => (
+          {(reviews ?? []).map((review) => (
             <div key={review.id} style={{ background: "var(--wwh-card)", padding: "24px", borderRadius: "12px", border: "1px solid var(--wwh-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "12px" }}>
-                <span style={{ color: "var(--wwh-accent)", fontWeight: 700 }}>{review.restaurants.name}</span>
+                <span style={{ color: "var(--wwh-accent)", fontWeight: 700 }}>{(Array.isArray(review.restaurants) ? review.restaurants[0] : review.restaurants)?.name ?? "Unknown restaurant"}</span>
                 <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem" }}>{review.status.toUpperCase()}</span>
               </div>
               <div style={{ color: "#FFD700", marginBottom: "8px" }}>{"★".repeat(review.rating)}</div>
@@ -51,6 +45,6 @@ export default async function AdminReviewsPage() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,9 +1,10 @@
-# Blockers
+# Launch gates still requiring operational evidence
 
-## Current Blockers
-- **Supabase Permissions/CLI**: I do not have direct access to execute SQL on the remote Supabase instance. This requires the user to manually copy/paste the `v2_upgrade.sql` content to the Supabase dashboard.
+- Export/reconcile the actual database schema, RLS, grants, role-assignment logic and existing constraints. Production policy/schema verification remains pending.
+- Review and test any new migration in an isolated staging project. Production application is a separately approved action.
+- Complete authenticated staging signup/confirmation/recovery, inquiry receipt, listing/review moderation and direct-API permission tests.
+- Confirm real critic content/video, imported country/location correctness and any quarantined records with the owner; do not invent facts or publish unreviewed verdicts.
+- Map the already-owned domain to Vercel and verify DNS/TLS/redirects under separate authorization.
+- Verify backups/restore, monitoring, capacity, privacy/retention and moderation/contact ownership.
 
-## Resolved Blockers
-- **Missing 'city' Column**: The RPC was failing because it referenced `r.city` instead of `r.area`. Resolved in the latest `search_restaurants` function definition.
-- **Return Type Mismatch**: Fixed by adding `DROP FUNCTION` to the SQL upgrade script.
-- **Inconsistent Data Sources**: Resolved by unifying the `/browse` page to use Supabase instead of static file imports.
+Source-level checks and their exact outcomes belong in the draft PR and launch runbook. A build pass alone does not close these gates.

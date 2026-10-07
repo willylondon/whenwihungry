@@ -1,10 +1,13 @@
 import { createRestaurantAction } from "@/app/admin/restaurants/actions";
 
-export default function NewRestaurantPage() {
+export default async function NewRestaurantPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container" style={{ maxWidth: "800px" }}>
         <h1 style={{ color: "#fff", marginBottom: "40px" }}>Add New Restaurant</h1>
+        <p>Creates a pending directory listing. Approve it separately when ready. Critic reviews are published separately.</p>
+        {error && <p role="alert" className="form-alert">{error === "invalid" ? "Check the name, lowercase slug, Jamaican parish, URL and optional price (1–4)." : "The listing could not be confirmed. Check whether it exists before retrying."}</p>}
         
         <form action={createRestaurantAction} style={{ display: "grid", gap: "24px" }}>
           <div className="form-group">
@@ -46,13 +49,13 @@ export default function NewRestaurantPage() {
              </div>
              <div>
                <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>PRICE LEVEL (1-4)</label>
-               <input type="number" name="price_level" defaultValue="2" min="1" max="4" style={inputStyle} />
+               <input type="number" name="price_level" placeholder="Unknown" min="1" max="4" style={inputStyle} />
              </div>
           </div>
 
           <div className="form-group">
             <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>DESCRIPTION</label>
-            <textarea name="description" style={{ ...inputStyle, minHeight: "120px" }} placeholder="Initial honest take..." />
+            <textarea name="description" style={{ ...inputStyle, minHeight: "120px" }} placeholder="Factual listing information..." />
           </div>
 
           <div style={{ display: "flex", gap: "20px" }}>
@@ -67,7 +70,7 @@ export default function NewRestaurantPage() {
           </button>
         </form>
       </div>
-    </main>
+    </div>
   );
 }
 

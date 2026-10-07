@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { PlaceV2 } from "@/lib/community";
 import { SectionHeader } from "@/components/ui/section-header";
-import { ReviewCard } from "@/components/ui/review-card";
+import { PlaceListCard } from "@/components/browse/place-list-card";
 
 type LatestReviewsProps = {
   places: PlaceV2[];
@@ -27,7 +27,7 @@ export function LatestReviews({ places, variant = "reviews" }: LatestReviewsProp
         }}>
           <SectionHeader
             eyebrow={isReviews ? "Latest" : "Directory"}
-            heading={isReviews ? "Fresh Off the Plate" : "Recently Added"}
+            heading={isReviews ? "Fresh Off the Plate" : "Explore Food Spots"}
             subtext={
               isReviews
                 ? "The most recent critic reviews. Honest. Unfiltered."
@@ -35,7 +35,7 @@ export function LatestReviews({ places, variant = "reviews" }: LatestReviewsProp
             }
           />
           <Link
-            href="/browse"
+            href={isReviews ? "/reviews" : "/browse"}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -59,7 +59,7 @@ export function LatestReviews({ places, variant = "reviews" }: LatestReviewsProp
           className="latest-grid"
         >
           {limited.map((place) => (
-            <ReviewCard key={place.slug} place={place} variant="vertical" />
+            <PlaceListCard key={place.slug} place={place} />
           ))}
         </div>
       </div>

@@ -5,6 +5,8 @@ import Script from "next/script";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 
+import { getSiteUrl } from "@/lib/site-url";
+import { serializeJsonLd } from "@/lib/security/json-ld";
 import "./globals.css";
 
 const bebasNeue = Bebas_Neue({
@@ -16,8 +18,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
 
-const siteUrl = "https://whenwihungry.vercel.app";
-const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "whenwihungry.com";
+const siteUrl = getSiteUrl();
+const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN?.trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -27,9 +29,6 @@ export const metadata: Metadata = {
   },
   description:
     "Jamaica's boldest food critic. No fake ratings, no sponsored plates, no corporate nonsense — just honest Jamaican food reviews.",
-  alternates: {
-    canonical: "/"
-  },
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
@@ -79,7 +78,7 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify([
+            __html: serializeJsonLd([
               {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
@@ -109,14 +108,15 @@ export default function RootLayout({
             ])
           }}
         />
-        <Script
+        {plausibleDomain && <Script
           defer
           data-domain={plausibleDomain}
           src="https://plausible.io/js/script.js"
           strategy="afterInteractive"
-        />
+        />}
+        <a className="skip-link" href="#main-content">Skip to main content</a>
         <Navbar />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
       </body>
     </html>

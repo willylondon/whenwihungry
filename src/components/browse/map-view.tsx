@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import Link from "next/link";
 import L from "leaflet";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { PlaceListCard } from "@/components/browse/place-list-card";
-import type { Place } from "@/data/places";
+import type { MapPlace } from "./map-view-wrapper";
 
 const icon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -20,7 +19,7 @@ const icon = L.icon({
 });
 
 type MapViewProps = {
-  places: Place[];
+  places: MapPlace[];
 };
 
 export default function MapView({ places }: MapViewProps) {
@@ -35,13 +34,12 @@ export default function MapView({ places }: MapViewProps) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {places.map((place) => {
-          if (!place.lat || !place.lng) return null;
+          if (!Number.isFinite(place.lat) || !Number.isFinite(place.lng)) return null;
           return (
-            <Marker key={place.slug} position={[place.lat, place.lng]} icon={icon}>
-              <Popup className="custom-popup">
-                <div style={{ width: "320px" }}>
-                  <PlaceListCard place={place} />
-                </div>
+            <Marker key={place.slug} position={[place.lat!, place.lng!]} icon={icon}>
+              <Popup className="custom-popup" maxWidth={260}>
+                <Link href={`/places/${place.slug}`}>{place.name}</Link>
+                <p>{place.area || place.parish}</p>
               </Popup>
             </Marker>
           );

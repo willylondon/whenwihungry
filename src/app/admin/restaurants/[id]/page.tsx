@@ -1,16 +1,19 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
+import { isUuid } from "@/lib/validation";
 import { notFound } from "next/navigation";
-import { saveRestaurantAction, addDishAction, addKeywordAction } from "@/app/admin/restaurants/actions";
+import { saveRestaurantAction, publishCriticReviewAction, addDishAction, addKeywordAction } from "@/app/admin/restaurants/actions";
 
-export default async function EditRestaurantPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditRestaurantPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; updated?: string }> }) {
   const { id } = await params;
-  const supabase = await createSupabaseServerClient();
+  const supabase = await requireAdmin("/admin/restaurants");
+  if (!isUuid(id)) notFound();
+  const feedback = await searchParams;
   
   const [
-    { data: r },
-    { data: adminReview },
-    { data: dishes },
-    { data: keywords }
+    { data: r, error: restaurantError },
+    { data: adminReview, error: reviewError },
+    { data: dishes, error: dishError },
+    { data: keywords, error: keywordError }
   ] = await Promise.all([
     supabase.from("restaurants").select("*").eq("id", id).single(),
     supabase.from("admin_reviews").select("*").eq("restaurant_id", id).maybeSingle(),
@@ -18,12 +21,17 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
     supabase.from("search_keywords").select("*").eq("restaurant_id", id)
   ]);
 
+  if (restaurantError) return <div className="container section"><h1>Restaurant unavailable</h1><p>We could not load this listing. Refresh to try again.</p></div>;
   if (!r) notFound();
 
   return (
-    <main style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
+    <div style={{ background: "var(--wwh-bg)", minHeight: "100vh", padding: "100px 0" }}>
       <div className="container" style={{ maxWidth: "800px" }}>
         <h1 style={{ color: "#fff", marginBottom: "40px" }}>Edit: {r.name}</h1>
+        {feedback.error && <p role="alert" className="form-alert">{ERRORS[feedback.error] || "This change could not be saved. Check the form and retry."}</p>}
+        {feedback.updated && <p role="status" className="form-success">{SUCCESSES[feedback.updated] || "Change saved."}</p>}
+        {(dishError || keywordError) && <p role="alert">Some menu or keyword data could not be loaded. Refresh before editing it.</p>}
+        <p>Listing information and critic publication are saved separately. New listings require approval in Listing moderation.</p>
         
         <form action={saveRestaurantAction} style={{ display: "grid", gap: "24px" }}>
           <input type="hidden" name="id" value={r.id} />
@@ -67,7 +75,7 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
              </div>
              <div>
                <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>PRICE LEVEL (1-4)</label>
-               <input type="number" name="price_level" defaultValue={r.price_level || 2} min="1" max="4" style={inputStyle} />
+               <input type="number" name="price_level" defaultValue={r.price_level ?? (typeof r.price_range === "string" && /^\${1,4}$/.test(r.price_range) ? r.price_range.length : "")} placeholder="Unknown" min="1" max="4" style={inputStyle} />
              </div>
           </div>
 
@@ -77,32 +85,13 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
           </div>
 
           <div className="form-group">
-            <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>DESCRIPTION / HONEST TAKE</label>
+            <label style={{ display: "block", color: "var(--wwh-accent)", fontSize: "0.8rem", fontWeight: 700, marginBottom: "8px" }}>LISTING DESCRIPTION</label>
             <textarea name="description" defaultValue={r.description || ""} style={{ ...inputStyle, minHeight: "120px" }} />
           </div>
 
-          <div style={{ padding: "24px", background: "rgba(255,90,31,0.05)", borderRadius: "12px", border: "1px solid rgba(255,90,31,0.2)" }}>
-            <h3 style={{ color: "var(--wwh-accent)", marginTop: 0, fontSize: "1rem", textTransform: "uppercase" }}>Critic Authority</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "16px" }}>
-               <div>
-                  <label style={{ display: "block", color: "#fff", fontSize: "0.8rem", marginBottom: "8px" }}>VERDICT</label>
-                  <select name="verdict" defaultValue={adminReview?.verdict || "MID"} style={inputStyle}>
-                    <option value="RUN_GO_GET_IT">🔥 RUN GO GET IT</option>
-                    <option value="WORTH_IT">👍 WORTH IT</option>
-                    <option value="MID">😐 MID</option>
-                    <option value="SAVE_YOUR_MONEY">🚫 SAVE YOUR MONEY</option>
-                  </select>
-               </div>
-               <div>
-                  <label style={{ display: "block", color: "#fff", fontSize: "0.8rem", marginBottom: "8px" }}>ADMIN SCORE (0-100)</label>
-                  <input type="number" name="admin_score" defaultValue={adminReview?.admin_score || 50} style={inputStyle} />
-               </div>
-            </div>
-            <div style={{ marginTop: "16px" }}>
-               <label style={{ display: "block", color: "#fff", fontSize: "0.8rem", marginBottom: "8px" }}>ADMIN BOOST (Affects final rank)</label>
-               <input type="number" name="admin_boost" defaultValue={r.admin_boost || 0} style={inputStyle} step="0.1" />
-            </div>
-          </div>
+          <label>Ranking adjustment (-100 to 100)
+            <input type="number" name="admin_boost" defaultValue={r.admin_boost ?? 0} min="-100" max="100" step="0.1" style={inputStyle} />
+          </label>
 
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
              <label style={{ color: "#fff", display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
@@ -123,6 +112,26 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
             Save Restaurant Changes
           </button>
         </form>
+
+        <section aria-labelledby="critic-editor" style={{ marginTop: 48, padding: 24, border: "1px solid var(--wwh-border)", borderRadius: 12 }}>
+          <h2 id="critic-editor">Publish a critic review</h2>
+          <p>This publishes an actual critic visit. Saving the listing above never creates a verdict. Editing a published review preserves its original publication date.</p>
+          {reviewError ? <p role="alert">The review could not be loaded, or duplicate review records need resolution. Publishing is unavailable until this is fixed.</p> : <form action={publishCriticReviewAction} style={{ display: "grid", gap: 20 }}>
+            <input type="hidden" name="id" value={r.id} />
+            <label>Review headline<input name="headline" defaultValue={adminReview?.headline ?? ""} required minLength={5} maxLength={200} style={inputStyle} /></label>
+            <label>Honest take<textarea name="honest_take" defaultValue={adminReview?.honest_take ?? ""} required minLength={30} maxLength={10000} rows={8} style={inputStyle} /></label>
+            <label>Verdict<select name="verdict" defaultValue={adminReview?.verdict ?? ""} required style={inputStyle}>
+              <option value="">Choose the actual verdict</option>
+              <option value="RUN_GO_GET_IT">RUN GO GET IT</option><option value="WORTH_IT">WORTH IT</option>
+              <option value="MID">MID</option><option value="SAVE_YOUR_MONEY">SAVE YOUR MONEY</option>
+            </select></label>
+            <label>Critic score (0–100)<input type="number" name="admin_score" defaultValue={adminReview?.admin_score ?? ""} required min={0} max={100} step={1} style={inputStyle} /></label>
+            <label>Actual visit date<input type="date" name="visit_date" defaultValue={adminReview?.visit_date ?? ""} required max={new Date().toISOString().slice(0, 10)} style={inputStyle} /></label>
+            {adminReview?.created_at && <p>Original publication: {new Date(adminReview.created_at).toLocaleDateString("en-JM", { timeZone: "UTC" })}</p>}
+            <label><input type="checkbox" name="publish_confirmed" required /> I confirm this is a real critic review and want to publish it</label>
+            <button type="submit" className="btn btn-primary">{adminReview ? "Publish review changes" : "Publish critic review"}</button>
+          </form>}
+        </section>
 
         <hr style={{ margin: "64px 0", borderColor: "rgba(255,255,255,0.1)" }} />
 
@@ -160,7 +169,7 @@ export default async function EditRestaurantPage({ params }: { params: Promise<{
            </form>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -173,4 +182,18 @@ const inputStyle = {
   color: "#fff",
   fontFamily: "var(--wwh-font-body)",
   outline: "none"
+};
+
+const ERRORS: Record<string, string> = {
+  invalid: "Check the listing fields. Use a Jamaican parish, a lowercase URL slug, price 1–4 or blank, and valid http/https image URL.",
+  save_failed: "The listing change could not be confirmed. It may be missing or unavailable. Refresh and retry.",
+  review_invalid: "Add a headline, at least 30 characters of honest review, a chosen verdict, score 0–100, a valid past visit date, and confirm publication.",
+  review_unavailable: "The current review could not be read. Resolve database errors or duplicate reviews before publishing.",
+  review_failed: "Review publication could not be confirmed. The atomic publishing database function may be unavailable, or the save was denied. Refresh to check the current review before retrying.",
+  dish_failed: "The dish could not be saved. Refresh to check the menu before retrying.",
+  keyword_failed: "The keyword could not be saved. Refresh to check the list before retrying."
+};
+const SUCCESSES: Record<string, string> = {
+  listing: "Listing saved. Critic review unchanged.", review: "Critic review saved and marked reviewed. Public visibility still depends on listing approval and activity.",
+  unchanged: "Review already matches these details. Its date was preserved.", created: "Pending listing created. Approve it in Listing moderation when ready.", dish: "Dish saved.", keyword: "Keyword saved."
 };

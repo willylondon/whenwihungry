@@ -1,20 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { siteUrl } from "@/lib/site-url";
 import { getPublicFoodSpotCountLabel } from "@/lib/place-counts";
 
 export const revalidate = 21600;
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About the Anonymous Food Critic",
   description:
     "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
   openGraph: {
+    url: siteUrl("/about"),
     title: "About the Anonymous Food Critic | WhenWiHungry",
     description:
       "The anonymous food critic behind WhenWiHungry. No face. No bias. Just the honest truth about Jamaican food.",
     images: [
       {
-        url: "https://whenwihungry.vercel.app/og/whenwihungry-og.png",
+        url: siteUrl("/og/whenwihungry-og.png"),
         width: 1200,
         height: 630,
         alt: "WhenWiHungry — Jamaica's boldest food critic",
@@ -24,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["https://whenwihungry.vercel.app/og/whenwihungry-og.png"]
+    images: [siteUrl("/og/whenwihungry-og.png")]
   }
 };
 
@@ -257,7 +260,7 @@ export default async function AboutPage() {
             { value: "100K+", label: "Total Views" },
             { value: foodSpotCountLabel, label: "Food Spots Listed" },
             { value: "0", label: "Free Meals Accepted" }
-          ].map((stat) => (
+          ].filter(stat => stat.value != null).map((stat) => (
             <div key={stat.label}>
               <p
                 style={{
@@ -299,7 +302,7 @@ export default async function AboutPage() {
               { value: "100K+", label: "Total Views" },
               { value: foodSpotCountLabel, label: "Food Spots Mapped" },
               { value: "0", label: "Free Meals Accepted" }
-            ].map((s) => (
+            ].filter(stat => stat.value != null).map((s) => (
               <div key={s.label} style={{ padding: "24px 16px" }}>
                 <p style={{ margin: "0 0 6px", fontFamily: "var(--wwh-font-heading)", fontSize: "2.5rem", color: "var(--wwh-accent)", lineHeight: 1 }}>{s.value}</p>
                 <p style={{ margin: 0, color: "var(--wwh-muted)", fontFamily: "var(--wwh-font-body)", fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</p>
