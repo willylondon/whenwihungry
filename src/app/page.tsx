@@ -1,3 +1,4 @@
+import { ParishLinks } from "@/components/browse/parish-links";
 import { HeroSection } from "@/components/home/hero-section";
 import { FeaturedCritique } from "@/components/home/featured-critique";
 import { LatestReviews } from "@/components/home/latest-reviews";
@@ -11,7 +12,16 @@ import { getAllApprovedPlaces, CatalogUnavailableError, type PlaceV2 } from "@/l
 import { getPublicFoodSpotCountLabel } from "@/lib/place-counts";
 
 export const revalidate = 21600;
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = {
+  title: { absolute: "Jamaican Restaurants & Food Reviews | WhenWiHungry" },
+  description: "Find restaurants and food spots across Jamaica. Browse by parish, craving and price, with independent critic verdicts clearly marked where available.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Jamaican Restaurants & Food Reviews | WhenWiHungry",
+    description: "Discover food spots across Jamaica by parish, craving and price.",
+    url: "/", images: ["/og/whenwihungry-og.png"]
+  }
+};
 
 export default async function HomePage() {
   let allPlaces: PlaceV2[] = [];
@@ -41,6 +51,7 @@ export default async function HomePage() {
       {featuredReview && <FeaturedCritique place={featuredReview} />}
       {latestReviews.length > 0 && <LatestReviews places={latestReviews} variant="reviews" />}
       {recentListings.length > 0 && <LatestReviews places={recentListings} variant="listings" />}
+      {!unavailable && <ParishLinks places={allPlaces} />}
       <AboutSection />
       <RatingExplainer />
       <GetReviewedCta />

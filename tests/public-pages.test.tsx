@@ -14,7 +14,8 @@ vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: async () =
 
 import BrowsePage, { generateMetadata as browseMetadata } from "@/app/browse/page";
 import PlacePage, { generateMetadata as placeMetadata } from "@/app/places/[slug]/page";
-import LocationPage from "@/app/restaurants/[location]/page";
+import { ParishLinks } from "@/components/browse/parish-links";
+import LocationPage, { generateMetadata as locationMetadata } from "@/app/restaurants/[location]/page";
 import sitemap from "@/app/sitemap";
 
 const base: PlaceV2 = {
@@ -64,6 +65,27 @@ describe("public routes", () => {
     expect(await browseMetadata({ searchParams: Promise.resolve({ category: "Jerk" }) })).toMatchObject({ alternates: { canonical: "/browse?category=jerk" } });
     expect(await browseMetadata({ searchParams: Promise.resolve({ q: "jerk" }) })).toMatchObject({ robots: { index: false, follow: true } });
     expect(await placeMetadata({ params: Promise.resolve({ slug: base.slug }) })).toMatchObject({ alternates: { canonical: "/places/fixture-place" } });
+  });
+  it("indexes real collection pages with their own canonical and rejects out-of-range pages", async () => {
+    api.all.mockResolvedValue(Array.from({ length: 50 }, (_, i) => ({ ...base, slug: `place-${i}` })));
+    const browse = await browseMetadata({ searchParams: Promise.resolve({ category: "Jerk", page: "2" }) });
+    expect(browse.alternates?.canonical).toBe("/browse?category=jerk&page=2");
+    expect(browse.robots).toBeUndefined();
+    const local = await locationMetadata({ params: Promise.resolve({ location: "montego-bay" }), searchParams: Promise.resolve({ page: "2" }) });
+    expect(local.alternates?.canonical).toBe("/restaurants/st-james?page=2");
+    expect(local.robots).toBeUndefined();
+    expect(await browseMetadata({ searchParams: Promise.resolve({ page: "999" }) })).toMatchObject({ robots: { index: false }, alternates: { canonical: "/browse?page=3" } });
+    expect(await browseMetadata({ searchParams: Promise.resolve({ page: "2", sort: "az" }) })).toMatchObject({ robots: { index: false } });
+  });
+  it("links populated parish pages and excludes empty collections from the sitemap", async () => {
+    const doc = parse(renderToStaticMarkup(<ParishLinks places={[base]} />));
+    expect(doc.querySelector('a[href="/restaurants/st-james"]')).toBeTruthy();
+    expect(doc.querySelector('a[href="/restaurants/portland"]')).toBeNull();
+    const entries = await sitemap();
+    expect(entries.some(entry => entry.url.endsWith("/restaurants/st-james"))).toBe(true);
+    expect(entries.some(entry => entry.url.endsWith("/restaurants/portland"))).toBe(false);
+    expect(entries.some(entry => entry.url.endsWith("category=seafood"))).toBe(false);
+    expect(await browseMetadata({ searchParams: Promise.resolve({ category: "Seafood" }) })).toMatchObject({ robots: { index: false } });
   });
   it("renders St. James route using normalized public catalog data", async () => {
     const doc = parse(renderToStaticMarkup(await LocationPage({ params: Promise.resolve({ location: "st-james" }), searchParams: Promise.resolve({}) })));

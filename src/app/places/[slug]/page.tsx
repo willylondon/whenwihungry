@@ -1,3 +1,4 @@
+import { normalizeParish, getParishDisplayName } from "@/lib/location-validation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,10 +19,11 @@ export async function generateMetadata({ params }: PlacePageProps): Promise<Meta
   if (!place) return { title: "Food spot not found", robots: { index: false, follow: true } };
   const description = place.description || `${place.name} — ${place.category || "Food spot"} in ${place.parish}.`;
   const canonical = `/places/${place.slug}`;
+  const title = `${place.name}${place.parish ? ` in ${getParishDisplayName(place.parish)}` : ""}`;
   return {
-    title: place.name, description, alternates: { canonical },
-    openGraph: { title: `${place.name} | WhenWiHungry`, description, url: siteUrl(canonical), siteName: "WhenWiHungry", images: [{ url: place.image, alt: place.name }], type: "website" },
-    twitter: { card: "summary_large_image", title: place.name, description, images: [place.image] }
+    title, description, alternates: { canonical },
+    openGraph: { title: `${title} | WhenWiHungry`, description, url: siteUrl(canonical), siteName: "WhenWiHungry", images: [{ url: place.image, alt: place.name }], type: "website" },
+    twitter: { card: "summary_large_image", title, description, images: [place.image] }
   };
 }
 
@@ -39,6 +41,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     supabase.from("user_reviews").select("id, rating, comment, created_at").eq("restaurant_id", place.id).eq("status", "approved").order("created_at", { ascending: false }).limit(50),
     user ? supabase.from("user_reviews").select("id").eq("restaurant_id", place.id).eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null, error: null })
   ]);
+  const parish = normalizeParish(place.parish);
   const hasCriticReview = isCriticReviewed(place);
   const videoUrl = getReviewVideoUrl(place);
   const publishedDate = place.published_at || place.reviewed_at;
@@ -61,7 +64,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(reviewSchema ? [restaurantSchema, reviewSchema] : restaurantSchema) }} />
     <header className="place-hero" style={{ backgroundImage: `linear-gradient(to top, #0b0b0b, rgba(11,11,11,.65)), url(${place.image})` }}>
       <div className="place-container">
-        <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span><span>{place.name}</span></nav>
+        <nav aria-label="Breadcrumb"><Link href="/browse">Food spots</Link><span aria-hidden="true"> / </span>{parish && <><Link href={`/restaurants/${parish.replace(/ /g, "-")}`}>{getParishDisplayName(parish)}</Link><span aria-hidden="true"> / </span></>}<span>{place.name}</span></nav>
         <p className="place-status">{getPlaceStatusLabel(place)}</p>
         <h1>{place.name}</h1>
         {hasCriticReview && <VerdictBadge verdict={place.verdict} size="lg" />}
