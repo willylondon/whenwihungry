@@ -1949,8 +1949,7 @@ p { color: var(--ink-soft); font-size: 1rem; line-height: 1.65; }
 .view-list .browse-card-body { padding-top: 0; }
 .view-list .directory-results { display: grid; gap: 28px; }
 .listing-placeholder { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; padding: 16px; text-align: center; background: var(--concrete); color: var(--ink); }
-.listing-placeholder-icon { font-size: 2rem; line-height: 1; filter: grayscale(0.2); }
-.listing-placeholder-text { font-family: var(--font-display-stack); font-size: 1.05rem; }
+.listing-placeholder-text { font-family: var(--font-display-stack); font-size: 1.4rem; line-height: 1.1; }
 .listing-placeholder-note { color: var(--ink-soft); font-size: 0.82rem; font-weight: 600; }
 .photo-credit { position: absolute; right: 8px; bottom: 8px; margin: 0; padding: 2px 8px; border-radius: 4px; background: rgba(36,27,22,.72); color: #f6efe6; font-size: 0.7rem; font-weight: 600; pointer-events: none; }
 @media (max-width: 640px) { .view-list .browse-card-link { grid-template-columns: minmax(0,1fr); } }
@@ -2060,6 +2059,20 @@ p { color: var(--ink-soft); font-size: 1rem; line-height: 1.65; }
 .get-reviewed-grid ol { margin: 0 0 16px; padding-left: 22px; color: var(--ink); line-height: 1.8; }
 .get-reviewed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 @media (max-width: 860px) { .get-reviewed-grid { grid-template-columns: 1fr !important; } }
+
+/* ── Auth, forms and plain text pages ─── */
+.auth-shell h1 { font-size: clamp(2.2rem, 4.2vw, 3.25rem); letter-spacing: 0; }
+.auth-shell .form-card { padding: 28px; }
+.form-card label { font-family: var(--font-text-stack); font-weight: 700; color: var(--ink); }
+.prose-page { max-width: 72ch; }
+.prose-page h1 { margin-bottom: 8px; }
+.prose-page h2 { font-size: 1.4rem; margin: 36px 0 10px; }
+.prose-page p { margin-bottom: 14px; }
+.prose-page .btn { margin-top: 20px; }
+.not-found { max-width: 640px; padding: 24px 0 40px; }
+.not-found h1 { margin-bottom: 14px; }
+.not-found > p { font-size: 1.1rem; margin-bottom: 24px; }
+.not-found .not-found-links { margin-top: 18px; font-size: 1rem; }
 
 /* Motion: only what the reader triggers; respect reduced motion */
 @media (prefers-reduced-motion: reduce) {

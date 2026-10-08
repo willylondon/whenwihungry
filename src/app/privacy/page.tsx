@@ -8,8 +8,7 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  return <section className="section"><div className="container" style={{ maxWidth: 800 }}>
-    <span className="eyebrow">WhenWiHungry</span>
+  return <section className="section"><div className="container prose-page">
     <h1>Privacy and contact</h1>
     <p>Last updated: 7 October 2026.</p>
     <h2>Browsing and accounts</h2>

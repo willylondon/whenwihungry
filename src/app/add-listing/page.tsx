@@ -23,8 +23,7 @@ export default async function AddListingPage({ searchParams }: AddListingPagePro
     <section className="section auth-page">
       <div className="container auth-shell">
         <div>
-          <span className="eyebrow">Community picks</span>
-          <h1>Add a restaurant for WWH to check out.</h1>
+          <h1>Suggest a food spot</h1>
           <p>
             Submit the spot with enough context for people to trust it. New
             listings stay pending until approved.

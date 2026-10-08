@@ -21,7 +21,6 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
     <section className="section auth-page">
       <div className="container auth-shell">
         <div>
-          <span className="eyebrow">Join the table</span>
           <h1>Sign in to recommend a spot.</h1>
           <p>Add restaurants, rate the places you have tried, and help the best spots rise naturally.</p>
         </div>

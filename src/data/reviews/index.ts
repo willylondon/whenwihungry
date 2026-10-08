@@ -28,9 +28,9 @@ export function formatReviewDate(value: string) {
   return new Intl.DateTimeFormat("en-JM", { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
 }
 
-export const VERDICT_LABELS: Record<WrittenReview["verdict"], { emoji: string; label: string }> = {
-  RUN_GO_GET_IT: { emoji: "🔥", label: "Run Go Get It" },
-  WORTH_IT: { emoji: "👍", label: "Worth It" },
-  MID: { emoji: "😐", label: "Mid" },
-  SAVE_YOUR_MONEY: { emoji: "🚫", label: "Save Your Money" }
+export const VERDICT_LABELS: Record<WrittenReview["verdict"], { label: string }> = {
+  RUN_GO_GET_IT: { label: "Run Go Get It" },
+  WORTH_IT: { label: "Worth It" },
+  MID: { label: "Mid" },
+  SAVE_YOUR_MONEY: { label: "Save Your Money" }
 };
