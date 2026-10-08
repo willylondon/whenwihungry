@@ -42,17 +42,11 @@ export function PlaceListCard({ place, showMatchReason = false }: { place: Place
   );
 }
 
-const CATEGORY_ICONS: [RegExp, string][] = [
-  [/jerk|grill|bbq/i, "🔥"], [/sea ?food|fish|lobster/i, "🐟"], [/bak|pastr|patty|patties/i, "🥐"], [/ice cream|dessert|sweet/i, "🍨"],
-  [/bar|lounge|pub/i, "🍹"], [/chinese|asian|sushi|japanese/i, "🥢"], [/pizza|italian/i, "🍕"], [/vegan|vegetarian|ital/i, "🥗"], [/caf|coffee/i, "☕"]
-];
-
-/** Shown instead of a photo we don't have the rights to use. */
+/** Shown instead of a photo we don't have: the spot's category, set in the display face. */
 function ListingPlaceholder({ category, parish }: { category?: string; parish?: string }) {
-  const icon = CATEGORY_ICONS.find(([pattern]) => pattern.test(category ?? ""))?.[1] ?? "🍽️";
   return <div className="listing-placeholder" aria-hidden="true">
-    <span className="listing-placeholder-icon">{icon}</span>
-    <span className="listing-placeholder-text">{category || "Food spot"}{parish ? ` · ${parish}` : ""}</span>
+    <span className="listing-placeholder-text">{category || "Food spot"}</span>
+    {parish && <span className="listing-placeholder-note">{parish}</span>}
     <span className="listing-placeholder-note">Photo coming soon</span>
   </div>;
 }

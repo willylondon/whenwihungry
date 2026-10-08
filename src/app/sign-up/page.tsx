@@ -18,9 +18,8 @@ export default async function SignUpPage({ searchParams }: SignUpPageProps) {
     <section className="section auth-page">
       <div className="container auth-shell">
         <div>
-          <span className="eyebrow">Add your voice</span>
           <h1>Create an account for ratings and listings.</h1>
-          <p>Your ratings and comments help When Wi Hungry recommend restaurants people are actually enjoying.</p>
+          <p>Your ratings and comments help WhenWiHungry recommend restaurants people are actually enjoying.</p>
         </div>
         <form action={signUpAction} className="card form-card">
           {error ? <p className="form-alert" role="alert">{error}</p> : null}

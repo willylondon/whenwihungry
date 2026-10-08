@@ -27,7 +27,7 @@ export default async function ResetPasswordPage({ searchParams }: {
           <PasswordField label="New password" minLength={8} name="password" />
           <PasswordField label="Confirm new password" minLength={8} name="confirmPassword" />
           <button className="btn btn-primary" type="submit">Update password</button>
-          <Link href="/">Back to When Wi Hungry</Link>
+          <Link href="/">Back to WhenWiHungry</Link>
         </form>
       </div>
     </section>

@@ -13,7 +13,7 @@ import { serializeJsonLd } from "@/lib/security/json-ld";
 import { siteUrl } from "@/lib/site-url";
 import { hasListingPhoto } from "@/lib/image-config";
 import { directionsUrl, googleMapsPlaceUrl, telUrl } from "@/lib/maps-links";
-import { VERDICT_LABELS, formatReviewDate, getWrittenReviewForPlace } from "@/data/reviews";
+import { formatReviewDate, getWrittenReviewForPlace } from "@/data/reviews";
 
 type PlacePageProps = { params: Promise<{ slug: string }> };
 
@@ -109,7 +109,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
             <h2 id="written-review-heading"><Link href={written.path}>{written.title}</Link></h2>
             <p>{written.teaser}</p>
             <dl className="place-written-scores">
-              <div><dt>Verdict</dt><dd>{VERDICT_LABELS[written.verdict].emoji} {VERDICT_LABELS[written.verdict].label}</dd></div>
+              <div><dt>Verdict</dt><dd><VerdictBadge verdict={written.verdict} size="sm" /></dd></div>
               {written.scores.map(score => <div key={score.label}><dt>{score.label}</dt><dd>{score.value}</dd></div>)}
             </dl>
             <p className="rating-provenance">Visited {formatReviewDate(written.visited)}{written.hosted && written.disclosureShort ? ` · ${written.disclosureShort}` : ""}</p>

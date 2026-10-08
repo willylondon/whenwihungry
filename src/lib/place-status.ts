@@ -99,9 +99,6 @@ export function getPlaceDetailHeading(place: PlaceStatusLike): string {
   return { "critic-reviewed": "Critic Verdict", "tiktok-reviewed": "TikTok Review", listed: "Listing Info" }[getPlaceStatus(place)];
 }
 
-export function getPlaceStatusEmoji(place: PlaceStatusLike): string {
-  return { "critic-reviewed": "🖋️", "tiktok-reviewed": "🎬", listed: "📍" }[getPlaceStatus(place)];
-}
 
 export function isCriticReviewed(place: PlaceStatusLike): boolean { return getPlaceStatus(place) === "critic-reviewed"; }
 export function isTikTokReviewed(place: PlaceStatusLike): boolean { return getPlaceStatus(place) === "tiktok-reviewed"; }

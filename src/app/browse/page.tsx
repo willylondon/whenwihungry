@@ -30,7 +30,7 @@ const CATEGORY_META: Record<string, { title: string; description: string }> = {
 
 const CATEGORY_INTRO: Record<string, { heading: string; paragraphs: string[] }> = {
   jerk: {
-    heading: "Jerk Chicken, Jerk Pork, and Roadside Smoke Across Jamaica",
+    heading: "Jerk chicken, jerk pork and roadside smoke across Jamaica",
     paragraphs: [
       "Jerk is one of Jamaica's most searched food categories, but not every smoky grill tells the same story. This page helps map jerk chicken, jerk pork, roadside smoke spots, and pimento-style flavour across Jamaica — from well-known jerk capitals to the side-of-the-road pan spots that locals guard jealously.",
       "Some spots listed here are directory listings — mapped, tagged, and ready for discovery. Others have already been visited by the anonymous WhenWiHungry critic and carry a verdict or a TikTok review. Critic verdicts are added as they go live, and they are clearly separated from public rating signals.",
@@ -38,7 +38,7 @@ const CATEGORY_INTRO: Record<string, { heading: string; paragraphs: string[] }> 
     ]
   },
   seafood: {
-    heading: "Fish, Lobster, Conch, Shrimp, and Beachside Seafood Spots",
+    heading: "Fish, lobster, conch, shrimp and beachside seafood spots",
     paragraphs: [
       "Seafood in Jamaica is more than a menu category. It can mean fried fish by the beach, lobster by the coast, conch when it is available, shrimp, escoveitch, steamed fish, and those spots people drive out of parish to find. This page maps seafood food spots across Jamaica using public signals, category data, and WhenWiHungry verdicts where available.",
       "Some seafood spots are directory listings — mapped to help you discover what is out there. Others carry a real critic verdict or a TikTok review from the anonymous WhenWiHungry critic. Public rating signals from Google are shown for discovery, but real verdicts are clearly marked so you always know what has been reviewed and what has not.",
