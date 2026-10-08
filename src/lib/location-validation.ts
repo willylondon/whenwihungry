@@ -28,6 +28,26 @@ export function normalizeParish(input: string | null | undefined): string {
 
 export function getAllParishNames(): string[] { return Object.keys(PARISH_ALIASES); }
 
+const ALIAS_PATTERNS = Object.entries(PARISH_ALIASES)
+  .flatMap(([parish, aliases]) => aliases.map(alias => ({ parish, alias })))
+  .sort((a, b) => b.alias.length - a.alias.length);
+
+/**
+ * Pull a parish or well-known town out of a free-text search, so "seafood portland"
+ * searches "seafood" within Portland. Returns the query unchanged when no place is named.
+ */
+export function extractParishFromQuery(query: string): { text: string; parish: string | null } {
+  const normalized = normalizeLocationText(query);
+  for (const { parish, alias } of ALIAS_PATTERNS) {
+    const match = new RegExp(`(^|\\s)(?:in\\s+)?${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=\\s|$)`).exec(normalized);
+    if (match) {
+      const text = (normalized.slice(0, match.index) + " " + normalized.slice(match.index + match[0].length)).replace(/\s+/g, " ").trim();
+      return { text, parish: getParishDisplayName(parish) };
+    }
+  }
+  return { text: query.trim(), parish: null };
+}
+
 export function getParishDisplayName(parish: string): string {
   const key = normalizeParish(parish);
   return key ? key.split(" ").map((word) => word === "st" ? "St." : word[0].toUpperCase() + word.slice(1)).join(" ") : parish;

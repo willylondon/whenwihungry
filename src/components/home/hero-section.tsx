@@ -5,7 +5,8 @@ import type { WrittenReview } from "@/data/reviews";
 
 type Props = { foodSpotCountLabel?: string | null; latestReview?: WrittenReview };
 
-const TRIES = ["oxtail", "curry goat", "jerk chicken", "ice cream", "date night"];
+// Searches the directory can answer today; dish names come back once listings carry dish data.
+const TRIES = ["jerk chicken", "seafood negril", "patty", "ice cream", "date night"];
 
 /** Opens with the critic's voice and the newest real plate, not a stock photo. */
 export function HeroSection({ foodSpotCountLabel = null, latestReview }: Props) {

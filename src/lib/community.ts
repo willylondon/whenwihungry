@@ -156,6 +156,12 @@ async function attachApprovedRatings(supabase: Supabase, rows: Row[], operation:
   return rows.map((row) => ({ ...row, user_reviews: grouped.get(String(row.id)) ?? [] }));
 }
 
+/** Some imported listings carry invented ids sharing one prefix; Maps links must not trust them. */
+const INVENTED_PLACE_ID_PREFIX = "ChIJT-e8P-BxXo4Rf_f_";
+export function isUsablePlaceId(value: string): boolean {
+  return /^[A-Za-z0-9_-]{10,300}$/.test(value) && !value.startsWith(INVENTED_PLACE_ID_PREFIX);
+}
+
 function finiteNumber(value: unknown): number | undefined {
   if (value === null || value === undefined || (typeof value === "string" && value.trim() === "") || typeof value === "boolean") return undefined;
   const number = Number(value);
@@ -220,7 +226,7 @@ export function dbRowToPlace(restaurant: Row): PlaceV2 {
     hours: strings(restaurant.hours),
     image: listingImage(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
     image_credit: listingImageCredit(restaurant, process.env.NEXT_PUBLIC_SUPABASE_URL),
-    google_place_id: /^[A-Za-z0-9_-]{10,300}$/.test(stringValue(restaurant.google_place_id)) ? stringValue(restaurant.google_place_id) : null,
+    google_place_id: isUsablePlaceId(stringValue(restaurant.google_place_id)) ? stringValue(restaurant.google_place_id) : null,
     lat: validCoordinates ? lat : undefined,
     lng: validCoordinates ? lng : undefined,
     parish: stringValue(restaurant.parish),
@@ -282,7 +288,7 @@ const loadCatalogRows = unstable_cache(async (): Promise<Row[]> => {
   const supabase = getClient("browse");
   const rows = await readAllPages((from, to) => publicQuery(supabase).range(from, to), "browse");
   return attachApprovedRatings(supabase, eligibleRows(rows, "browse"), "browse");
-}, ["public-catalog-rows-v2"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-rows-v3"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> => {
   const supabase = getClient("detail");
@@ -291,7 +297,7 @@ const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> =>
   if (!eligible.length) return null;
   if (eligible.length !== 1) return reportUnavailable("detail", new Error("Duplicate restaurant slug"));
   return (await attachApprovedRatings(supabase, eligible, "detail"))[0];
-}, ["public-catalog-detail-v2"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-detail-v3"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 export const getAllApprovedPlaces = cache(async (): Promise<PlaceV2[]> => (await loadCatalogRows()).map(dbRowToPlace));
 

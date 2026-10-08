@@ -109,7 +109,7 @@ export function getFilteredPlaces(filters: {
       case "az":
         return byName;
       default:
-        if (filters.query?.trim()) return (right.final_score ?? 0) - (left.final_score ?? 0) || byName;
+        if (filters.query?.trim()) return (right.final_score ?? 0) - (left.final_score ?? 0) || recommendationScore(right) - recommendationScore(left) || mixOrder(left.slug) - mixOrder(right.slug) || byName;
         // Ties (most listings) use a stable shuffle so the list mixes parishes instead of reading A to Z.
         return recommendationScore(right) - recommendationScore(left) || mixOrder(left.slug) - mixOrder(right.slug) || byName;
     }

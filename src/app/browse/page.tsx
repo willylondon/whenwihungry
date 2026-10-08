@@ -8,6 +8,8 @@ import { PlaceListCard } from "@/components/browse/place-list-card";
 import { SearchFilters } from "@/components/browse/search-filters";
 import { getAllApprovedPlaces, searchRestaurants, type PlaceV2 } from "@/lib/community";
 import { categories, getFilteredPlaces, getParishStats } from "@/lib/places";
+import { extractParishFromQuery } from "@/lib/location-validation";
+import { isLooseMatch } from "@/lib/search/helpers";
 
 type BrowsePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -96,18 +98,16 @@ export async function generateMetadata({ searchParams }: BrowsePageProps): Promi
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const params = normalizeBrowseParams(await searchParams);
   const q = params.q || params.query || params.search || "";
-  
-  let allPlaces: PlaceV2[] = [];
-  
-  if (q) {
-    allPlaces = await searchRestaurants(q);
-  } else {
-    allPlaces = await getAllApprovedPlaces();
-  }
+  // "seafood portland" searches "seafood" within Portland, unless a parish filter is already set.
+  const named = params.parish ? { text: q, parish: null } : extractParishFromQuery(q);
+  const searchText = named.text;
+  const parish = params.parish || named.parish || undefined;
+
+  const allPlaces: PlaceV2[] = searchText ? await searchRestaurants(searchText) : await getAllApprovedPlaces();
 
   const results = getFilteredPlaces({
-    query: q,
-    parish: params.parish,
+    query: searchText,
+    parish,
     category: params.category,
     price: params.price,
     rating: params.rating,
@@ -156,15 +156,18 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         
         <SearchFilters
           activeCategory={params.category}
-          activeParish={params.parish}
+          activeParish={parish}
           activePrice={params.price}
-          activeQuery={q}
+          activeQuery={named.parish ? searchText : q}
           activeRating={params.rating}
           activeSort={params.sort}
           activeView={view}
           categories={categories}
           parishes={getParishStats(allPlaces).map((item) => item.name)}
         />
+        {searchText && results.length > 0 && results.every(isLooseMatch) && <p className="search-notice" role="status">
+          No spots mention &ldquo;{searchText}&rdquo; yet{parish ? ` in ${parish}` : ""}. These are related spots that might scratch the itch.
+        </p>}
         {results.length > 0 && <p className="result-summary" role="status">Showing {pagination.offset + 1}–{pagination.offset + pagination.items.length} of {results.length} food spots</p>}
         <div className={`results-shell view-${view}`}>
           <div className="results-column directory-results">
