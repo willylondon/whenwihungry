@@ -266,6 +266,16 @@ describe("production searchRestaurants data path", () => {
     expect(results[0].slug).toBe("spot-0");
     expect(results[204].slug).toBe("spot-204");
   });
+  it("adds strong local matches the database ranking missed, below the database results", async () => {
+    const bakery = restaurant({ id: "bakery", slug: "the-bakery", name: "The Bakery", dish_tags: ["patty"] });
+    const juici = restaurant({ id: "juici", slug: "juici-patties", name: "Juici Patties", category: "Patties" });
+    const unrelated = restaurant({ id: "other", slug: "other-spot", name: "Other Spot", category: "Seafood" });
+    state.client = catalogDb({ restaurants: [bakery, juici, unrelated], search_restaurants: [{ id: "bakery", final_score: 70, match_reason: "Dish tag match" }] });
+    const results = await searchRestaurants("patty");
+    expect(results.map((place) => place.slug)).toEqual(["the-bakery", "juici-patties"]);
+    expect(results[0].final_score).toBe(70);
+    expect(results[1].final_score).toBeLessThan(70);
+  });
   it("falls back to the shared approved full-row search on an unavailable RPC", async () => {
     state.client = catalogDb({ restaurants: [restaurant({ name: "Jerk Chicken Hut", description: "Smoky chicken", slug: "chicken" }), restaurant({ id: "dessert", name: "Ice Cream", slug: "dessert", description: "Jamaican dessert" })] }, { errors: { search_restaurants: "RPC not found" } });
     expect((await searchRestaurants("fry chicken")).map((place) => place.slug)).toEqual(["chicken"]);

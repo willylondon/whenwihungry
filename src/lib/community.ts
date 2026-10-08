@@ -9,7 +9,7 @@ import type { Place } from "@/data/places";
 import { getPublishedCriticReview, getReviewVideoUrl, getTikTokContactUrl, safeWebUrl, validReviewDate } from "@/lib/place-status";
 import { getPublicExclusionReasons } from "@/lib/place-visibility";
 import { buildRestaurantSearchDocument, rankPlacesForQuery, type RestaurantSearchDocument } from "@/lib/search/engine";
-import { normalizeSearchQuery } from "@/lib/search/helpers";
+import { isLooseMatch, normalizeSearchQuery } from "@/lib/search/helpers";
 
 type Row = Record<string, any>;
 type Supabase = SupabaseClient<any, any, any>;
@@ -288,7 +288,7 @@ const loadCatalogRows = unstable_cache(async (): Promise<Row[]> => {
   const supabase = getClient("browse");
   const rows = await readAllPages((from, to) => publicQuery(supabase).range(from, to), "browse");
   return attachApprovedRatings(supabase, eligibleRows(rows, "browse"), "browse");
-}, ["public-catalog-rows-v3"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-rows-v4"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> => {
   const supabase = getClient("detail");
@@ -297,7 +297,7 @@ const loadPlaceRow = unstable_cache(async (slug: string): Promise<Row | null> =>
   if (!eligible.length) return null;
   if (eligible.length !== 1) return reportUnavailable("detail", new Error("Duplicate restaurant slug"));
   return (await attachApprovedRatings(supabase, eligible, "detail"))[0];
-}, ["public-catalog-detail-v3"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
+}, ["public-catalog-detail-v4"], { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_CACHE_TAG] });
 
 export const getAllApprovedPlaces = cache(async (): Promise<PlaceV2[]> => (await loadCatalogRows()).map(dbRowToPlace));
 
@@ -360,13 +360,18 @@ export async function searchRestaurants(query: string): Promise<PlaceV2[]> {
     if (!(cause instanceof CatalogUnavailableError)) throw cause;
     // An old/missing RPC can degrade to full-row search, never to a false empty catalog.
   }
-  if (ranked.length) {
-    const results = await hydrateSearchRows(supabase, ranked);
-    if (results.length) return results;
-  }
+  const fromDatabase = ranked.length ? await hydrateSearchRows(supabase, ranked) : [];
   const all = await getAllApprovedPlaces();
   const candidates = all.filter((place): place is PlaceV2 & { search_document: RestaurantSearchDocument } => Boolean(place.search_document));
-  return rankPlacesForQuery(normalized, candidates);
+  const local = rankPlacesForQuery(normalized, candidates);
+  // The database ranks first; strong local matches it missed (e.g. "patty" vs "Patties") follow.
+  // Loose related matches only appear when nothing matched directly.
+  const seen = new Set(fromDatabase.map(place => place.slug));
+  const strongLocal = local.filter(place => !seen.has(place.slug) && !isLooseMatch(place));
+  if (!fromDatabase.length) return strongLocal.length ? strongLocal : local;
+  // Database scores are kept; local additions are placed just below them (the two use different scales).
+  const floor = Math.min(...fromDatabase.map(place => place.final_score ?? 0));
+  return [...fromDatabase, ...strongLocal.map((place, index) => ({ ...place, final_score: floor - (index + 1) / 1000 }))];
 }
 
 export type CommunityRestaurant = { id: string; slug: string; avg_rating: number; rating_count: number; positive_comment_count?: number; recommendation_score?: number };
