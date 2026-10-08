@@ -1,6 +1,6 @@
 # Kingston data pass: batch 2 (listings without their own website)
 
-Status: **applied 2026-10-08** after owner approval. Owner notes: the 7 listings in section A were removed (hidden as `not_food`); Shaggy Jerk Chicken is a street-side jerk man (description and category updated). Crepe House was held back pending confirmation. Previous values: `.tools/backups/kingston-batch-2-before-2026-10-08.json`.
+Status: **applied 2026-10-08** after owner approval. Owner notes: the 7 listings in section A were removed (hidden as `not_food`); Shaggy Jerk Chicken is a street-side jerk man (description and category updated). Crepe House was held, then applied from the Devon House listing the owner provided. Previous values: `.tools/backups/kingston-batch-2-before-2026-10-08.json`.
 
 These listings have no website, or only a social page that can't be read without logging in. So the descriptions use only what the listing already shows: the name, the type of place and the street. They're short and plain on purpose. Dish tags are added only where the name itself says what they serve (e.g. "Jerk Chicken", "Crepe House").
 
@@ -32,7 +32,7 @@ These listings have no website, or only a social page that can't be read without
 | Chef Kiss Ja | Restaurant on Constant Spring Road. | | Name "CHEF KISS Ja" → "Chef Kiss Ja" | |
 | Coded Frolic E-Sport Bar & Jerk Lounge | E-sports bar and jerk lounge on South Avenue. | jerk | | |
 | Cook Shop (Tavern Avenue) | Cookshop on Tavern Avenue. | | Category → Cook shop | |
-| Crepe House | *Held: owner described it as street food (jerk man), but the listing places it in Shop 23 at Devon House. Awaiting confirmation.* | | | |
+| Crepe House | Crêpe stand in the Artisan Village at Devon House on Hope Road, with sweet and savoury crêpes, both traditional and with Jamaican flavours. An easy on-the-go meal. Open daily, 10:30am–6pm. | crepes, dessert | Category → Crêpes; Instagram crepe_house_ja (from the Devon House listing the owner provided) |
 | Cupcakes By Pastry Passions | Cupcake bakery at the Half Way Tree Transport Centre. | cupcakes | | |
 | D'Lux Restaurant & Lounge | Restaurant and lounge on Caledonia Avenue. | | Name: drop the "\|" | |
 | Di Lot Restaurant & Bar | Restaurant and bar on Constant Spring Road. | | Name: drop the "\|" | |
