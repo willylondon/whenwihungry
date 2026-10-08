@@ -1907,6 +1907,7 @@ p { color: var(--ink-soft); font-size: 1rem; line-height: 1.65; }
 .filter-chip:hover { border-color: var(--ink); }
 .filter-chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
 .result-summary { color: var(--ink-soft); margin: 18px 0; font-size: 0.95rem; }
+.search-notice { margin: 18px 0 0; padding: 14px 16px; border-left: 4px solid var(--yellow); background: var(--concrete); border-radius: 0 8px 8px 0; color: var(--ink); font-weight: 600; }
 .results-shell { display: grid; gap: 28px; }
 .results-shell.view-grid, .results-shell.view-list { grid-template-columns: 1fr; }
 .results-shell:not(.view-map) .map-placeholder { display: none; }

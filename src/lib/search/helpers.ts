@@ -122,3 +122,8 @@ export function getTokenOverlapScore(queryTokens: string[], candidateTokens: str
 
   return matched.length / queryTokens.length;
 }
+
+/** True when a result only matched through related words or fuzzy overlap, not the search itself. */
+export function isLooseMatch(place: { match_reason?: string | null }): boolean {
+  return /^(Related|Fuzzy)/.test(place.match_reason ?? "");
+}
